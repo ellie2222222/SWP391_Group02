@@ -34,8 +34,8 @@ const jewelrySchema = new Schema( {
     },
     model_type: {
         type: String,
-        default: 'sample'
+        required: true
     }
 })
 
-module.exports = mongoose.model('Jewelry', userSchema)
+module.exports = mongoose.model('Jewelry', jewelrySchema)
