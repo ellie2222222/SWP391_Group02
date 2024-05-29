@@ -6,6 +6,7 @@ const cors = require('cors');
 
 const userRoutes = require('./routes/user')
 const jewelryRoutes = require('./routes/jewelry')
+const requestRoutes = require('./routes/request')
 
 //application
 const app = express()
@@ -22,13 +23,14 @@ app.use((req, res, next) => {
 //router
 app.use('/api/user', userRoutes)
 app.use('/api/jewelry', jewelryRoutes)
+app.use('/api/request', requestRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         // listen 
         app.listen(process.env.PORT, () => {
-            console.log('Listening on port', process.env.PORT)
+            console.log('Connected to database! Listening on port', process.env.PORT)
         })
     })
     .catch((error) => {
