@@ -41,7 +41,7 @@ const createRequest = async (req, res) => {
 
     // add to the database
     try {
-      const request = await Request.create({ user_id: _id, description, status: 'ongoing' })
+      const request = await Request.create({ user_id: _id, description })
       res.status(200).json(request)
     } catch (error) {
       res.status(400).json({ error: error.message })
