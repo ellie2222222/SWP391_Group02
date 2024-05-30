@@ -1,7 +1,7 @@
 const express = require('express')
 const { loginUser, signupUser, deleteUser} = require('../controllers/userController')
 const requireAuth = require('../middleware/requireAuth')
-const requireAdmin = require('../middleware/requireAdmin')
+const {requireAdmin} = require('../middleware/requireRoles')
 
 const userRoutes = express.Router()
 

@@ -1,7 +1,7 @@
 const express = require('express')
 const { getJewelries, getJewelry, createJewelry, deleteJewelry, updateJewelry } = require('../controllers/jewelryController')
 const requireAuth = require('../middleware/requireAuth')
-const requireAdmin = require('../middleware/requireAdmin')
+const {requireAdmin} = require('../middleware/requireRoles')
 
 const jewelryRoutes = express.Router()
 
