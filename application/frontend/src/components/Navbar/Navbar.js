@@ -127,14 +127,14 @@ const Navbar = () => {
                 
                 
                   <CustomListItem button onClick={handleDrawerClose}>
-                  <CustomLink>
+                  <CustomLink to='/blogs'>
                     <ListItemText primary="Blogs" />
                     </CustomLink>
                   </CustomListItem>
                 
                 
                   <CustomListItem button onClick={handleDrawerClose}>
-                  <CustomLink>
+                  <CustomLink to='/aboutus'>
                     <ListItemText primary="About Us" />
                     </CustomLink>
                   </CustomListItem>
@@ -168,10 +168,14 @@ const Navbar = () => {
                   </Link>
                 </Grid>
                 <Grid item xs>
-                  <CustomButton>Blogs</CustomButton>
+                  <Link to='/blogs'>
+                    <CustomButton>Blogs</CustomButton>
+                  </Link>
                 </Grid>
                 <Grid item xs>
-                  <CustomButton>About Us</CustomButton>
+                  <Link to='/aboutus'>
+                    <CustomButton>About Us</CustomButton>
+                  </Link>
                 </Grid>
                 <Grid item xs>
                   <CustomButton>Sales</CustomButton>
