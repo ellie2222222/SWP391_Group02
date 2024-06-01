@@ -1,3 +1,11 @@
+const requireUser = (req, res, next) => {
+  if (req.role !== 'user') {
+    return res.status(403).json({ error: 'Must be a normal user' });
+  }
+
+  next();
+}
+
 const requireAdmin = (req, res, next) => {
   if (req.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
@@ -46,4 +54,5 @@ const requireManagerOrSale = (req, res, next) => {
 
   next();
 }
-module.exports = {requireAdmin, requireManager, requireSales, requireDesigns, requireProductions, requireManagerOrSale};
+
+module.exports = {requireAdmin, requireManager, requireSales, requireDesigns, requireProductions, requireManagerOrSale, requireUser };

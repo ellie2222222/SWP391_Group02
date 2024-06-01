@@ -18,7 +18,7 @@ const jewelrySchema = new Schema( {
         type: Number
     },
     material_id: {
-        ttype: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Material', 
         required: true
     },

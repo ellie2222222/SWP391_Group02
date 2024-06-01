@@ -1,15 +1,18 @@
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth')
-const { getWarranties, getWarranty, createWarranty } = require('../controllers/warrantyController')
+const { getWarranties, getWarranty, createWarranty, deleteWarranty, updateWarranty } = require('../controllers/warrantyController')
+const { requireSales, requireAdmin, requireManager, requireManagerOrSale } = require('../middleware/requireRoles')
 
-const WarrantyRoutes = express.Router()
+const warrantyRoutes = express.Router()
 
-WarrantyRoutes.use(requireAuth)
+warrantyRoutes.use(requireAuth)
 
-WarrantyRoutes.post('/createWarranty', createWarranty)
+warrantyRoutes.post('/createWarranty', createWarranty)
 
-WarrantyRoutes.get('/getWarrantys', getWarranties)
+warrantyRoutes.get('/getWarranties', requireManagerOrSale, getWarranties)
 
-WarrantyRoutes.get('/getWarranty/:id', getWarranty)
+warrantyRoutes.get('/getWarranty/:id', requireManagerOrSale, getWarranty)
+
+warrantyRoutes.patch('/updateWarranty/:id',  requireManagerOrSale, updateWarranty)
 
 module.exports = WarrantyRoutes
