@@ -17,6 +17,6 @@ blogRoutes.patch('/updateBlog',  requireUser, updateBlog)
 
 blogRoutes.delete('/deleteBlog',  requireAdmin, deleteBlog)
 
-requestRoutes.get('/getMyBlogs', requireUser, getMyBlogs)
+blogRoutes.get('/getMyBlogs', requireUser, getMyBlogs)
 
-module.exports = blogRoutes
+module.exports = blogRoutess
