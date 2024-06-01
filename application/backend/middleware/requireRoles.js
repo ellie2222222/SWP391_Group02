@@ -7,37 +7,36 @@ const requireUser = (req, res, next) => {
 }
 
 const requireAdmin = (req, res, next) => {
-  if (req.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
+    if (req.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+  
+    next();
   }
-
-  next();
-}
 
 const requireManager = (req, res, next) => {
-  if (req.role !== 'manager') {
-    return res.status(403).json({ error: 'Manager access required' });
+    if (req.role !== 'manager') {
+      return res.status(403).json({ error: 'Manager access required' });
+    }
+  
+    next();
   }
-
-  next();
-}
 
 const requireSales = (req, res, next) => {
-console.log(req.role)
-  if (req.role !== 'sale_staff') {
-    return res.status(403).json({ error: 'Sale Staff access required' });
+    if (req.role !== 'sale_staff') {
+      return res.status(403).json({ error: 'Sale Staff access required' });
+    }
+  
+    next();
   }
-
-  next();
-}
 
 const requireDesigns = (req, res, next) => {
-  if (req.role !== 'design_staff') {
-    return res.status(403).json({ error: 'Design Staff access required' });
+    if (req.role !== 'design_staff') {
+      return res.status(403).json({ error: 'Design Staff access required' });
+    }
+  
+    next();
   }
-
-  next();
-}
 
 const requireProductions = (req, res, next) => {
   if (req.role !== 'production_staff') {
