@@ -1,6 +1,6 @@
 const requireUser = (req, res, next) => {
   if (req.role !== 'user') {
-    return res.status(403).json({ error: 'Must be a normal user' });
+    return res.status(403).json({ error: 'Must have role user' });
   }
 
   next();

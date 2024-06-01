@@ -51,7 +51,7 @@ const updateQuoteStatus = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'No such Quote' })
+        return res.status(400).json({ error: 'No such quote' })
     }
 
     const allowedStatuses = ["pending", "approved", "rejected"]
