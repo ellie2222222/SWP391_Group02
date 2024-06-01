@@ -16,7 +16,7 @@ const loginUser = async (req, res) => {
     // create a token
     const token = createToken(user._id, user.role);
 
-    res.status(200).json({ email, token, role: user.role });
+    res.status(200).json({ user_id: user._id, email, token, role: user.role });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -35,10 +35,9 @@ const signupUser = async (req, res) => {
       address
     );
 
-    // create a token
     const token = createToken(user._id, user.role);
 
-    res.status(200).json({ email, token, role: user.role });
+    res.status(200).json({ user_id: user._id, email, token, role: user.role });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -50,7 +49,7 @@ const deleteUser = async (req, res) => {
 
   // Convert id to ObjectID
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid user ID" });
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
   try {
@@ -67,11 +66,12 @@ const deleteUser = async (req, res) => {
 };
 
 const assignRole = async (req, res) => {
-  const { user_id, role } = req.body;
+  const { id } = req.params
+  const { role } = req.body;
 
   // check valid user id
-  if (!mongoose.Types.ObjectId.isValid(user_id)) {
-    return res.status(400).json({ error: "Invalid user ID" });
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
   // check valid role
@@ -89,7 +89,7 @@ const assignRole = async (req, res) => {
 
   try {
     const user = await User.findOneAndUpdate(
-      { _id: user_id },
+      { _id: id },
       { $set: { role } },
       { new: true } // Return the updated document
     );

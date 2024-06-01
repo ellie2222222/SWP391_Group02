@@ -9,7 +9,7 @@ userRoutes.post('/login', loginUser)
 
 userRoutes.post('/signup', signupUser)
 
-userRoutes.patch('/assignRole', requireAuth, requireAdmin, assignRole)
+userRoutes.patch('/assignRole/:id', requireAuth, requireAdmin, assignRole)
 
 userRoutes.delete('/delete/:id', requireAuth, requireAdmin, deleteUser);
 

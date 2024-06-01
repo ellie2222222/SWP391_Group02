@@ -14,34 +14,41 @@ const getRequest = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "No such request" });
+    return res.status(404).json({ error: "Invalid ID" });
   }
 
-  const request = await Request.findById(id);
+  try {
+    const request = await Request.findById(id);
 
-  if (!request) {
-    return res.status(404).json({ error: "No such request" });
+    if (!request) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    res.status(200).json(request);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
-
-  res.status(200).json(request);
 };
 
 // get my request
-const getMyRequest = async (req, res) => {
+const getUserRequests = async (req, res) => {
   const { user_id } = req.headers;
 
-  const requests = await Request.find({ user_id: user_id });
+  try {
+    const requests = await Request.find({ user_id: user_id });
 
-  if (!requests) {
-    return res.status(404).json({ error: "No such request" });
+    if (!requests) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    res.status(200).json(requests);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
-
-  res.status(200).json(requests);
 };
 
 // create a new request
 const createRequest = async (req, res) => {
-  console.log("start creating request");
   const { authorization } = req.headers;
   const token = authorization.split(" ")[1];
   const { _id } = jwt.verify(token, process.env.SECRET);
@@ -100,5 +107,5 @@ module.exports = {
   getRequest,
   createRequest,
   updateRequestStatus,
-  getMyRequest,
+  getUserRequests
 };

@@ -13,7 +13,7 @@ const getMaterial = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: 'No such material'})
+        return res.status(404).json({error: 'Invalid ID'})
       }
     
     const material = await Material.findById(id)
@@ -59,7 +59,7 @@ const deleteMaterial = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({error: 'No such material'})
+    return res.status(400).json({error: 'Invalid ID'})
     }
 
     const material = await Material.findOneAndDelete({_id: id})
@@ -76,7 +76,7 @@ const updateMaterial = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({error: 'No such material'})
+        return res.status(400).json({error: 'Invalid ID'})
     }
 
     const material = await Material.findOneAndUpdate({_id: id}, {

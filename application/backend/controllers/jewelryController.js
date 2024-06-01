@@ -13,7 +13,7 @@ const getJewelry = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: 'No such jewelry'})
+        return res.status(404).json({error: 'Invalid ID'})
       }
     
     const jewelry = await Jewelry.findById(id)
@@ -70,7 +70,7 @@ const deleteJewelry = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({error: 'No such jewelry'})
+    return res.status(400).json({error: 'Invalid ID'})
     }
 
     const jewelry = await Jewelry.findOneAndDelete({_id: id})
@@ -87,7 +87,7 @@ const updateJewelry = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({error: 'No such jewelry'})
+        return res.status(400).json({error: 'Invalid ID'})
     }
 
     const jewelry = await Jewelry.findOneAndUpdate({_id: id}, {

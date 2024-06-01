@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('../models/userModel')
-
+const mongoose = require('mongoose')
 
 const requireAuth = async (req, res, next) => {
     const { authorization } = req.headers
@@ -13,6 +12,11 @@ const requireAuth = async (req, res, next) => {
 
     try {
         const { _id, role} = jwt.verify(token, process.env.SECRET)
+
+        if (!mongoose.Types.ObjectId.isValid(_id)) {
+            return res.status(400).json({ error: "Invalid user ID" });
+        }
+
         req.role = role
         next()
     } catch (error) {

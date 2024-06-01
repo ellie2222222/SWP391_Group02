@@ -13,7 +13,7 @@ const getGemstone = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: 'No such gemstone'})
+        return res.status(404).json({error: 'Invalid ID'})
       }
     
     const gemstone = await Gemstone.findById(id)
@@ -68,7 +68,7 @@ const deleteGemstone = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({error: 'No such gemstone'})
+    return res.status(400).json({error: 'Invalid ID'})
     }
 
     const gemstone = await Gemstone.findOneAndDelete({_id: id})
@@ -85,7 +85,7 @@ const updateGemstone = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({error: 'No such gemstone'})
+        return res.status(400).json({error: 'Invalid ID'})
     }
 
     const gemstone = await Gemstone.findOneAndUpdate({_id: id}, {
