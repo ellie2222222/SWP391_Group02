@@ -19,4 +19,4 @@ blogRoutes.delete('/deleteBlog',  requireAdmin, deleteBlog)
 
 blogRoutes.get('/getMyBlogs', requireUser, getMyBlogs)
 
-module.exports = blogRoutess
+module.exports = blogRoutes
