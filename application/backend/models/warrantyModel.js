@@ -3,11 +3,6 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const warrantySchema = new Schema( {
-    warranty_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Warranty', 
-        required: true
-    },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', 
@@ -23,7 +18,8 @@ const warrantySchema = new Schema( {
         required: true,
     },
     warranty_end_date: {
-        type: Date
+        type: Date,
+        required: true
     }
 }, {timestamps: true})
 

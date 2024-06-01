@@ -66,7 +66,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const assignRole = async () => {
+const assignRole = async (req, res) => {
   const { user_id, role } = req.body;
 
   // check valid user id
@@ -89,7 +89,7 @@ const assignRole = async () => {
 
   try {
     const user = await User.findOneAndUpdate(
-      { _id: id },
+      { _id: user_id },
       { $set: { role } },
       { new: true } // Return the updated document
     );

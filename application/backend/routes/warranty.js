@@ -13,6 +13,6 @@ warrantyRoutes.get('/getWarranties', requireManagerOrSale, getWarranties)
 
 warrantyRoutes.get('/getWarranty/:id', requireManagerOrSale, getWarranty)
 
-warrantyRoutes.patch('/updateWarranty/:id',  requireManagerOrSale, updateWarranty)
+warrantyRoutes.patch('/updateWarranty',  requireManagerOrSale, updateWarranty)
 
-module.exports = WarrantyRoutes
+module.exports = warrantyRoutes
