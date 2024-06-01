@@ -28,20 +28,15 @@ const getWarranty = async (req, res) => {
 
 // create a new warranty
 const createWarranty = async (req, res) => {
-    console.log('start creating warranty')
-    const { authorization } = req.headers;
-    const token = authorization.split(' ')[1];
-    const { _id } = jwt.verify(token, process.env.SECRET);
-
-    const { description } = req.body
+    const { warranty_content, user_id, jewelry_id } = req.body
   
-    if (!description) {
+    if (!warranty_content || !user_id || !jewelry_id) {
       return res.status(400).json({error: "Please fill in the required field!"})
     }
 
     // add to the database
     try {
-      const warranty = await warranty.create({ user_id: _id, description })
+      const warranty = await warranty.create({ user_id, jewelry_id, warranty_content })
       res.status(200).json(warranty)
     } catch (error) {
       res.status(400).json({ error: error.message })
