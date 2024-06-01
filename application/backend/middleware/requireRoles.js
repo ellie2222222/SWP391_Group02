@@ -1,3 +1,11 @@
+const requireUser = (req, res, next) => {
+  if (req.role !== 'user') {
+    return res.status(403).json({ error: 'Must be a normal user' });
+  }
+
+  next();
+}
+
 const requireAdmin = (req, res, next) => {
     if (req.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });
@@ -31,10 +39,19 @@ const requireDesigns = (req, res, next) => {
   }
 
 const requireProductions = (req, res, next) => {
-    if (req.role !== 'production_staff') {
-      return res.status(403).json({ error: 'Production Staff access required' });
-    }
-  
-    next();
+  if (req.role !== 'production_staff') {
+    return res.status(403).json({ error: 'Production Staff access required' });
   }
-  module.exports = {requireAdmin, requireManager, requireSales, requireDesigns, requireProductions};
+
+  next();
+}
+
+const requireManagerOrSale = (req, res, next) => {
+  if (req.role !== 'sale_staff' && req.role !== 'manager') {
+    return res.status(403).json({ error: 'Sale Staff or Manager access required' });
+  }
+
+  next();
+}
+
+module.exports = {requireAdmin, requireManager, requireSales, requireDesigns, requireProductions, requireManagerOrSale, requireUser };

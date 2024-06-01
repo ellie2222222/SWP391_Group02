@@ -2,29 +2,29 @@ const mongoose = require('mongoose')
 
 const Schema = mongoose.Schema
 
-const requestSchema = new Schema( {
-    user_id: { 
+const quoteSchema = new Schema( {
+    user_id: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User', 
         required: true 
     },
-    description: {
+    content: {
         type: String,
         required: true
     },
-    quote_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Quote'
+    amount: {
+        type: Number,
+        required: true
     },
     status: {
         type: String,
         required: true,
-        enum: ['ongoing', 'completed'],
-        default: 'ongoing'
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
     },
     endedAt: {
         type: Date
     }
 }, {timestamps: true})
 
-module.exports = mongoose.model('Request', requestSchema)
+module.exports = mongoose.model('Quote', quoteSchema)

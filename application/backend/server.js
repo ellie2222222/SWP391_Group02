@@ -6,9 +6,8 @@ const cors = require('cors');
 
 const userRoutes = require('./routes/user')
 const jewelryRoutes = require('./routes/jewelry')
-const requestRoutes = require('./routes/request');
-const materialRoutes = require('./routes/material');
-const gemstoneRoutes = require('./routes/gemstone');
+const requestRoutes = require('./routes/request')
+const quoteRoutes = require('./routes/quote')
 
 //application
 const app = express()
@@ -26,8 +25,7 @@ app.use((req, res, next) => {
 app.use('/api/user', userRoutes)
 app.use('/api/jewelry', jewelryRoutes)
 app.use('/api/request', requestRoutes)
-app.use('/api/material', materialRoutes)
-app.use('/api/gemstone', gemstoneRoutes)
+app.use('/api/quote', quoteRoutes)
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
