@@ -12,6 +12,7 @@ const gemstoneRoutes = require('./routes/gemstone')
 const quoteRoutes = require('./routes/quote')
 const warrantyRoutes = require('./routes/warranty')
 const blogRoutes = require('./routes/blog')
+const worksonRoutes = require('./routes/workson')
 //application
 const app = express()
 
@@ -32,7 +33,8 @@ app.use('/api/quote', quoteRoutes)
 app.use('/api/material', materialRoutes)
 app.use('/api/gemstone', gemstoneRoutes)
 app.use('/api/warranty', warrantyRoutes)
-app.use('/api/blog', blogRoutes)  
+app.use('/api/blog', blogRoutes) 
+app.use('/api/workson', worksonRoutes) 
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
