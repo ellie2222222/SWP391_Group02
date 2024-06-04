@@ -35,7 +35,7 @@ const getJewelry = async (req, res) => {
 
 // create a new jewelry
 const createJewelry = async (req, res) => {
-    const { name, description, gemstone_id, gemstone_weight, material_id, material_weight, price, category, model_type } = req.body
+    const { name, description, gemstone_id, gemstone_weight, material_id, material_weight, price, category, model_type, images } = req.body
   
     let emptyFields = []
     
@@ -66,11 +66,11 @@ const createJewelry = async (req, res) => {
   
     // add to the database
     try {
-      const jewelry = await Jewelry.create({ name, description, gemstone_id, gemstone_weight, material_id, material_weight, price, category, model_type })
+      const jewelry = await Jewelry.create({ name, description, gemstone_id, gemstone_weight, material_id, material_weight, price, category, model_type, images })
 
       res.status(201).json(jewelry)
     } catch (error) {
-      res.status(500).json({ error: 'Error while creating jewelry' });
+      res.status(500).json({ error: error.message });
     }
   }
 

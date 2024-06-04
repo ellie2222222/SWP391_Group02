@@ -20,7 +20,7 @@ const getRequest = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "Invalid ID" });
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
   try {
@@ -33,7 +33,7 @@ const getRequest = async (req, res) => {
     res.status(200).json(request);
   } catch (error) {
     console.error('Error fetching request:', error);
-    res.status(500).json({ error: "An error occurred while fetching the request" });
+    res.status(500).json({ error: "An error occurred while fetching request" });
   }
 };
 
@@ -54,7 +54,7 @@ const getMyRequests = async (req, res) => {
     res.status(200).json(requests);
   } catch (error) {
     console.error('Error fetching request:', error);
-    res.status(500).json({ error: "An error occurred while fetching user requests" });
+    res.status(500).json({ error: "An error occurred while fetching your requests" });
   }
 };
 
@@ -63,7 +63,7 @@ const getUserRequests = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "Invalid ID" });
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
   try {
@@ -96,13 +96,13 @@ const getStaffRequests = async (req, res) => {
 
     // Check if requests exist
     if (requests.length === 0) {
-      return res.status(404).json({ error: "No requests found for this user" });
+      return res.status(404).json({ error: "No requests found for this staff" });
     }
 
     res.status(200).json(requests);
   } catch (error) {
     console.error('Error fetching request:', error);
-    res.status(500).json({ error: "An error occurred while fetching user requests" });
+    res.status(500).json({ error: "An error occurred while fetching staff requests" });
   }
 };
 
@@ -129,35 +129,49 @@ const createRequest = async (req, res) => {
   }
 };
 
-// update request status
-const updateRequestStatus = async (req, res) => {
+// update request 
+const updateRequest = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "No such request" });
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
-  // check valid status
-  const allowedStatuses = ["ongoing", "completed"];
+  if (req.body.status) {
+    // check valid status
+    const allowedStatuses = ["ongoing", "completed"];
 
-  if (!allowedStatuses.includes(req.body.status)) {
-    return res.status(400).json({ error: "Invalid status" });
+    if (!allowedStatuses.includes(req.body.status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
+  }
+
+  if (req.body.jewelry_ids && req.body.jewelry_ids.length !== new Set(req.body.jewelry_ids).size) {
+    return res.status(400).json({ error: "Duplicate jewelry IDs found" });
+  }
+
+  if (req.body.jewelry_ids && req.body.jewelry_ids.some(id => !mongoose.Types.ObjectId.isValid(id))) {
+    return res.status(400).json({ error: "Invalid jewelry ID(s)" });
   }
 
   try {
     const request = await Request.findOneAndUpdate(
       { _id: id },
-      { $set: { status: req.body.status } },
-      { new: true } // Return the updated document
+      { $set: { 
+        status: req.body.status, 
+        jewelry_ids: req.body.jewelry_ids
+      }},
+      { new: true, // Return the updated document
+      runValidators: true }
     );
 
     if (!request) {
-      return res.status(400).json({ error: "No such request" });
+      return res.status(404).json({ error: "No such request" });
     }
 
-    res.status(200).json(quote);
+    res.status(200).json(request);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -165,8 +179,8 @@ module.exports = {
   getRequests,
   getRequest,
   createRequest,
-  updateRequestStatus,
+  updateRequest,
   getUserRequests,
   getStaffRequests,
-  getMyRequests
+  getMyRequests,
 };

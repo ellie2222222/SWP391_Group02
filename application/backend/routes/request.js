@@ -1,6 +1,6 @@
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth')
-const { getRequests, getRequest, createRequest, getUserRequests, getStaffRequests, getMyRequests } = require('../controllers/requestController')
+const { getRequests, getRequest, createRequest, getUserRequests, getStaffRequests, getMyRequests, updateRequest } = require('../controllers/requestController')
 const { requireUser, requireAdmin, requireManager, requireManagerOrStaff } = require('../middleware/requireRoles')
 
 const requestRoutes = express.Router()
@@ -23,5 +23,7 @@ requestRoutes.get('/getMyRequests', requireUser, getMyRequests)
 
 // Get all requests one staff works ons
 requestRoutes.get('/getStaffRequests', requireManagerOrStaff, getStaffRequests)
+
+requestRoutes.patch('/updateRequest/:id', requireManager, updateRequest)
 
 module.exports = requestRoutes

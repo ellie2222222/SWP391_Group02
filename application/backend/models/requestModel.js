@@ -22,6 +22,10 @@ const requestSchema = new Schema( {
         enum: ['ongoing', 'completed'],
         default: 'ongoing'
     },
+    jewelry_ids: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Jewelry'
+    }],
     endedAt: {
         type: Date
     }

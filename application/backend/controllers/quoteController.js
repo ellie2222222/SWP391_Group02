@@ -76,7 +76,7 @@ const updateQuoteStatus = async (req, res) => {
             { _id: id },
             { $set: { status: req.body.status } },
             { new: true, // Return the updated document
-            runValidators: true } // Return the updated document
+            runValidators: true } 
         );
 
         if (!quote) {

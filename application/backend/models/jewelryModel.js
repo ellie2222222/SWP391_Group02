@@ -37,7 +37,10 @@ const jewelrySchema = new Schema( {
     model_type: {
         type: String,
         required: true
-    }
+    },
+    images: [{
+        type: String
+    }]
 }, {timestamps: true})
 
 module.exports = mongoose.model('Jewelry', jewelrySchema)
