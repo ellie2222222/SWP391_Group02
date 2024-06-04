@@ -1,4 +1,4 @@
-const Workson = require('../models/worksonModel')
+const WorksOn = require('../models/worksOnModel')
 const Request = require('../models/requestModel')
 const User = require('../models/userModel')
 
@@ -16,8 +16,8 @@ const checkStaffRole = async (staff_id) => {
     }
 };
 
-// Create a new Workson
-const createWorkson = async (req, res) => {
+// Create a new WorksOn
+const createWorksOn = async (req, res) => {
     try {
         const { request_id, staff_ids, endedAt } = req.body;
 
@@ -30,52 +30,52 @@ const createWorkson = async (req, res) => {
         // Check staff_ids
         await checkStaffRoles(staff_ids);
 
-        const workson = new Workson({
+        const worksOn = new WorksOn({
             request_id,
             staff_ids,
             endedAt
         });
 
-        await workson.save()
+        await worksOn.save()
 
-        res.status(201).json(workson)
+        res.status(201).json(worksOn)
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 };
 
-// Get a Workson by ID
-const getWorksonById = async (req, res) => {
+// Get a WorksOn by ID
+const getWorksOnById = async (req, res) => {
     try {
-        const workson = await Workson.findById(req.params.id)
+        const worksOn = await WorksOn.findById(req.params.id)
             // .populate('request_id')
-            // .populate('staff_ids');
+            .populate('staff_ids');
 
-        if (!workson) {
-            return res.status(404).json({ message: 'Workson not found' })
+        if (!worksOn) {
+            return res.status(404).json({ message: 'WorksOn not found' })
         }
 
-        res.json(workson);
+        res.json(worksOn);
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 };
 
-// Get all Worksons
-const getAllWorksons = async (req, res) => {
+// Get all WorksOns
+const getAllWorksOns = async (req, res) => {
     try {
-        const worksons = await Workson.find()
+        const worksOns = await WorksOn.find()
             // .populate('request_id')
-            // .populate('staff_ids');
+            .populate('staff_ids');
 
-        res.json(worksons);
+        res.json(worksOns);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
-// Update a Workson by ID
-const updateWorksonById = async (req, res) => {
+// Update a WorksOn by ID
+const updateWorksOnById = async (req, res) => {
     try {
         const { request_id, staff_ids, endedAt } = req.body;
 
@@ -88,94 +88,95 @@ const updateWorksonById = async (req, res) => {
         // Check if all staff_ids exist and have the appropriate role
         await checkStaffRoles(staff_ids);
 
-        const workson = await Workson.findByIdAndUpdate(
+        const worksOn = await WorksOn.findByIdAndUpdate(
             req.params.id,
             {
                 request_id,
                 staff_ids,
                 endedAt
             },
-            { new: true }
+            { new: true, // Return the updated document
+            runValidators: true }
         );
 
-        if (!workson) {
-            return res.status(404).json({ message: 'Workson not found' })
+        if (!worksOn) {
+            return res.status(404).json({ message: 'WorksOn not found' })
         }
 
-        res.json(workson);
+        res.json(worksOn);
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 };
 
-// Delete a Workson by ID
-const deleteWorksonById = async (req, res) => {
+// Delete a WorksOn by ID
+const deleteWorksOnById = async (req, res) => {
     try {
-        const workson = await Workson.findByIdAndDelete(req.params.id);
+        const worksOn = await WorksOn.findByIdAndDelete(req.params.id);
 
-        if (!workson) {
-            return res.status(404).json({ message: 'Workson not found' })
+        if (!worksOn) {
+            return res.status(404).json({ message: 'WorksOn not found' })
         }
 
-        res.json({ message: 'Workson deleted successfully' })
+        res.json({ message: 'WorksOn deleted successfully' })
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 };
 
-// Add a staff member to a Workson
-const addStaffToWorkson = async (req, res) => {
+// Add a staff member to a WorksOn
+const addStaffToWorksOn = async (req, res) => {
     try {
         const { id, staff_id } = req.params
 
-        // Check if the Workson exists
-        const workson = await Workson.findById(id)
-        if (!workson) {
-            return res.status(404).json({ message: 'Workson not found' })
+        // Check if the WorksOn exists
+        const worksOn = await WorksOn.findById(id)
+        if (!worksOn) {
+            return res.status(404).json({ message: 'WorksOn not found' })
         }
 
         // Check if the staff_id is valid and has the appropriate role
         await checkStaffRole(staff_id);
 
         // Add staff_id to the staff_ids array if it's not already included
-        if (!workson.staff_ids.includes(staff_id)) {
-            workson.staff_ids.push(staff_id)
-            await workson.save()
+        if (!worksOn.staff_ids.includes(staff_id)) {
+            worksOn.staff_ids.push(staff_id)
+            await worksOn.save()
         }
 
-        res.json(workson)
+        res.json(worksOn)
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 };
 
-// Remove a staff member from a Workson
-const removeStaffFromWorkson = async (req, res) => {
+// Remove a staff member from a WorksOn
+const removeStaffFromWorksOn = async (req, res) => {
     try {
         const { id, staff_id } = req.params
 
-        // Check if the Workson exists
-        const workson = await Workson.findById(id)
-        if (!workson) {
-            return res.status(404).json({ message: 'Workson not found' });
+        // Check if the WorksOn exists
+        const worksOn = await WorksOn.findById(id)
+        if (!worksOn) {
+            return res.status(404).json({ message: 'WorksOn not found' });
         }
 
         // Remove staff_id from the staff_ids array
-        workson.staff_ids = workson.staff_ids.filter(id => id.toString() !== staff_id);
-        await workson.save();
+        worksOn.staff_ids = worksOn.staff_ids.filter(id => id.toString() !== staff_id);
+        await worksOn.save();
 
-        res.json(workson);
+        res.json(worksOn);
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
 
 module.exports = {
-    createWorkson,
-    getWorksonById,
-    getAllWorksons,
-    updateWorksonById,
-    deleteWorksonById,
-    addStaffToWorkson,
-    removeStaffFromWorkson
+    createWorksOn,
+    getWorksOnById,
+    getAllWorksOns,
+    updateWorksOnById,
+    deleteWorksOnById,
+    addStaffToWorksOn,
+    removeStaffFromWorksOn
 }

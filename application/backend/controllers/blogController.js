@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const getBlogs = async (req, res) => {
     const blogs = await Blog.find({})
 
-    res.status(200).json(materials)
+    res.status(200).json(blogs)
 }
 
 // get one blog
@@ -13,7 +13,7 @@ const getBlog = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: 'No such blog'})
+        return res.status(404).json({error: 'Invalid ID'})
       }
     
     const blog = await Blog.findById(id)
@@ -29,7 +29,7 @@ const getBlog = async (req, res) => {
 const getMyBlogs = async (req, res) => {
     const { user_id } = req.headers;
   
-    const requests = await Blog.find({ user_id: user_id });
+    const blog = await Blog.find({ user_id: user_id });
   
     if (!blog) {
       return res.status(404).json({ error: "No such blog" });
@@ -81,7 +81,8 @@ const updateBlog = async (req, res) => {
     const blog = await Blog.findOneAndUpdate(
       { _id: blog_id },
       { $set: updateData },
-      { new: true } // Return the updated document
+      { new: true, // Return the updated document
+      runValidators: true } // Return the updated document
   );
     if (!blog) {
     return res.status(400).json({error: 'No such blog'})

@@ -3,9 +3,13 @@ const mongoose = require('mongoose')
 
 // get all jewelries
 const getJewelries = async (req, res) => {
-    const jewelries = await Jewelry.find({})
+    try {
+      const jewelries = await Jewelry.find({})
 
-    res.status(200).json(jewelries)
+      res.status(200).json(jewelries)
+    } catch (error) {
+      res.status(500).json({ error: 'Error while getting jewelries' });
+    }
 }
 
 // get one jewelry
@@ -13,21 +17,25 @@ const getJewelry = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: 'Invalid ID'})
-      }
-    
-    const jewelry = await Jewelry.findById(id)
-    
-    if (!jewelry) {
-        return res.status(404).json({error: 'No such jewelry'})
+      return res.status(400).json({error: 'Invalid ID'})
     }
     
-    res.status(200).json(jewelry)
+    try {
+      const jewelry = await Jewelry.findById(id)
+      
+      if (!jewelry) {
+          return res.status(404).json({error: 'No such jewelry'})
+      }
+      
+      res.status(200).json(jewelry)
+    } catch (error) {
+      res.status(500).json({ error: 'Error while getting a jewelry' });
+    }
 }
 
 // create a new jewelry
 const createJewelry = async (req, res) => {
-    const { name, description, gemstone, gemstone_weight, material, material_weight, price, category, model_type } = req.body
+    const { name, description, gemstone_id, gemstone_weight, material_id, material_weight, price, category, model_type } = req.body
   
     let emptyFields = []
     
@@ -37,7 +45,7 @@ const createJewelry = async (req, res) => {
     if (!description) {
       emptyFields.push('description')
     }
-    if (!material) {
+    if (!material_id) {
         emptyFields.push('material')
     }
     if (!material_weight) {
@@ -58,10 +66,11 @@ const createJewelry = async (req, res) => {
   
     // add to the database
     try {
-      const jewelry = await Jewelry.create({ name, description, gemstone, gemstone_weight, material, material_weight, price, category, model_type })
-      res.status(200).json(jewelry)
+      const jewelry = await Jewelry.create({ name, description, gemstone_id, gemstone_weight, material_id, material_weight, price, category, model_type })
+
+      res.status(201).json(jewelry)
     } catch (error) {
-      res.status(400).json({ error: error.message })
+      res.status(500).json({ error: 'Error while creating jewelry' });
     }
   }
 
@@ -72,14 +81,17 @@ const deleteJewelry = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({error: 'Invalid ID'})
     }
+    try {
+      const jewelry = await Jewelry.findOneAndDelete({_id: id})
 
-    const jewelry = await Jewelry.findOneAndDelete({_id: id})
+      if (!jewelry) {
+      return res.status(404).json({error: 'No such jewelry'})
+      }
 
-    if(!jewelry) {
-    return res.status(400).json({error: 'No such jewelry'})
+      res.status(200).json(jewelry)
+    } catch (error) {
+      res.status(500).json({ error: 'Error while deleting jewelry' });
     }
-
-    res.status(200).json(jewelry)
 }
   
 // update a jewelry
@@ -90,15 +102,22 @@ const updateJewelry = async (req, res) => {
         return res.status(400).json({error: 'Invalid ID'})
     }
 
-    const jewelry = await Jewelry.findOneAndUpdate({_id: id}, {
-        ...req.body
-    })
+    try {
+      const jewelry = await Jewelry.findOneAndUpdate(
+        {_id: id},
+        req.body,
+        { new: true, // Return the updated document
+        runValidators: true }
+      )
 
-    if (!jewelry) {
-    return res.status(400).json({error: 'No such jewelry'})
+      if (!jewelry) {
+      return res.status(404).json({error: 'No such jewelry'})
+      }
+
+      res.status(200).json(jewelry)
+    } catch (error) {
+      res.status(500).json({ error: 'Error while updating jewelry' });
     }
-
-    res.status(200).json(jewelry)
 }
 
 module.exports = { getJewelries, getJewelry, createJewelry, deleteJewelry, updateJewelry }

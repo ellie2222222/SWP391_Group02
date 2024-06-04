@@ -18,7 +18,7 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({ user_id: user._id, email, token, role: user.role });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -37,7 +37,7 @@ const signupUser = async (req, res) => {
 
     const token = createToken(user._id, user.role);
 
-    res.status(200).json({ user_id: user._id, email, token, role: user.role });
+    res.status(201).json({ user_id: user._id, email, token, role: user.role });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -61,7 +61,8 @@ const deleteUser = async (req, res) => {
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: "An error occurred while deleting the user" });
   }
 };
 
@@ -95,10 +96,13 @@ const assignRole = async (req, res) => {
     );
 
     if (user) {
-      return res.status(200).json({user});
+      return res.status(200).json({ user });
+    } else {
+      return res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('Error assigning role:', error);
+    return res.status(500).json({ error: "An error occurred while assigning the role" });
   }
 };
 

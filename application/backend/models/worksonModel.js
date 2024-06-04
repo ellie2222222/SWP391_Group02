@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const worksonSchema = new Schema({
+const worksOnSchema = new Schema({
     request_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Request',
@@ -18,4 +18,4 @@ const worksonSchema = new Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Workson', worksonSchema);
+module.exports = mongoose.model('WorksOn', worksOnSchema);

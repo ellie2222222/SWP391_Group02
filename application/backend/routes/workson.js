@@ -1,22 +1,22 @@
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth')
 const { requireManager } = require('../middleware/requireRoles')
-const { createWorkson, getWorksonById, getAllWorksons, updateWorksonById, deleteWorksonById, addStaffToWorkson, removeStaffFromWorkson} = require('../controllers/worksonController');
+const { createWorksOn, getWorksOnById, getAllWorksOns, updateWorksOnById, deleteWorksOnById, addStaffToWorksOn, removeStaffFromWorksOn} = require('../controllers/worksOnController');
 
-const worksonRoutes = express.Router()
+const worksOnRoutes = express.Router()
 
-worksonRoutes.post('/createWorkson', requireAuth, requireManager, createWorkson)
+worksOnRoutes.post('/createWorksOn', requireAuth, requireManager, createWorksOn)
 
-worksonRoutes.get('/getWorksonById/:id', requireAuth, requireManager, getWorksonById)
+worksOnRoutes.get('/getWorksOnById/:id', requireAuth, requireManager, getWorksOnById)
 
-worksonRoutes.get('/getAllWorksons', requireAuth, requireManager, getAllWorksons)
+worksOnRoutes.get('/getAllWorksOns', requireAuth, requireManager, getAllWorksOns)
 
-worksonRoutes.patch('/updateWorksonById/:id', requireAuth, requireManager, updateWorksonById)
+worksOnRoutes.patch('/updateWorksOnById/:id', requireAuth, requireManager, updateWorksOnById)
 
-worksonRoutes.delete('/deleteWorksonById/:id', requireAuth, requireManager, deleteWorksonById)
+worksOnRoutes.delete('/deleteWorksOnById/:id', requireAuth, requireManager, deleteWorksOnById)
 
-worksonRoutes.patch('/:id/add-staff/:staff_id', requireAuth, requireManager, addStaffToWorkson);
+worksOnRoutes.patch('/:id/add-staff/:staff_id', requireAuth, requireManager, addStaffToWorksOn);
 
-worksonRoutes.patch('/:id/remove-staff/:staff_id', requireAuth, requireManager, removeStaffFromWorkson);
+worksOnRoutes.patch('/:id/remove-staff/:staff_id', requireAuth, requireManager, removeStaffFromWorksOn);
 
-module.exports = worksonRoutes;
+module.exports = worksOnRoutes;

@@ -12,7 +12,7 @@ const gemstoneSchema = new Schema( {
         required: true
     },
     carat: {
-        type: String,
+        type: Number,
         required: true
     },
     cut: {
