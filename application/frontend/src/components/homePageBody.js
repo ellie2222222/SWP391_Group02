@@ -1,10 +1,10 @@
 import React from 'react';
-import { Container, Typography, Button, Box, styled, useMediaQuery, useTheme, Grid, Card, CardMedia, CardContent, Paper } from '@mui/material';
+import { Container, Typography, Button, Box, styled, Grid, Card, CardMedia, CardContent } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import VerifiedIcon from '@mui/icons-material/Verified';
 
-const Banner = styled(Box)(({ theme }) => ({
+const Banner = styled(Box) ({
     backgroundImage: 'url(https://www.tierra.vn/files/2560x/main-banner-homepage-copy-r8w7lY2k3z.webp)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
@@ -16,11 +16,8 @@ const Banner = styled(Box)(({ theme }) => ({
     textShadow: '2px 2px 4px rgba(0,0,0,0.7)', // Optional for better text visibility
     flexDirection: 'column',
     textAlign: 'center',
-}));
-
-const CustomCardMedia = styled(CardMedia)({
-    height: '500px',
 });
+
 
 const items = [
     {
@@ -67,7 +64,7 @@ const CustomButton = styled(Button)({
     textTransform: 'uppercase',
     width: '100%',
     height: '100%', // Chiếm toàn bộ chiều cao của Grid item
-    fontSize: '1rem',
+    fontSize: '1.6rem',
     fontWeight: '400',
     '&:hover': {
         backgroundColor: 'transparent', // Xóa hiệu ứng viền mặc định
@@ -86,6 +83,7 @@ const CustomButton1 = styled(Button)({
     border: '1px solid #000',
     color: '#000',
     width: '100%',
+    fontSize:'1.6rem',
     '&:hover': {
         color: '#b48c72', // Thay đổi màu chữ khi hover
         border: '1px solid #b48c72',
@@ -94,8 +92,7 @@ const CustomButton1 = styled(Button)({
 });
 
 const HomePageBody = () => {
-    const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    
 
     return (
         <Box>
@@ -114,10 +111,10 @@ const HomePageBody = () => {
                                     alt={item.title}
                                 />
                                 <CardContent>
-                                    <Typography variant="h6" component="div">
+                                    <Typography variant="h4" component="div">
                                         {item.title}
                                     </Typography>
-                                    <Typography variant="body2" color="textSecondary">
+                                    <Typography variant="h6" color="textSecondary">
                                         {item.discount}
                                     </Typography>
                                     <Box mt={2}>
@@ -141,10 +138,10 @@ const HomePageBody = () => {
                         {/* Text Content */}
                         <Grid item xs={12} md={4} marginBottom="20px">
                             <Box>
-                                <Typography variant="h4" gutterBottom>
+                                <Typography variant="h3" gutterBottom>
                                     Nhẫn Cầu Hôn
                                 </Typography>
-                                <Typography variant="body1" color="textSecondary" paragraph>
+                                <Typography variant="h5" color="textSecondary" paragraph>
                                     Một chiếc nhẫn lấp lánh trao tay, mở ra hành trình yêu thương viên mãn.
                                 </Typography>
                                 <CustomButton1 variant="outlined" color="primary">
@@ -200,14 +197,14 @@ const HomePageBody = () => {
                         {/* Text Content */}
                         <Grid item xs={12} md={4} marginBottom="20px">
                             <Box>
-                                <Typography variant="h4" gutterBottom>
-                                    Nhẫn Cầu Hôn
+                                <Typography variant="h3" gutterBottom>
+                                    Custom Ring
                                 </Typography>
-                                <Typography variant="body1" color="textSecondary" paragraph>
+                                <Typography variant="h5" color="textSecondary" paragraph>
                                     Một chiếc nhẫn lấp lánh trao tay, mở ra hành trình yêu thương viên mãn.
                                 </Typography>
                                 <CustomButton1 variant="outlined" color="primary">
-                                    XEM THÊM
+                                    Custom
                                 </CustomButton1>
                             </Box>
                         </Grid>
@@ -239,7 +236,7 @@ const HomePageBody = () => {
                     {/* Right Side - Text and Icons */}
                     <Grid item xs={12} md={6}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-                            <Typography variant="h4" component="div" mb={4}>
+                            <Typography variant="h3" component="div" mb={4}>
                                 Dịch vụ của chúng tôi
                             </Typography>
                             <Box display="flex" alignItems="center" mb={2}>
