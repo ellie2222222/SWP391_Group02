@@ -1,6 +1,8 @@
 const Warranty = require("../models/warrantyModel");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
+const Jewelry = require("../models/jewelryModel");
 
 // get all warranties
 const getWarranties = async (req, res) => {
@@ -51,12 +53,25 @@ const createWarranty = async (req, res) => {
     return res.status(400).json({ error: "Invalid warranty end date" });
   }
 
-  if (!mongoose.Types.ObjectId.isValid(user_id) || !mongoose.Types.ObjectId.isValid(jewelry_id)) {
-    return res.status(400).json({ error: "Invalid user or jewelry ID" });
+  if (!mongoose.Types.ObjectId.isValid(user_id)) {
+    return res.status(400).json({ error: "Invalid user ID" });
+  }
+  if (!mongoose.Types.ObjectId.isValid(jewelry_id)) {
+    return res.status(400).json({ error: "Invalid jewelry ID" });
   }
 
   // Add to the database
   try {
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const jewelry = await Jewelry.findById(jewelry_id);
+    if (!jewelry) {
+      return res.status(404).json({ error: "Jewelry not found" });
+    }
+
     const warranty = await Warranty.create({
       user_id,
       jewelry_id,
@@ -67,7 +82,7 @@ const createWarranty = async (req, res) => {
     res.status(201).json(warranty);
   } catch (error) {
     console.error('Error creating warranty:', error);
-    res.status(500).json({ error: "An error occurred while creating the warranty" });
+    res.status(500).json({ error: error.message });
   }
 };  
 

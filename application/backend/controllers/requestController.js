@@ -83,7 +83,6 @@ const getUserRequests = async (req, res) => {
 // get staff requests
 const getStaffRequests = async (req, res) => {
   try {
-    
     const { authorization } = req.headers
     const token = authorization.split(' ')[1]
     const { _id } = jwt.verify(token, process.env.SECRET)
@@ -95,7 +94,7 @@ const getStaffRequests = async (req, res) => {
     const requests = await Request.find({ _id: { $in: requestIds } });
 
     // Check if requests exist
-    if (requests.length === 0) {
+    if (requests) {
       return res.status(404).json({ error: "No requests found for this staff" });
     }
 
@@ -129,40 +128,66 @@ const createRequest = async (req, res) => {
   }
 };
 
-// update request 
-const updateRequest = async (req, res) => {
+// Update request status
+const updateRequestStatus = async (req, res) => {
   const { id } = req.params;
+  const { status } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: "Invalid ID" });
   }
 
-  if (req.body.status) {
-    // check valid status
-    const allowedStatuses = ["ongoing", "completed"];
+  const allowedStatuses = ["ongoing", "completed"];
 
-    if (!allowedStatuses.includes(req.body.status)) {
-      return res.status(400).json({ error: "Invalid status" });
-    }
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: "Invalid status" });
   }
 
-  if (req.body.jewelry_ids && req.body.jewelry_ids.length !== new Set(req.body.jewelry_ids).size) {
+  try {
+    const request = await Request.findOneAndUpdate(
+      { _id: id },
+      { $set: { status } },
+      { new: true, runValidators: true }
+    );
+
+    if (!request) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    res.status(200).json(request);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update request jewelry
+const updateRequestJewelry = async (req, res) => {
+  const { id } = req.params;
+  const { jewelry_ids } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+  
+  if (jewelry_ids && !Array.isArray(jewelry_ids)) {
+    return res.status(400).json({ error: "Jewelry IDs should be an array" });
+  }
+
+  // Check for duplicate jewelry IDs
+  if (jewelry_ids && jewelry_ids.length !== new Set(jewelry_ids).size) {
     return res.status(400).json({ error: "Duplicate jewelry IDs found" });
   }
 
-  if (req.body.jewelry_ids && req.body.jewelry_ids.some(id => !mongoose.Types.ObjectId.isValid(id))) {
+  // Check for invalid ObjectIds in the array
+  if (jewelry_ids && jewelry_ids.some(jewelryId => !mongoose.Types.ObjectId.isValid(jewelryId))) {
     return res.status(400).json({ error: "Invalid jewelry ID(s)" });
   }
 
   try {
     const request = await Request.findOneAndUpdate(
       { _id: id },
-      { $set: { 
-        status: req.body.status, 
-        jewelry_ids: req.body.jewelry_ids
-      }},
-      { new: true, // Return the updated document
-      runValidators: true }
+      { $set: { jewelry_ids } },
+      { new: true, runValidators: true }
     );
 
     if (!request) {
@@ -179,7 +204,8 @@ module.exports = {
   getRequests,
   getRequest,
   createRequest,
-  updateRequest,
+  updateRequestStatus,
+  updateRequestJewelry,
   getUserRequests,
   getStaffRequests,
   getMyRequests,
