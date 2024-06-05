@@ -36,6 +36,7 @@ const jewelrySchema = new Schema( {
     },
     model_type: {
         type: String,
+        enum: ["Sample", "Custom"],
         required: true
     },
     images: [{

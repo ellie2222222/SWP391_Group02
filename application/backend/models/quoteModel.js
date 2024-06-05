@@ -8,6 +8,11 @@ const quoteSchema = new Schema( {
         ref: 'User', 
         required: true 
     },
+    request_id: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Request', 
+        required: true 
+    },
     content: {
         type: String,
         required: true

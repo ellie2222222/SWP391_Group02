@@ -12,10 +12,6 @@ const requestSchema = new Schema( {
         type: String,
         required: true
     },
-    quote_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Quote'
-    },
     status: {
         type: String,
         required: true,

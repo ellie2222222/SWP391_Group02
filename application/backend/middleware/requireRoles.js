@@ -62,4 +62,11 @@ const requireManagerOrStaff = (req, res, next) => {
   next();
 }
 
-module.exports = {requireAdmin, requireManager, requireSales, requireDesigns, requireProductions, requireManagerOrSale, requireUser, requireManagerOrStaff };
+const requireManagerOrDesign = (req, res, next) => {
+  if (req.role !== 'design_staff' && req.role !== 'manager') {
+    return res.status(403).json({ error: 'Design or Manager access required' });
+  }
+
+  next();
+}
+module.exports = {requireAdmin, requireManager, requireSales, requireDesigns, requireProductions, requireManagerOrSale, requireUser, requireManagerOrStaff, requireManagerOrDesign };

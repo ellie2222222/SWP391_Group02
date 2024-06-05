@@ -16,14 +16,17 @@ const gemstoneSchema = new Schema( {
         required: true
     },
     cut: {
+        enum: ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'],
         type: String,
         required: true
     },
     clarity: {
+        enum:  ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', 'I2', 'I3'],
         type: String,
         required: true
     },
     color: {
+        enum: ['Colorless', 'Near Colorless', 'Faint Yellow', 'Very Light Yellow', 'Light Yellow'],
         type: String,
         required: true
     }
