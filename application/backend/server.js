@@ -14,6 +14,7 @@ const warrantyRoutes = require('./routes/warranty')
 const blogRoutes = require('./routes/blog')
 const worksonRoutes = require('./routes/workson');
 const productionRoutes = require('./routes/production');
+const designRoutes = require('./routes/design');
 //application
 const app = express()
 
@@ -37,6 +38,7 @@ app.use('/api/warranty', warrantyRoutes)
 app.use('/api/blog', blogRoutes) 
 app.use('/api/workson', worksonRoutes) 
 app.use('/api/production', productionRoutes) 
+app.use('/api/design', designRoutes) 
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
