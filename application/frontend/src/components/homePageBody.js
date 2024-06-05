@@ -17,9 +17,11 @@ const Banner = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     textAlign: 'center',
 }));
+
 const CustomCardMedia = styled(CardMedia)({
     height: '500px',
 });
+
 const items = [
     {
         image: 'https://www.tierra.vn/files/450x/banner-homepage-2-EYD97kmwoZ.webp', // Replace with actual image URL
@@ -40,6 +42,7 @@ const items = [
         actionText: 'Khám phá ngay'
     }
 ];
+
 const ringItems = [
     {
         label: 'Solitaire',
@@ -58,6 +61,7 @@ const ringItems = [
         image: 'https://www.tierra.vn/files/halo-A7tL5Eltco.webp'
     }
 ];
+
 const CustomButton = styled(Button)({
     color: '#000',
     textTransform: 'uppercase',
@@ -76,6 +80,7 @@ const CustomButton = styled(Button)({
         borderRadius: '0',
     },
 });
+
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     border: '1px solid #000',
@@ -93,7 +98,7 @@ const HomePageBody = () => {
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <div >
+        <Box>
             {/* Banner Section */}
             <Banner>
             </Banner>
@@ -101,7 +106,7 @@ const HomePageBody = () => {
             <Container sx={{ paddingTop: '40px', paddingBottom: '40px' }}>
                 <Grid container spacing={2}>
                     {items.map((item, index) => (
-                        <Grid item xs={12} sm={4} key={index} >
+                        <Grid item xs={12} sm={4} key={index}>
                             <Card>
                                 <CardMedia
                                     component="img"
@@ -131,12 +136,12 @@ const HomePageBody = () => {
                 backgroundColor: '#f5f5f5',
                 marginBottom: '40px',
             }}>
-                <Container >
+                <Container>
                     <Grid container spacing={0} alignItems="center">
                         {/* Text Content */}
                         <Grid item xs={12} md={4} marginBottom="20px">
                             <Box>
-                                <Typography variant="h4" component="Container" gutterBottom>
+                                <Typography variant="h4" gutterBottom>
                                     Nhẫn Cầu Hôn
                                 </Typography>
                                 <Typography variant="body1" color="textSecondary" paragraph>
@@ -156,7 +161,7 @@ const HomePageBody = () => {
                             />
                         </Grid>
                         {/* Image 2 */}
-                        <Grid item xs={6} md={4} >
+                        <Grid item xs={6} md={4}>
                             <CardMedia
                                 component="img"
                                 image="https://www.tierra.vn/files/oh-nch-homepage-mobile-kpxZd0aqlc.webp"  // Replace with actual image URL or path
@@ -190,12 +195,12 @@ const HomePageBody = () => {
                 backgroundColor: '#f5f5f5',
                 marginBottom: '40px',
             }}>
-                <Container >
-                    <Grid container spacing={0} alignItems="center" flexDirection='row-reverse' >
+                <Container>
+                    <Grid container spacing={0} alignItems="center" flexDirection='row-reverse'>
                         {/* Text Content */}
                         <Grid item xs={12} md={4} marginBottom="20px">
                             <Box>
-                                <Typography variant="h4" component="Container" gutterBottom>
+                                <Typography variant="h4" gutterBottom>
                                     Nhẫn Cầu Hôn
                                 </Typography>
                                 <Typography variant="body1" color="textSecondary" paragraph>
@@ -215,7 +220,7 @@ const HomePageBody = () => {
                             />
                         </Grid>
                         {/* Image 2 */}
-                        <Grid item xs={6} md={4} >
+                        <Grid item xs={6} md={4}>
                             <CardMedia
                                 component="img"
                                 image="https://www.tierra.vn/files/600x/banner-bta-mobile-2lQtsfIA8D.webp"  // Replace with actual image URL or path
@@ -229,11 +234,8 @@ const HomePageBody = () => {
                 <Grid container spacing={4}>
                     {/* Left Side - Image */}
                     <Grid item xs={12} md={6}>
-
                         <Box component="img" src="https://www.tierra.vn/files/11-cuahang-Re1KmV2Ptu.webp" alt="Jewelry Store" sx={{ width: '100%', borderRadius: 0 }} />
-
                     </Grid>
-
                     {/* Right Side - Text and Icons */}
                     <Grid item xs={12} md={6}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
@@ -262,7 +264,7 @@ const HomePageBody = () => {
                     </Grid>
                 </Grid>
             </Container>
-        </div>
+        </Box>
     );
 };
 
