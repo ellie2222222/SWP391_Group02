@@ -1,11 +1,13 @@
 import React from 'react'
 import Navbar from "../components/Navbar/Navbar"
+import Footer from '../components/Footer/Footer'
 
 export default function Products() {
   return (
     <div>
         <Navbar/>
-        <h2>Products</h2>
+   
+        <Footer/>
     </div>
   )
 }
