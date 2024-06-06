@@ -7,11 +7,16 @@ const designSchema = new Schema( {
         type: String,
         required: true
     },
-    jewelry_id: [{
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    jewelry_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Jewelry',
         required: true
-    }],
+    },
     images: [{
         type: String
     }]

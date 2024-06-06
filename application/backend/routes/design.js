@@ -10,7 +10,7 @@ designRoutes.use(requireAuth)
 
 designRoutes.get('/getDesigns', requireManager,  getDesigns)
 
-designRoutes.get('/getDesign/:id', getDesign)
+designRoutes.get('/getDesign/:id', requireManagerOrDesign, getDesign)
 
 designRoutes.post('/createDesign', requireDesigns, createDesign)
 
