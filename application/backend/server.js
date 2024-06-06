@@ -12,7 +12,7 @@ const gemstoneRoutes = require('./routes/gemstone')
 const quoteRoutes = require('./routes/quote')
 const warrantyRoutes = require('./routes/warranty')
 const blogRoutes = require('./routes/blog')
-const worksonRoutes = require('./routes/workson');
+const worksOnRoutes = require('./routes/workson');
 const productionRoutes = require('./routes/production');
 const designRoutes = require('./routes/design');
 //application
@@ -36,7 +36,7 @@ app.use('/api/material', materialRoutes)
 app.use('/api/gemstone', gemstoneRoutes)
 app.use('/api/warranty', warrantyRoutes)
 app.use('/api/blog', blogRoutes) 
-app.use('/api/workson', worksonRoutes) 
+app.use('/api/worksOn', worksOnRoutes) 
 app.use('/api/production', productionRoutes) 
 app.use('/api/design', designRoutes) 
 

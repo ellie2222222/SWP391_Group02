@@ -3,13 +3,8 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const productionSchema = new Schema( {
-    labor_cost: {
+    production_cost: {
         type: Number,
-        required: true,
-        default: 0
-    },
-    cost_type: {
-        type: String,
         required: true
     },
     production_start_date: {

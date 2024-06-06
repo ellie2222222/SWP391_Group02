@@ -15,6 +15,6 @@ quoteRoutes.get('/getQuote/:id', requireManagerOrSale, getQuote)
 
 quoteRoutes.patch('/updateQuoteStatus/:id', requireManager, updateQuoteStatus)
 
-quoteRoutes.patch('/updateQuote/:id', requireManager, updateQuote)
+quoteRoutes.patch('/updateQuote/:id', requireManagerOrSale, updateQuote)
 
 module.exports = quoteRoutes

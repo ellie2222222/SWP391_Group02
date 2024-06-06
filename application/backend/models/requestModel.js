@@ -15,13 +15,9 @@ const requestSchema = new Schema( {
     status: {
         type: String,
         required: true,
-        enum: ['ongoing', 'completed'],
-        default: 'ongoing'
+        enum: ['pending', 'assigned','completed'],
+        default: 'pending'
     },
-    jewelry_ids: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Jewelry'
-    }],
     endedAt: {
         type: Date
     }

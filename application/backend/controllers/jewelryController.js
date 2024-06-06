@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const validateEmptyFields = (data) => {
     const {
         name, description, gemstone_id, gemstone_weight,
-        material_id, material_weight, price, category, model_type
+        material_id, material_weight, price, category, type
     } = data;
     let emptyFields = [];
 
@@ -15,7 +15,7 @@ const validateEmptyFields = (data) => {
     if (!material_weight) emptyFields.push('material_weight');
     if (!category) emptyFields.push('category');
     if (!price) emptyFields.push('price');
-    if (!model_type) emptyFields.push('model_type');
+    if (!type) emptyFields.push('type');
 
     return emptyFields;
 };

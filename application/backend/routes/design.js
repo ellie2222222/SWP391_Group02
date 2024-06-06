@@ -7,9 +7,10 @@ const { getDesigns, getDesign, createDesign, updateDesign } = require('../contro
 const designRoutes = express.Router()
 
 designRoutes.use(requireAuth)
+
 designRoutes.get('/getDesigns', requireManager,  getDesigns)
 
-designRoutes.get('/getDesign/:id', requireManagerOrDesign, getDesign)
+designRoutes.get('/getDesign/:id', getDesign)
 
 designRoutes.post('/createDesign', requireDesigns, createDesign)
 

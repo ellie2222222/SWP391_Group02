@@ -26,15 +26,11 @@ const jewelrySchema = new Schema( {
         type: Number,
         required: true
     },
-    price: {
-        type: Number,
-        required: true
-    },
     category: {
         type: String,
         required: true
     },
-    model_type: {
+    type: {
         type: String,
         enum: ["Sample", "Custom"],
         required: true
