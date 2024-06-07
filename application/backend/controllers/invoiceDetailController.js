@@ -51,13 +51,27 @@ const getInvoiceDetailsByInvoiceId = async (req, res) => {
 // Update an InvoiceDetail by ID
 const updateInvoiceDetailById = async (req, res) => {
     const { id } = req.params;
-    const updates = req.body;
+    const { product_id, quantity, price } = req.body;
 
     try {
-        const invoiceDetail = await InvoiceDetail.findByIdAndUpdate(id, updates, { new: true });
+        // Check if the invoice detail exists
+        const invoiceDetail = await InvoiceDetail.findById(id);
         if (!invoiceDetail) {
-            return res.status(404).json({ message: 'Invoice detail not found.' });
+            return res.status(404).json({ message: 'Invoice detail not found. Please provide a valid invoice detail ID.' });
         }
+
+        // Check if the product_id exists
+        const product = await Jewelry.findById(product_id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Update the fields
+        if (product_id !== undefined) invoiceDetail.quantity = quantity;
+        if (quantity !== undefined) invoiceDetail.quantity = quantity;
+        if (price !== undefined) invoiceDetail.price = price;
+
+        await invoiceDetail.save();
         res.json(invoiceDetail);
     } catch (error) {
         res.status(400).json({ message: 'Unable to update invoice detail. Please try again later.' });
