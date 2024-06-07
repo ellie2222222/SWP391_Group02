@@ -20,17 +20,10 @@ import logo from '../assets/imgs/logo.png';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
-import { Typography } from '@mui/material';
 
 const CustomAppBar = styled(AppBar)({
   backgroundColor: '#fff',
   color: '#000',
-});
-
-const CustomTypography = styled(Typography)({
-  flexGrow: 1,
-  fontWeight: 'bold',
-  cursor: 'pointer',
 });
 
 const CustomButton = styled(Button)({

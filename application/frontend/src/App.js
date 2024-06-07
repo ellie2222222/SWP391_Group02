@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Products from "./pages/Products";
 import Blogs from "./pages/Blogs";
 import About from "./pages/About";
+import Details from "./pages/Details";
 function App() {
   return (
     <div className="App">
@@ -13,6 +14,7 @@ function App() {
         <Route path='/products' element={<Products/>}></Route>
         <Route path='/blogs' element={<Blogs/>}></Route>
         <Route path='/aboutus' element={<About/>}></Route>
+        <Route path='/product/:id' element={<Details/>}></Route>
       </Routes>
     </div>
   );
