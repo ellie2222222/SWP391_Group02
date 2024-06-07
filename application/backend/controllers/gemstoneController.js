@@ -1,7 +1,7 @@
 const Gemstone = require('../models/gemstoneModel')
 const mongoose = require('mongoose')
 
-// get all jewelries
+// get all gemstones
 const getGemstones = async (req, res) => {
     try {
       const gemstones = await Gemstone.find({});
