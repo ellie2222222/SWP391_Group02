@@ -69,7 +69,7 @@ const createQuote = async (req, res) => {
                 return res.status(404).json({ error: 'No such request' });
             }
 
-            const existRequest = await Quote.find({request_id: request_id})
+            const existRequest = await Quote.findOne({request_id: request_id})
             if (existRequest) {
                 return res.status(400).json({ error: 'This request already have a quote' });
             }
@@ -174,5 +174,24 @@ const updateQuote = async (req, res) => {
     }
 };
 
+const deleteQuote = async (req, res) => {
+    try {
+      const { id } = req.params
 
-module.exports = { getQuote, getQuotes, createQuote, updateQuoteStatus, updateQuote };
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "Invalid ID" });
+      } 
+  
+      const quote = await Quote.findOneAndDelete({_id: id})
+      if (!quote) {
+        return res.status(404).json({ error: "No such quote" });
+      }
+
+      return res.status(200).json(quote);
+    } catch (error) {
+      res.status(500).json({ error: "Error while deleting quote" });
+    }
+  }
+
+
+module.exports = { getQuote, getQuotes, createQuote, updateQuoteStatus, updateQuote, deleteQuote };

@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 const Production = require("../models/productionModel");
-const User = require("../models/userModel");
 const Jewelry = require("../models/jewelryModel");
+const jwt = require("jsonwebtoken")
 
 // Get all productions
 const getProductions = async (req, res) => {
   try {
     const productions = await Production.find({});
+
     res.status(200).json(productions);
   } catch (error) {
     console.error('Error fetching productions:', error);
@@ -16,13 +17,24 @@ const getProductions = async (req, res) => {
 
 // Get one production
 const getProduction = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
-  }
-
   try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    const { authorization } = req.headers;
+    const token = authorization.split(' ')[1];
+    const { _id, role } = jwt.verify(token, process.env.SECRET);
+
+    if (role !== 'manager') {
+        const uid = await Production.findById(id).select('user_id');
+        if (!uid || uid.user_id.toString() !== _id) {
+            return res.status(403).json({ error: 'You do not have permissions to perform this action' });
+        }
+    }
+
     const production = await Production.findById(id);
 
     if (!production) {
@@ -32,22 +44,22 @@ const getProduction = async (req, res) => {
     res.status(200).json(production);
   } catch (error) {
     console.error('Error retrieving production:', error);
-    res.status(500).json({ error: "An error occurred while retrieving the production" });
+    res.status(500).json({ error: "Error while getting a production" });
   }
 };
 
 // Create a new production
 const createProduction = async (req, res) => {
-    const { production_cost, production_start_date, production_end_date } = req.body;
+    const { jewelry_id, production_type, production_cost, production_start_date, production_end_date } = req.body;
   
     // Check if all required fields are provided
-    if (!production_cost || !production_start_date || !production_end_date) {
+    if (!jewelry_id || !production_type || !production_cost || !production_start_date || !production_end_date) {
       return res.status(400).json({ error: "Please fill in all required fields!" });
     }
   
     // Validate production_cost
     if (production_cost <= 0) {
-      return res.status(400).json({ error: "Labor cost must be a positive number" });
+      return res.status(400).json({ error: "Production cost must be a positive number" });
     }
   
     // Validate dates
@@ -62,10 +74,27 @@ const createProduction = async (req, res) => {
     if (parsedEndDate <= parsedStartDate) {
       return res.status(400).json({ error: "Production end date must be after the start date" });
     }
+
+    // Validate jewelry
+    if (!mongoose.Types.ObjectId.isValid(jewelry_id)) {
+      return res.status(400).json({ error: "Invalid jewelry ID" });
+    }
+
+    const jewelry = await Jewelry.findById(request_id)
+    if (!jewelry) {
+        return res.status(404).json({ error: 'No such jewelry' });
+    }
+
+    const existJewelry = await Production.findOne({jewelry_id: jewelry_id})
+    if (existJewelry) {
+        return res.status(400).json({ error: 'This jewelry already have a production' });
+    }
   
     // Add to the database
     try {
       const production = await Production.create({
+        jewelry_id,
+        production_type,
         production_cost,
         production_start_date: parsedStartDate,
         production_end_date: parsedEndDate,
@@ -82,13 +111,19 @@ const createProduction = async (req, res) => {
 // Update a production
 const updateProduction = async (req, res) => {
   const { id } = req.params;
-  const { production_start_date, production_end_date } = req.body;
+  const { production_type, production_cost, production_start_date, production_end_date, jewelry_id } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: "Invalid ID" });
   }
 
-  const updateData = {};
+  if (jewelry_id && !mongoose.Types.ObjectId.isValid(jewelry_id)) {
+    return res.status(400).json({ error: "Invalid jewelry ID" });
+  }
+
+  if (production_cost != null && (typeof production_cost !== 'number' || production_cost <= 0)) {
+    return res.status(400).json('Production cost must be a positive number');
+  }
 
   // Validate and set dates if provided
   if (production_start_date) {
@@ -109,6 +144,19 @@ const updateProduction = async (req, res) => {
     }
     updateData.production_end_date = parsedEndDate;
   }
+
+  const allowedStatuses = ["design", "production"];
+
+  if (production_type && !allowedStatuses.includes(production_type)) {
+    return res.status(400).json({ error: "Invalid production type" });
+  }
+
+  const updateData = {};
+  if (jewelry_id) updateData.jewelry_id = jewelry_id;
+  if (production_cost) updateData.production_cost = production_cost;
+  if (production_type) updateData.production_type = production_type;
+  if (production_start_date) updateData.production_start_date = parsedStartDate;
+  if (production_end_date) updateData.production_end_date = parsedEndDate;
 
   try {
     const production = await Production.findOneAndUpdate(
