@@ -12,10 +12,12 @@ const jewelrySchema = new Schema( {
     },
     gemstone_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Gemstone', 
+        ref: 'Gemstone',
+        required: true
     },
     gemstone_weight: {
-        type: Number
+        type: Number,
+        required: true
     },
     material_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -28,6 +30,7 @@ const jewelrySchema = new Schema( {
     },
     category: {
         type: String,
+        enum: ["Ring", "Necklace", "Bracelet", "Earring", "Other"],
         required: true
     },
     type: {
@@ -35,6 +38,17 @@ const jewelrySchema = new Schema( {
         enum: ["Sample", "Custom"],
         required: true
     },
+    on_sale: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    sale_percentage: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    //fix
     images: [{
         type: String
     }]

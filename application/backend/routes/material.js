@@ -5,14 +5,14 @@ const { getMaterials, getMaterial, createMaterial, deleteMaterial, updateMateria
 
 const materialRoutes = express.Router()
 
-materialRoutes.get('/getMaterials', getMaterials)
+materialRoutes.get('/', getMaterials)
 
-materialRoutes.get('/getMaterial/:id', getMaterial)
+materialRoutes.get('/:id', getMaterial)
 
-materialRoutes.post('/createMaterial', requireAuth, requireAdmin, createMaterial)
+materialRoutes.post('/', requireAuth, requireAdmin, createMaterial)
 
-materialRoutes.delete('/deleteMaterial/:id', requireAuth, requireAdmin, deleteMaterial)
+materialRoutes.delete('/:id', requireAuth, requireAdmin, deleteMaterial)
 
-materialRoutes.patch('/updateMaterial/:id', requireAuth, requireAdmin, updateMaterial)
+materialRoutes.patch('/:id', requireAuth, requireAdmin, updateMaterial)
 
 module.exports = materialRoutes

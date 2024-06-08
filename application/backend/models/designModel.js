@@ -3,10 +3,6 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const designSchema = new Schema( {
-    design_name: {
-        type: String,
-        required: true
-    },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

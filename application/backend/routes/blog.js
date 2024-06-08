@@ -1,18 +1,23 @@
-const express = require('express')
-const requireAuth = require('../middleware/requireAuth')
-const { getBlogs, getBlog, createBlog, deleteBlog, updateBlog } = require('../controllers/blogController')
-const { requireUser, requireAdmin } = require('../middleware/requireRoles')
+const express = require('express');
+const requireAuth = require('../middleware/requireAuth');
+const { getBlogs, getBlog, getBlogTitle, createBlog, deleteBlog, updateBlog } = require('../controllers/blogController');
+const { requireUser, requireAdmin } = require('../middleware/requireRoles');
 
-const blogRoutes = express.Router()
+const blogRoutes = express.Router();
 
-blogRoutes.post('/createBlog', requireAuth, requireAdmin, createBlog)
+// Create a blog
+blogRoutes.post('/', requireAuth, requireAdmin, createBlog);
 
-blogRoutes.get('/getBlogs', getBlogs)
+// Get all blogs or by title
+blogRoutes.get('/', getBlogs);
 
-blogRoutes.get('/getBlog/:id', getBlog)
+// Get a single blog by ID
+blogRoutes.get('/:id', getBlog);
 
-blogRoutes.patch('/updateBlog/:id', requireAuth, requireAdmin, updateBlog)
+// Update a blog
+blogRoutes.patch('/:id', requireAuth, requireAdmin, updateBlog);
 
-blogRoutes.delete('/deleteBlog/:id', requireAuth, requireAdmin, deleteBlog)
+// Delete a blog
+blogRoutes.delete('/:id', requireAuth, requireAdmin, deleteBlog);
 
-module.exports = blogRoutes
+module.exports = blogRoutes;
