@@ -5,15 +5,15 @@ const { createWorksOn, getWorksOnById, getAllWorksOns, updateWorksOnById, delete
 
 const worksOnRoutes = express.Router()
 
-worksOnRoutes.post('/createWorksOn', requireAuth, requireManager, createWorksOn)
+worksOnRoutes.post('/', requireAuth, requireManager, createWorksOn)
 
-worksOnRoutes.get('/getWorksOnById/:id', requireAuth, requireManager, getWorksOnById)
+worksOnRoutes.get('/:id', requireAuth, requireManager, getWorksOnById)
 
-worksOnRoutes.get('/getAllWorksOns', requireAuth, requireManager, getAllWorksOns)
+worksOnRoutes.get('/', requireAuth, requireManager, getAllWorksOns)
 
-worksOnRoutes.patch('/updateWorksOnById/:id', requireAuth, requireManager, updateWorksOnById)
+worksOnRoutes.patch('/:id', requireAuth, requireManager, updateWorksOnById)
 
-worksOnRoutes.delete('/deleteWorksOnById/:id', requireAuth, requireManager, deleteWorksOnById)
+worksOnRoutes.delete('/:id', requireAuth, requireManager, deleteWorksOnById)
 
 worksOnRoutes.patch('/:id/add-staff/:staff_id', requireAuth, requireManager, addStaffToWorksOn);
 

@@ -28,6 +28,7 @@ app.use((req, res, next) => {
 
 //router
 app.use('/api/user', userRoutes)
+app.use('/api/users', userRoutes)
 app.use('/api/jewelries', jewelryRoutes)
 app.use('/api/requests', requestRoutes)
 app.use('/api/materials', materialRoutes)

@@ -7,14 +7,14 @@ const warrantyRoutes = express.Router()
 
 warrantyRoutes.use(requireAuth)
 
-warrantyRoutes.post('/createWarranty', requireSales, createWarranty)
+warrantyRoutes.post('/', requireSales, createWarranty)
 
-warrantyRoutes.get('/getWarranties', requireManagerOrSale, getWarranties)
+warrantyRoutes.get('/', requireManagerOrSale, getWarranties)
 
-warrantyRoutes.get('/getWarranty/:id', requireManagerOrSale, getWarranty)
+warrantyRoutes.get('/:id', requireManagerOrSale, getWarranty)
 
-warrantyRoutes.delete('/deleteWarranty/:id', requireManager, deleteWarranty)
+warrantyRoutes.delete('/:id', requireManager, deleteWarranty)
 
-warrantyRoutes.patch('/updateWarranty/:id',  requireManagerOrSale, updateWarranty)
+warrantyRoutes.patch('/:id',  requireManagerOrSale, updateWarranty)
 
 module.exports = warrantyRoutes

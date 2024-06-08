@@ -39,7 +39,7 @@ const getRequest = async (req, res) => {
 };
 
 // get user requests
-const getMyRequests = async (req, res) => {
+const getUserRequests = async (req, res) => {
   try {
     const { authorization } = req.headers
     const token = authorization.split(' ')[1]
@@ -90,20 +90,20 @@ const createRequest = async (req, res) => {
   const token = authorization.split(" ")[1];
   const { _id } = jwt.verify(token, process.env.SECRET);
 
-  const { description } = req.body;
+  const { request_description } = req.body;
 
-  if (!description) {
+  if (!request_description) {
     return res.status(400).json({ error: "Please provide a description for the request" });
   }
 
   // add to the database
   try {
-    const request = await Request.create({ user_id: _id, description });
+    const request = await Request.create({ user_id: _id, request_description });
 
     res.status(201).json(request);
   } catch (error) {
     console.error('Error creating request:', error);
-    res.status(500).json({ error: "An error occurred while creating the request" });
+    res.status(500).json({ error: "Error while creating request" });
   }
 };
 
@@ -207,13 +207,13 @@ const updateRequest = async (req, res) => {
     if (production_end_date !== null) updateFields.production_end_date = parsedEndDate;
     if (production_cost !== null) updateFields.production_cost = production_cost;
     if (production_status !== null) updateFields.production_status = production_status;
-
+    
     const request = await Request.findOneAndUpdate(
       { _id: id },
       { $set: { updateFields } },
       { new: true, runValidators: true }
     );
-
+    
     if (!request) {
       return res.status(404).json({ error: "No such request" });
     }
@@ -229,6 +229,6 @@ module.exports = {
   getRequest,
   createRequest,
   getStaffRequests,
-  getMyRequests,
+  getUserRequests,
   updateRequest
 };
