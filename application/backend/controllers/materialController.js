@@ -65,7 +65,7 @@ const createMaterial = async (req, res) => {
 
     if (emptyFields.length > 0 || validationErrors.length > 0) {
       return res.status(400).json({
-          message: 'Validation failed',
+          error: 'Validation failed',
           emptyFields,
           validationErrors,
       });
@@ -112,10 +112,10 @@ const updateMaterial = async (req, res) => {
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
-          message: 'Validation failed',
+          error: 'Validation failed',
           validationErrors,
       });
-  }
+    }
 
     try {
         const material = await Material.findOneAndUpdate(

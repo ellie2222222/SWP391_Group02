@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const cors = require('cors');
 
 const userRoutes = require('./routes/user')
+const usersRoutes = require('./routes/users')
 const jewelryRoutes = require('./routes/jewelry')
 const requestRoutes = require('./routes/request')
 const materialRoutes = require('./routes/material')
@@ -28,7 +29,7 @@ app.use((req, res, next) => {
 
 //router
 app.use('/api/user', userRoutes)
-app.use('/api/users', userRoutes)
+app.use('/api/users', usersRoutes)
 app.use('/api/jewelries', jewelryRoutes)
 app.use('/api/requests', requestRoutes)
 app.use('/api/materials', materialRoutes)
