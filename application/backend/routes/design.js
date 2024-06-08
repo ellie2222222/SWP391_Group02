@@ -8,14 +8,14 @@ const designRoutes = express.Router()
 
 designRoutes.use(requireAuth)
 
-designRoutes.get('/getDesigns', requireManager, getDesigns)
+designRoutes.get('/', requireManager, getDesigns)
 
-designRoutes.get('/getDesign/:id', requireManagerOrDesign, getDesign)
+designRoutes.get('/:id', requireManagerOrDesign, getDesign)
 
-designRoutes.post('/createDesign', requireDesigns, createDesign)
+designRoutes.post('/', requireDesigns, createDesign)
 
-designRoutes.patch('/updateDesign/:id', requireDesigns, updateDesign)
+designRoutes.patch('/:id', requireDesigns, updateDesign)
 
-designRoutes.delete('/deleteDesign/:id', requireDesigns, deleteDesign)
+designRoutes.delete('/:id', requireDesigns, deleteDesign)
 
 module.exports = designRoutes

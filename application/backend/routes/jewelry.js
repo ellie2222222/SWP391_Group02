@@ -5,14 +5,14 @@ const {requireAdmin} = require('../middleware/requireRoles')
 
 const jewelryRoutes = express.Router()
 
-jewelryRoutes.get('/getJewelries', getJewelries)
+jewelryRoutes.get('/', getJewelries)
 
-jewelryRoutes.get('/getJewelry/:id', getJewelry)
+jewelryRoutes.get('/:id', getJewelry)
 
-jewelryRoutes.post('/createJewelry', requireAuth, requireAdmin, createJewelry)
+jewelryRoutes.post('/', requireAuth, requireAdmin, createJewelry)
 
-jewelryRoutes.delete('/deleteJewelry/:id', requireAuth, requireAdmin, deleteJewelry)
+jewelryRoutes.delete('/:id', requireAuth, requireAdmin, deleteJewelry)
 
-jewelryRoutes.patch('/updateJewelry/:id', requireAuth, requireAdmin, updateJewelry)
+jewelryRoutes.patch('/:id', requireAuth, requireAdmin, updateJewelry)
 
 module.exports = jewelryRoutes

@@ -1,21 +1,34 @@
 const Blog = require('../models/blogModel')
 const mongoose = require('mongoose')
 
-// get all jewelries
+// get all blogs or get a blog by title
 const getBlogs = async (req, res) => {
-    try {
-      const blogs = await Blog.find({})
+  const { title } = req.query;
 
-      res.status(200).json(blogs)
-    } catch (error) {
-      res.status(500).json({ error: 'Error while getting blogs' })
-    }
+  try {
+      if (title) {
+          // If title query parameter is present, find the blog by title
+          const blog = await Blog.findOne({ blog_title: title });
+
+          if (!blog) {
+              return res.status(404).json({ error: 'No blog with such title' });
+          }
+
+          return res.status(200).json(blog);
+      } else {
+          // If no title query parameter, find all blogs
+          const blogs = await Blog.find({});
+          return res.status(200).json(blogs);
+      }
+  } catch (error) {
+      res.status(500).json({ error: 'Error while getting blogs' });
+  }
 }
 
 // get one blog
 const getBlog = async (req, res) => {
     const { id } = req.params
-
+    
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({error: 'Invalid ID'})
     }
@@ -96,5 +109,9 @@ const updateBlog = async (req, res) => {
     res.status(500).json({ error: 'Error while getting blog' })
   }
 }
+
+
+
+//
 
 module.exports = { getBlogs, getBlog, createBlog, deleteBlog, updateBlog }
