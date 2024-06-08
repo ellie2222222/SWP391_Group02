@@ -9,14 +9,11 @@ const jewelryRoutes = require('./routes/jewelry')
 const requestRoutes = require('./routes/request')
 const materialRoutes = require('./routes/material')
 const gemstoneRoutes = require('./routes/gemstone')
-const quoteRoutes = require('./routes/quote')
 const warrantyRoutes = require('./routes/warranty')
 const blogRoutes = require('./routes/blog')
-const worksOnRoutes = require('./routes/workson');
-const productionRoutes = require('./routes/production');
+const worksOnRoutes = require('./routes/worksOn');
 const designRoutes = require('./routes/design');
 const invoiceRoutes = require('./routes/invoice')
-const invoiceDetailRoutes = require('./routes/invoiceDetail')
 //application
 const app = express()
 
@@ -31,18 +28,15 @@ app.use((req, res, next) => {
 
 //router
 app.use('/api/user', userRoutes)
-app.use('/api/jewelry', jewelryRoutes)
-app.use('/api/request', requestRoutes)
-app.use('/api/quote', quoteRoutes)
-app.use('/api/material', materialRoutes)
-app.use('/api/gemstone', gemstoneRoutes)
-app.use('/api/warranty', warrantyRoutes)
-app.use('/api/blog', blogRoutes) 
-app.use('/api/worksOn', worksOnRoutes) 
-app.use('/api/production', productionRoutes) 
-app.use('/api/design', designRoutes)
+app.use('/api/jewelries', jewelryRoutes)
+app.use('/api/requests', requestRoutes)
+app.use('/api/materials', materialRoutes)
+app.use('/api/gemstones', gemstoneRoutes)
+app.use('/api/warranties', warrantyRoutes)
+app.use('/api/blogs', blogRoutes) 
+app.use('/api/worksOns', worksOnRoutes)
+app.use('/api/designs', designRoutes)
 app.use('/api/invoice', invoiceRoutes);
-app.use('/api/invoicedetail', invoiceDetailRoutes);
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)

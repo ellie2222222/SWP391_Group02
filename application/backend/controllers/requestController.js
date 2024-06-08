@@ -210,7 +210,7 @@ const updateRequest = async (req, res) => {
 
     const request = await Request.findOneAndUpdate(
       { _id: id },
-      { $set: {  } },
+      { $set: { updateFields } },
       { new: true, runValidators: true }
     );
 
