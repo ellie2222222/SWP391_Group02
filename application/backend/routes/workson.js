@@ -1,7 +1,7 @@
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth')
 const { requireManager } = require('../middleware/requireRoles')
-const { createWorksOn, getWorksOnById, getAllWorksOns, updateWorksOnById, deleteWorksOnById, addStaffToWorksOn, removeStaffFromWorksOn} = require('../controllers/worksonController');
+const { createWorksOn, getWorksOnById, getAllWorksOns, updateWorksOnById, deleteWorksOnById, addStaffToWorksOn, removeStaffFromWorksOn} = require('../controllers/worksOnController.js');
 
 const worksOnRoutes = express.Router()
 
