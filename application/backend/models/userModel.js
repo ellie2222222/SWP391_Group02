@@ -30,7 +30,7 @@ const userSchema = new Schema( {
         type: String,
         required: true
     }
-})
+}, {timestamps: true})
 
 userSchema.statics.signup = async function(username, email, password, phone_number, address) {
     if (!username || !email || !password || !phone_number || !address) {

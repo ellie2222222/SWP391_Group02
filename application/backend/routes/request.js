@@ -1,6 +1,6 @@
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth')
-const { getRequests, getRequest, createRequest, getUserRequests, getStaffRequests, getMyRequests, updateRequestStatus, updateRequestJewelry } = require('../controllers/requestController')
+const { getRequests, createRequest, getStaffRequests, getMyRequests, updateRequest } = require('../controllers/requestController')
 const { requireUser, requireAdmin, requireManager, requireManagerOrStaff } = require('../middleware/requireRoles')
 
 const requestRoutes = express.Router()
@@ -9,26 +9,12 @@ requestRoutes.use(requireAuth)
 
 requestRoutes.post('/createRequest', requireUser, createRequest)
 
-// Get all requests from all user
-// requestRoutes.get('/getRequests', requireManager, getRequests)
-
-// Get one request
-// requestRoutes.get('/getRequest/:id', requireManager, getRequest)
-
-// Get all requests from one user 
-// requestRoutes.get('/getUserRequests/:id', requireManager, getUserRequests)
-
 // Get all requests from one user
 requestRoutes.get('/getMyRequests', requireUser, getMyRequests)
 
-// Get all requests one staff works ons
+// Get all requests one staff works on
 requestRoutes.get('/getStaffRequests', requireManagerOrStaff, getStaffRequests)
 
-// Get one request one staff works ons
-requestRoutes.get('/getStaffRequest/:id', requireManagerOrStaff, () => {})
-
-requestRoutes.patch('/updateRequestStatus/:id', requireManager, updateRequestStatus)
-
-requestRoutes.patch('/updateRequestJewelry/:id', requireManager, updateRequestJewelry)
+requestRoutes.patch('/updateRequestStatus/:id', requireManager, updateRequest)
 
 module.exports = requestRoutes

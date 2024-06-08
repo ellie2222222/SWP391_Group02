@@ -1,5 +1,6 @@
 const Request = require("../models/requestModel");
 const WorksOn = require("../models/worksOnModel");
+const Jewelry = require("../models/jewelryModel")
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
@@ -48,35 +49,13 @@ const getMyRequests = async (req, res) => {
 
     // Check if requests exist
     if (requests.length === 0) {
-      return res.status(404).json({ error: "No requests found for this user" });
+      return res.status(404).json({ error: "No requests found" });
     }
 
     res.status(200).json(requests);
   } catch (error) {
     console.error('Error fetching request:', error);
     res.status(500).json({ error: "An error occurred while fetching your requests" });
-  }
-};
-
-// get user requests
-const getUserRequests = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
-  }
-
-  try {
-    const requests = await Request.find({ user_id: id });
-    
-    if (requests.length === 0) {
-      return res.status(404).json({error: 'No request found for this user'});
-    }
-
-    res.status(200).json(requests);
-  } catch (error) {
-    console.error('Error fetching request:', error);
-    res.status(500).json({ error: "An error occurred while fetching user requests" });
   }
 };
 
@@ -129,24 +108,109 @@ const createRequest = async (req, res) => {
 };
 
 // Update request status
-const updateRequestStatus = async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
-  }
-
-  const allowedStatuses = ["ongoing", "completed"];
-
-  if (!allowedStatuses.includes(status)) {
-    return res.status(400).json({ error: "Invalid status" });
-  }
-
+const updateRequest = async (req, res) => {
   try {
+    const { id } = req.params;
+    const { 
+      jewelry_id,
+      request_description, request_status, 
+      quote_content, quote_amount, quote_status, 
+      production_start_date, production_end_date, production_cost, production_status 
+    } = req.body;
+    
+    // Retrieve the existing request
+    const existingRequest = await Request.findById(id);
+    if (!existingRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    // Validate jewelry id and if jewelry id already exist in other request
+    if (jewelry_id) {
+      const jewelry = await Jewelry.findById(jewelry_id)
+      if (!jewelry) {
+          return res.status(404).json({ error: 'No such jewelry' });
+      }
+
+      const existJewelry = await Request.findOne({jewelry_id: jewelry_id})
+      if (existJewelry) {
+          return res.status(400).json({ error: 'This jewelry already have a request' });
+      }
+    }
+
+    // Validate request ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    // Validate request status
+    const allowedRequestStatuses = ["ongoing", "completed"];
+
+    if (request_status && !allowedRequestStatuses.includes(request_status)) {
+      return res.status(400).json({ error: "Invalid request status" });
+    }
+
+    // Validate quote status
+    const allowedQuoteStatuses = ["pending", "approved", "rejected"];
+
+    if (quote_status && !allowedQuoteStatuses.includes(quote_status)) {
+      return res.status(400).json({ error: "Invalid quote status" });
+    }
+
+    // Validate production status
+    const allowedProductionStatuses = ["ongoing", "completed"];
+
+    if (production_status && !allowedProductionStatuses.includes(production_status)) {
+      return res.status(400).json({ error: "Invalid production status" });
+    }
+
+    // Validate quote amount
+    if (quote_amount != null && (typeof quote_amount !== 'number' || quote_amount <= 0)) {
+      return res.status(400).json('Quote amount must be a positive number');
+    }
+
+    // Validate production cost
+    if (production_cost != null && (typeof production_cost !== 'number' || production_cost <= 0)) {
+      return res.status(400).json('Production cost must be a positive number');
+    }
+
+    // Validate and parse dates if provided
+    let parsedStartDate, parsedEndDate;
+
+    if (production_start_date) {
+      parsedStartDate = new Date(production_start_date);
+      if (isNaN(parsedStartDate)) {
+        return res.status(400).json({ error: "Invalid request start date" });
+      }
+    } else {
+      parsedStartDate = existingRequest.production_start_date;
+    }
+
+    if (production_end_date) {
+      parsedEndDate = new Date(production_end_date);
+      if (isNaN(parsedEndDate)) {
+        return res.status(400).json({ error: "Invalid request end date" });
+      }
+    } else {
+      parsedEndDate = existingRequest.production_end_date;
+    }
+
+    // Only update fields that are not null
+    const updateFields = {};
+
+    if (jewelry_id !== null) updateFields.jewelry_id = jewelry_id;
+    if (request_description !== null) updateFields.request_description = request_description;
+    if (request_status !== null) updateFields.request_status = request_status;
+    if (quote_content !== null) updateFields.quote_content = quote_content;
+    if (quote_amount !== null) updateFields.quote_amount = quote_amount;
+    if (quote_status !== null) updateFields.quote_status = quote_status;
+    if (production_start_date !== null) updateFields.production_start_date = parsedStartDate;
+    if (production_end_date !== null) updateFields.production_end_date = parsedEndDate;
+    if (production_cost !== null) updateFields.production_cost = production_cost;
+    if (production_status !== null) updateFields.production_status = production_status;
+
     const request = await Request.findOneAndUpdate(
       { _id: id },
-      { $set: { status } },
+      { $set: {  } },
       { new: true, runValidators: true }
     );
 
@@ -156,47 +220,7 @@ const updateRequestStatus = async (req, res) => {
 
     res.status(200).json(request);
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Update request jewelry
-const updateRequestJewelry = async (req, res) => {
-  const { id } = req.params;
-  const { jewelry_ids } = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
-  }
-  
-  if (jewelry_ids && !Array.isArray(jewelry_ids)) {
-    return res.status(400).json({ error: "Jewelry IDs should be an array" });
-  }
-
-  // Check for duplicate jewelry IDs
-  if (jewelry_ids && jewelry_ids.length !== new Set(jewelry_ids).size) {
-    return res.status(400).json({ error: "Duplicate jewelry IDs found" });
-  }
-
-  // Check for invalid ObjectIds in the array
-  if (jewelry_ids && jewelry_ids.some(jewelryId => !mongoose.Types.ObjectId.isValid(jewelryId))) {
-    return res.status(400).json({ error: "Invalid jewelry ID(s)" });
-  }
-
-  try {
-    const request = await Request.findOneAndUpdate(
-      { _id: id },
-      { $set: { jewelry_ids } },
-      { new: true, runValidators: true }
-    );
-
-    if (!request) {
-      return res.status(404).json({ error: "No such request" });
-    }
-
-    res.status(200).json(request);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Error while updating request" });
   }
 };
 
@@ -204,9 +228,7 @@ module.exports = {
   getRequests,
   getRequest,
   createRequest,
-  updateRequestStatus,
-  updateRequestJewelry,
-  getUserRequests,
   getStaffRequests,
   getMyRequests,
+  updateRequest
 };

@@ -8,15 +8,41 @@ const requestSchema = new Schema( {
         ref: 'User', 
         required: true 
     },
-    description: {
+    request_description: {
         type: String,
         required: true
     },
-    status: {
+    request_status: {
         type: String,
         required: true,
         enum: ['pending', 'assigned','completed'],
         default: 'pending'
+    },
+    quote_content: {
+        type: String
+    },
+    quote_amount: {
+        type: Number
+    },
+    quote_status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected']
+    },
+    production_start_date: {
+        type: Date
+    },
+    production_end_date: {
+        type: Date
+    },
+    production_cost: {
+        type: Number
+    },
+    production_status: {
+        type: String,
+        enum: ['ongoing', 'completed']
+    },
+    total_amount: {
+        type: Number
     },
     endedAt: {
         type: Date
