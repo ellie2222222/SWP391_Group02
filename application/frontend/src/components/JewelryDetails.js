@@ -22,7 +22,7 @@ const JewelryDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://localhost:4000/api/jewelry/getJewelry/${id}`)
+    axios.get(`http://localhost:4000/api/jewelries/${id}`)
       .then(response => {
         setProduct(response.data);
         setLoading(false);

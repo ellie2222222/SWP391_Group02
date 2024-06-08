@@ -24,7 +24,7 @@ const JewelryList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/jewelry/getJewelries') // Thay đổi URL tới API của bạn
+    axios.get('http://localhost:4000/api/jewelries') // Thay đổi URL tới API của bạn
       .then(response => {
         setProducts(response.data);
         setLoading(false);
