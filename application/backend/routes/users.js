@@ -11,7 +11,7 @@ usersRoutes.use(requireAdmin)
 
 usersRoutes.patch('/role-assignment/:id', assignRole)
 
-usersRoutes.delete('/delete/:id', deleteUser);
+usersRoutes.delete('/:id', deleteUser);
 
 usersRoutes.get('/', getUsers)
 
