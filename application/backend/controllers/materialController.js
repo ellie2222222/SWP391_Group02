@@ -27,10 +27,17 @@ const validateInputData = (data) => {
     return validationErrors;
 };
 
-// Get all materials
+// Get all materials or get materials by name
 const getMaterials = async (req, res) => {
+    const { name } = req.query;
+
     try {
-        const materials = await Material.find({});
+        let query = {};
+        if (name) {
+            query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
+        }
+
+        const materials = await Material.find(query);
         res.status(200).json(materials);
     } catch (error) {
         console.error('Error fetching materials:', error);

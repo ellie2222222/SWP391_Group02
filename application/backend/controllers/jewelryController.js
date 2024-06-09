@@ -65,12 +65,14 @@ const createJewelry = async (req, res) => {
     }
 };
 
-// Get all jewelries or get jewelries by category
 const getJewelries = async (req, res) => {
-    const { category } = req.query;
+    const { name, category } = req.query;
 
     try {
         let query = {};
+        if (name) {
+            query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
+        }
         if (category) {
             query.category = category;
         }
@@ -81,7 +83,6 @@ const getJewelries = async (req, res) => {
         res.status(500).json({ error: 'Error while getting jewelries' });
     }
 };
-
 // Get jewelries by category
 
 // Get one jewelry

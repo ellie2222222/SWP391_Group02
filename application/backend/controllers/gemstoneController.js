@@ -1,16 +1,23 @@
 const Gemstone = require('../models/gemstoneModel')
 const mongoose = require('mongoose')
 
-// get all gemstones
+// Get all gemstones or get gemstones by name
 const getGemstones = async (req, res) => {
+    const { name } = req.query;
+
     try {
-      const gemstones = await Gemstone.find({});
-      res.status(200).json(gemstones);
+        let query = {};
+        if (name) {
+            query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
+        }
+
+        const gemstones = await Gemstone.find(query);
+        res.status(200).json(gemstones);
     } catch (error) {
         console.error('Error fetching gemstones:', error);
         res.status(500).json({ error: 'An error occurred while fetching gemstones' });
     }
-}
+};
 
 // get one gemstone
 const getGemstone = async (req, res) => {
