@@ -108,12 +108,15 @@ const assignRole = async (req, res) => {
 
 // get all users
 const getUsers = async (req, res) => {
-  try {
-    const users = await User.find({})
+  const { username } = req.query;
 
-    if (!users) {
-      return res.status(404).json({ error: "No users found" })
+  try {
+    let query = {};
+    if (username) {
+      query.username = new RegExp(username, 'i'); // 'i' for case-insensitive search
     }
+
+    const users = await User.find(query)
 
     return res.status(200).json({ users })
   } catch (error) {

@@ -65,7 +65,11 @@ const validateEmptyFields = (data) => {
       emptyFields.push('color');
   }
 
-  return emptyFields;
+  if (emptyFields.length > 0) {
+    return "Please fill in the required field"
+  }
+
+  return null
 };
 
 const validateInputData = (data) => {
@@ -96,24 +100,28 @@ const validateInputData = (data) => {
 };
 
 const createGemstone = async (req, res) => {
-  const emptyFields = validateEmptyFields(req.body);
-  const validationErrors = validateInputData(req.body);
+    const emptyFields = validateEmptyFields(req.body);
+    const validationErrors = validateInputData(req.body);
 
-  if (emptyFields.length > 0 || validationErrors.length > 0) {
-      return res.status(400).json({
-          message: 'Validation failed',
-          emptyFields,
-          validationErrors,
-      });
-  }
+    if (emptyFields) {
+        return res.status(400).json({
+            error: emptyFields
+        });
+    }
 
-  try {
+    if (validationErrors.length > 0) {
+        return res.status(400).json({
+            error: validationErrors
+        });
+    }
+
+    try {
       const gemstone = await Gemstone.create(req.body);
       res.status(201).json(gemstone);
-  } catch (error) {
+    } catch (error) {
       console.error('Error creating gemstone:', error);
       res.status(500).json({ error: 'An error occurred while creating gemstone' });
-  }
+    }
 };
 
 const updateGemstone = async (req, res) => {
@@ -127,8 +135,7 @@ const updateGemstone = async (req, res) => {
 
   if (validationErrors.length > 0) {
       return res.status(400).json({
-          message: 'Validation failed',
-          validationErrors,
+          error: validationErrors
       });
   }
 
@@ -170,7 +177,7 @@ const deleteGemstone = async (req, res) => {
   
       res.status(200).json(gemstone)
     } catch (error) {
-      console.error('Error fetching gemstones:', error);
+      console.error('Error deleting gemstones:', error);
       res.status(500).json({ error: 'An error occurred while deleting gemstones' });
     }
 }

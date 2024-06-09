@@ -55,9 +55,9 @@ const createDesign = async (req, res) => {
       return res.status(400).json({error: 'Invalid user ID'})
     }
 
-    const { design_name, jewelry_id, images } = req.body
+    const { jewelry_id, images } = req.body
 
-    if (!design_name || !jewelry_id) {
+    if (!jewelry_id) {
       return res.status(400).json({error: "Please fill in the required field!"})
     }
 
@@ -76,7 +76,7 @@ const createDesign = async (req, res) => {
         return res.status(400).json({ error: 'This jewelry already have a design' });
       }
 
-      const design = await Design.create({ user_id: _id, design_name, jewelry_id, images })
+      const design = await Design.create({ user_id: _id, jewelry_id, images })
 
       res.status(201).json(design)
     } catch (error) {
@@ -109,7 +109,7 @@ const deleteDesign = async (req, res) => {
 const updateDesign = async (req, res) => {
     try {
         const { id } = req.params
-        const { design_name, jewelry_id, images } = req.body; // Extract jewelry_id from request body
+        const { jewelry_id, images } = req.body; // Extract jewelry_id from request body
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({error: 'Invalid ID'})

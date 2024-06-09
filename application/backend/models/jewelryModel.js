@@ -8,7 +8,8 @@ const jewelrySchema = new Schema( {
         required: true
     },
     description: {
-        type: String
+        type: String,
+        required: true
     },
     gemstone_id: {
         type: mongoose.Schema.Types.ObjectId,

@@ -10,7 +10,11 @@ const validateEmptyFields = (data) => {
     if (!price) emptyFields.push('price');
     if (!carat) emptyFields.push('carat');
 
-    return emptyFields;
+    if (emptyFields.length > 0) {
+        return "Please fill in the required field"
+    }
+
+    return null;
 };
 
 const validateInputData = (data) => {
@@ -70,13 +74,17 @@ const createMaterial = async (req, res) => {
     const emptyFields = validateEmptyFields(req.body);
     const validationErrors = validateInputData(req.body);
 
-    if (emptyFields.length > 0 || validationErrors.length > 0) {
-      return res.status(400).json({
-          error: 'Validation failed',
-          emptyFields,
-          validationErrors,
-      });
-  }
+    if (emptyFields) {
+        return res.status(400).json({
+            error: emptyFields
+        });
+    }
+
+    if (validationErrors.length > 0) {
+        return res.status(400).json({
+            error: validationErrors
+        });
+    }
 
     try {
         const material = await Material.create(req.body);
@@ -119,8 +127,7 @@ const updateMaterial = async (req, res) => {
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
-          error: 'Validation failed',
-          validationErrors,
+          error: validationErrors
       });
     }
 

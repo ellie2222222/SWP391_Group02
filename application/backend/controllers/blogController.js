@@ -8,20 +8,20 @@ const getBlogs = async (req, res) => {
   try {
       if (title) {
           // If title query parameter is present, find the blog by title
-          const blog = await Blog.findOne({ blog_title: title });
+          const blogs = await Blog.find({ blog_title: { $regex: title, $options: 'i' } });
 
-          if (!blog) {
+          if (!blogs) {
               return res.status(404).json({ error: 'No blog with such title' });
           }
 
-          return res.status(200).json(blog);
+          return res.status(200).json(blogs);
       } else {
           // If no title query parameter, find all blogs
           const blogs = await Blog.find({});
           return res.status(200).json(blogs);
       }
   } catch (error) {
-      res.status(500).json({ error: 'Error while getting blogs' });
+      res.status(500).json({ error: error.message });
   }
 }
 

@@ -16,18 +16,27 @@ const validateEmptyFields = (data) => {
     if (!material_id) emptyFields.push('material_id');
     if (!material_weight) emptyFields.push('material_weight');
     if (!category) emptyFields.push('category');
-    if (!price) emptyFields.push('price');
     if (!type) emptyFields.push('type');
     if (!on_sale) emptyFields.push('on_sale');
     if (!sale_percentage) emptyFields.push('sale_percentage');
+    
+    if (emptyFields.length > 0) {
+        return "Please fill in the required field"
+    }
 
-    return emptyFields;
+    return null
 };
 
 const validateInputData = (data) => {
-    const { price, material_weight, gemstone_weight, sale_percentage} = data;
+    const { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage } = data;
     let validationErrors = [];
 
+    if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
+        validationErrors.push('Invalid gemstone ID')
+    }
+    if (material_id && !mongoose.Types.ObjectId.isValid(material_id)) {
+        validationErrors.push('Invalid material ID')
+    }
     if (price != null && (typeof price !== 'number' || price <= 0)) {
         validationErrors.push('Price must be a positive number');
     }
@@ -49,12 +58,16 @@ const createJewelry = async (req, res) => {
     const emptyFields = validateEmptyFields(req.body);
     const validationErrors = validateInputData(req.body);
 
-    if (emptyFields.length > 0 || validationErrors.length > 0) {
-      return res.status(400).json({
-          message: 'Validation failed',
-          emptyFields,
-          validationErrors
-      });
+    if (emptyFields) {
+        return res.status(400).json({
+            error: emptyFields
+        });
+    }
+
+    if (validationErrors.length > 0) {
+        return res.status(400).json({
+            error: validationErrors
+        });
     }
 
     try {
@@ -137,10 +150,9 @@ const updateJewelry = async (req, res) => {
     }
 
     if (validationErrors.length > 0) {
-      return res.status(400).json({
-          message: 'Validation failed',
-          validationErrors,
-      });
+        return res.status(400).json({
+            error: validationErrors
+        });
     }
 
     try {
