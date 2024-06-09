@@ -153,58 +153,6 @@ const updateGemstone = async (req, res) => {
   }
 };
 
-const validatePriceUpdate = (data) => {
-  const { price } = data;
-  let validationErrors = [];
-
-  if (price == null) {
-      validationErrors.push('Price is required');
-  } else if (price <= 0) {
-      validationErrors.push('Price must be a positive number');
-  }
-
-  return validationErrors;
-};
-
-const updateGemstonePrice = async (req, res) => {
-  const { id } = req.params;
-  const { price } = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid ID' });
-  }
-
-  const validationErrors = validatePriceUpdate({ price });
-
-  if (validationErrors.length > 0) {
-      return res.status(400).json({
-          message: 'Validation failed',
-          validationErrors,
-      });
-  }
-
-  try {
-      const gemstone = await Gemstone.findOneAndUpdate(
-          { _id: id },
-          { price },
-          {
-              new: true, // Return the updated document
-              runValidators: true,
-          }
-      );
-
-      if (!gemstone) {
-          return res.status(404).json({ error: 'No such gemstone' });
-      }
-
-      res.status(200).json(gemstone);
-  } catch (error) {
-      console.error('Error updating gemstone price:', error);
-      res.status(500).json({ error: 'An error occurred while updating gemstone price' });
-  }
-};
-
-
 // delete a gemstone
 const deleteGemstone = async (req, res) => {
     const { id } = req.params
@@ -227,4 +175,4 @@ const deleteGemstone = async (req, res) => {
     }
 }
 
-module.exports = { getGemstones, getGemstone, createGemstone, deleteGemstone, updateGemstone, updateGemstonePrice }
+module.exports = { getGemstones, getGemstone, createGemstone, deleteGemstone, updateGemstone }

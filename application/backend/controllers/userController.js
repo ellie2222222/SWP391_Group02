@@ -106,4 +106,41 @@ const assignRole = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, loginUser, deleteUser, assignRole };
+// get all users
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({})
+
+    if (!users) {
+      return res.status(404).json({ error: "No users found" })
+    }
+
+    return res.status(200).json({ users })
+  } catch (error) {
+    return res.status(500).json({ error: "Error while getting users" })
+  }
+}
+
+const getUser = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    // check valid user id
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    const users = await User.find({_id: id})
+
+    if (!users) {
+      return res.status(404).json({ error: "No users found" })
+    }
+
+    return res.status(200).json({ users })
+  } catch (error) {
+    return res.status(500).json({ error: "Error while getting users" })
+  }
+}
+
+
+module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser };
