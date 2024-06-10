@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, {  useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
@@ -22,8 +22,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import AuthContext from '../../context/AuthContext';
-
+import useAuth from '../../hooks/useAuthContext';
 const CustomAppBar = styled(AppBar)({
   backgroundColor: '#fff',
   color: '#000',
@@ -85,8 +84,7 @@ const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const authContext = useContext(AuthContext);
-  const { user, logout } = authContext;
+  const { user, logout } = useAuth();
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
