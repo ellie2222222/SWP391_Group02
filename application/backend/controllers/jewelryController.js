@@ -17,6 +17,7 @@ const validateEmptyFields = (data) => {
     if (!material_weight) emptyFields.push('material_weight');
     if (!category) emptyFields.push('category');
     if (!type) emptyFields.push('type');
+    if (type && type === 'Sample' && !price) emptyFields.push('price');
     if (!on_sale) emptyFields.push('on_sale');
     if (!sale_percentage) emptyFields.push('sale_percentage');
     
@@ -28,7 +29,7 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    const { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage } = data;
+    const { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage, type } = data;
     let validationErrors = [];
 
     if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
@@ -47,7 +48,13 @@ const validateInputData = (data) => {
         validationErrors.push('Gemstone weight must be a positive number');
     }
     if (sale_percentage != null && (typeof sale_percentage !== 'number' || sale_percentage < 0 || sale_percentage > 100)) {
-        validationErrors.push('sale percentage must be a positive number between 0 and 100');
+        validationErrors.push('Sale percentage must be a positive number between 0 and 100');
+    }
+
+    const allowedType = ['Custom', 'Sample']
+
+    if (!allowedType.includes(type)) {
+        validationErrors.push("Invalid type");
     }
 
     return validationErrors;

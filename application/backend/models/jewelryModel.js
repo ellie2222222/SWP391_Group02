@@ -11,6 +11,9 @@ const jewelrySchema = new Schema( {
         type: String,
         required: true
     },
+    price: {
+        type: Number
+    },
     gemstone_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gemstone',
