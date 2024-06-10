@@ -1,35 +1,86 @@
-import { useState } from "react";
-import { useSignup } from '../hooks/useSignup'
+import React, { useState } from 'react';
+import { TextField, Button, Container, Typography } from '@mui/material';
+import useAuth from '../hooks/useAuthContext';
 
 const Signup = () => {
-    const [username, setUsername] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const { signup, error, isLoading } = useSignup()
+    const [userData, setUserData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        phone_number: '',
+        address: ''
+    });
+    const [error, setError] = useState('');
+    const { signup } = useAuth();
 
-    const handleSubmit = async(e) => {
-        e.preventDefault()
-        
-        await signup(username, email, password)
-    }
+    const handleChange = (e) => {
+        setUserData({ ...userData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await signup(userData);
+            alert('Signup successful! Please log in.');
+        } catch (err) {
+            setError('Signup failed');
+        }
+    };
 
     return (
-        <form className="signup" onSubmit={handleSubmit}>
-            <h3>Sign up</h3>
+        <Container maxWidth="sm">
+            <Typography variant="h4" gutterBottom>
+                Sign Up
+            </Typography>
+            <form onSubmit={handleSubmit}>
+                <TextField
+                    label="Username"
+                    name="username"
+                    fullWidth
+                    margin="normal"
+                    value={userData.username}
+                    onChange={handleChange}
+                />
+                <TextField
+                    label="Email"
+                    name="email"
+                    fullWidth
+                    margin="normal"
+                    value={userData.email}
+                    onChange={handleChange}
+                />
+                <TextField
+                    label="Password"
+                    name="password"
+                    type="password"
+                    fullWidth
+                    margin="normal"
+                    value={userData.password}
+                    onChange={handleChange}
+                />
+                <TextField
+                    label="Phone Number"
+                    name="phone_number"
+                    fullWidth
+                    margin="normal"
+                    value={userData.phone_number}
+                    onChange={handleChange}
+                />
+                <TextField
+                    label="Address"
+                    name="address"
+                    fullWidth
+                    margin="normal"
+                    value={userData.address}
+                    onChange={handleChange}
+                />
+                <Button variant="contained" color="primary" type="submit">
+                    Sign Up
+                </Button>
+                {error && <Typography color="error">{error}</Typography>}
+            </form>
+        </Container>
+    );
+};
 
-            <label>Username: </label>
-            <input type="text" value={username} onChange={(e) => {setUsername(e.target.value)}} placeholder="Enter username"/>
-            
-            <label>Email: </label>
-            <input type="email" value={email} onChange={(e) => {setEmail(e.target.value)}} placeholder="Enter email which will be used for login credential"/>
-
-            <label>Password: </label>
-            <input type="password" value={password} onChange={(e) => {setPassword(e.target.value)}} placeholder="Enter password"/>
-
-            <button disabled={isLoading}>Sign up</button>
-            {error && <div className="error">{error}</div>}
-        </form>
-    )
-}
-
-export default Signup
+export default Signup;

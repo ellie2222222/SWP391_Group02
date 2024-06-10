@@ -1,36 +1,57 @@
-import { createContext, useReducer, useEffect } from "react";
+import React, { createContext, useState, useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode';
+import axios from 'axios';
 
-export const AuthContext = createContext()
+const AuthContext = createContext();
 
-export const authReducer = (state, action) => {
-    switch (action.type) {
-        case "LOGIN":
-            return {user: action.payload}
-        case "LOGOUT":
-            return {user: null}
-        default:
-            return state
-    }
-}
-
-export const AuthContextProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(authReducer, {
-        user: null
-    })
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'))
-
-        if (user) {
-            dispatch({type: 'LOGIN', payload: user})
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwtDecode(token);
+            setUser({ ...decoded, token });
         }
-    }, [])
+        setLoading(false);
+    }, []);
 
-    console.log('AuthContext state: ', state)
+    const login = async (email, password) => {
+        try {
+            const response = await axios.post('http://localhost:4000/api/user/login', { email, password });
+            const { token } = response.data;
+            const decoded = jwtDecode(token);
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(decoded));
+            setUser({ ...decoded, token });
+            return decoded.role;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
+    };
+
+    const signup = async (userData) => {
+        try {
+            await axios.post('http://localhost:4000/api/user/signup', userData);
+        } catch (error) {
+            console.error('Signup error:', error);
+            throw error;
+        }
+    };
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+    };
 
     return (
-        <AuthContext.Provider value={{...state, dispatch}}>
+        <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};
+
+export default AuthContext;

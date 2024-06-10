@@ -1,31 +1,57 @@
-import { useState } from "react";
-import { useLogin } from "../hooks/useLogin";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Container, Typography } from '@mui/material';
+import useAuth from '../hooks/useAuthContext';
 
 const Login = () => {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const { login, error, isLoading } = useLogin()
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const handleSubmit = async(e) => {
-        e.preventDefault()
-
-        await login(email, password)
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const role = await login(email, password);
+            if (role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
+        } catch (err) {
+            setError('Invalid email or password');
+        }
+    };
 
     return (
-        <form className="login" onSubmit={handleSubmit}>
-            <h3>Login</h3>
-            
-            <label>Email: </label>
-            <input type="email" value={email} onChange={(e) => {setEmail(e.target.value)}}/>
+        <Container maxWidth="sm">
+            <Typography variant="h4" gutterBottom>
+                Login
+            </Typography>
+            <form onSubmit={handleSubmit}>
+                <TextField
+                    label="Email"
+                    fullWidth
+                    margin="normal"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    margin="normal"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button variant="contained" color="primary" type="submit">
+                    Login
+                </Button>
+                {error && <Typography color="error">{error}</Typography>}
+            </form>
+        </Container>
+    );
+};
 
-            <label>Password: </label>
-            <input type="password" value={password} onChange={(e) => {setPassword(e.target.value)}}/>
-            
-            <button disabled={isLoading}>Log in</button>
-            {error && <div className="error">{error}</div>}
-        </form>
-    )
-}
-
-export default Login
+export default Login;
