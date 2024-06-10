@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
@@ -20,6 +20,9 @@ import logo from '../assets/imgs/logo.png';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import AuthContext from '../../context/AuthContext';
 
 const CustomAppBar = styled(AppBar)({
   backgroundColor: '#fff',
@@ -76,10 +79,14 @@ const CustomTextField = styled(TextField)({
   },
 });
 const Navbar = () => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const authContext = useContext(AuthContext);
+  const { user, logout } = authContext;
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -87,6 +94,14 @@ const Navbar = () => {
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
+  };
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -111,33 +126,24 @@ const Navbar = () => {
               onClose={handleDrawerClose}
             >
               <List>
-                
-                  <CustomListItem button onClick={handleDrawerClose}>
+                <CustomListItem button onClick={handleDrawerClose}>
                   <CustomLink to='/products'>
                     <ListItemText primary="Products" />
-                    </CustomLink>
-                  </CustomListItem>
-                
-                
-                  <CustomListItem button onClick={handleDrawerClose}>
+                  </CustomLink>
+                </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
                   <CustomLink to='/blogs'>
                     <ListItemText primary="Blogs" />
-                    </CustomLink>
-                  </CustomListItem>
-                
-                
-                  <CustomListItem button onClick={handleDrawerClose}>
+                  </CustomLink>
+                </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
                   <CustomLink to='/aboutus'>
                     <ListItemText primary="About Us" />
-                    </CustomLink>
-                  </CustomListItem>
-               
-              
-                  <CustomListItem button onClick={handleDrawerClose}>
-                    <CustomLink>
-                      <ListItemText primary="Sales" />
-                    </CustomLink>
-                  </CustomListItem>
+                  </CustomLink>
+                </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
+                  <ListItemText primary="Sales" />
+                </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
                   <ListItemIcon>
                     <SearchIcon style={{ fontSize: '1.6rem' }} />
@@ -195,11 +201,29 @@ const Navbar = () => {
                 }}
 
               />
-              <Link to='/login'>
-                <CustomIconButton color="inherit">
-                  <AccountCircleIcon fontSize='2.6rem' />
-                </CustomIconButton>
-              </Link>
+              {user ? (
+                <>
+                  <CustomIconButton color="inherit" onClick={handleMenuOpen}>
+                    <AccountCircleIcon fontSize='2.6rem' />
+                  </CustomIconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                  >
+                    <MenuItem onClick={logout}>Logout</MenuItem>
+                    <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
+                      Profile
+                    </MenuItem>
+                  </Menu>
+                </>
+              ) : (
+                <Link to='/login'>
+                  <CustomIconButton color="inherit">
+                    <AccountCircleIcon fontSize='2.6rem' />
+                  </CustomIconButton>
+                </Link>
+              )}
             </Box>
           </Box>
         )}
