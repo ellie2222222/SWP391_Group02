@@ -17,6 +17,8 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
+    const backendURI = "https://backend-j9ne.onrender.com" // backend server 
+
     const login = async (email, password) => {
         try {
             const response = await axios.post('http://localhost:4000/api/user/login', { email, password });

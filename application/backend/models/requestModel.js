@@ -8,6 +8,10 @@ const requestSchema = new Schema( {
         ref: 'User', 
         required: true 
     },
+    jewelry_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Jewelry',
+    },
     request_description: {
         type: String,
         required: true
