@@ -157,7 +157,7 @@ const getStaffRequest = async (req, res) => {
   }
 };
 
-// create a new request
+// Create a new request
 const createRequest = async (req, res) => {
   const { authorization } = req.headers;
   const token = authorization.split(" ")[1];
@@ -169,10 +169,26 @@ const createRequest = async (req, res) => {
     return res.status(400).json({ error: "Please provide a description for the request" });
   }
 
-  // add to the database
-  try {
-    const request = await Request.create({ user_id: _id, request_description });
+  // Initialize all fields with default or null values
+  const newRequest = {
+    user_id: _id,
+    request_description,
+    jewelry_id: null,
+    request_status: 'pending',
+    quote_content: null,
+    quote_amount: null,
+    quote_status: 'pending',
+    production_start_date: null,
+    production_end_date: null,
+    production_cost: null,
+    production_status: null,
+    total_amount: null,
+    endedAt: null
+  };
 
+  // Add to the database
+  try {
+    const request = await Request.create(newRequest);
     res.status(201).json(request);
   } catch (error) {
     console.error('Error creating request:', error);
@@ -180,58 +196,58 @@ const createRequest = async (req, res) => {
   }
 };
 
-// Update request status
+// Update request
 const updateRequest = async (req, res) => {
   try {
     const { id } = req.params;
-    const { 
+    const {
       jewelry_id,
-      request_description, request_status, 
-      quote_content, quote_amount, quote_status, 
-      production_start_date, production_end_date, production_cost, production_status 
+      request_description,
+      request_status,
+      quote_content,
+      quote_amount,
+      quote_status,
+      production_start_date,
+      production_end_date,
+      production_cost,
+      production_status,
+      total_amount,
+      endedAt
     } = req.body;
-    
-    // Retrieve the existing request
-    const existingRequest = await Request.findById(id);
-    if (!existingRequest) {
-      return res.status(404).json({ error: "No such request" });
-    }
-
-    // Validate jewelry id and if jewelry id already exist in other request
-    if (jewelry_id) {
-      const jewelry = await Jewelry.findById(jewelry_id)
-      if (!jewelry) {
-          return res.status(404).json({ error: 'No such jewelry' });
-      }
-
-      const existJewelry = await Request.findOne({jewelry_id: jewelry_id})
-      if (existJewelry) {
-          return res.status(400).json({ error: 'This jewelry already have a request' });
-      }
-    }
 
     // Validate request ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid ID" });
     }
 
-    // Validate request status
-    const allowedRequestStatuses = ['pending', 'assigned','completed'];
+    // Retrieve the existing request
+    const existingRequest = await Request.findById(id);
+    if (!existingRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
 
+    // Validate jewelry id and check if it already exists in another request
+    if (jewelry_id) {
+      const jewelry = await Jewelry.findById(jewelry_id);
+      if (!jewelry) {
+        return res.status(404).json({ error: 'No such jewelry' });
+      }
+    }
+
+    // Validate request status
+    const allowedRequestStatuses = ['pending', 'assigned', 'completed'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }
 
     // Validate quote status
     const allowedQuoteStatuses = ["pending", "approved", "rejected"];
-
     if (quote_status && !allowedQuoteStatuses.includes(quote_status)) {
       return res.status(400).json({ error: "Invalid quote status" });
     }
 
     // Validate production status
     const allowedProductionStatuses = ["ongoing", "completed"];
-
     if (production_status && !allowedProductionStatuses.includes(production_status)) {
       return res.status(400).json({ error: "Invalid production status" });
     }
@@ -241,18 +257,23 @@ const updateRequest = async (req, res) => {
       return res.status(400).json('Quote amount must be a positive number');
     }
 
+    // Validate toatal amount
+    if (total_amount != null && (typeof total_amount !== 'number' || total_amount <= 0)) {
+      return res.status(400).json('Total amount must be a positive number');
+    }
+
     // Validate production cost
     if (production_cost != null && (typeof production_cost !== 'number' || production_cost <= 0)) {
       return res.status(400).json('Production cost must be a positive number');
     }
 
     // Validate and parse dates if provided
-    let parsedStartDate, parsedEndDate;
+    let parsedStartDate, parsedEndDate, parsedEndAt;
 
     if (production_start_date) {
       parsedStartDate = new Date(production_start_date);
       if (isNaN(parsedStartDate)) {
-        return res.status(400).json({ error: "Invalid request start date" });
+        return res.status(400).json({ error: "Invalid production start date" });
       }
     } else {
       parsedStartDate = existingRequest.production_start_date;
@@ -261,38 +282,51 @@ const updateRequest = async (req, res) => {
     if (production_end_date) {
       parsedEndDate = new Date(production_end_date);
       if (isNaN(parsedEndDate)) {
-        return res.status(400).json({ error: "Invalid request end date" });
+        return res.status(400).json({ error: "Invalid production end date" });
       }
     } else {
       parsedEndDate = existingRequest.production_end_date;
     }
 
-    // Only update fields that are not null
+    if (endedAt) {
+      parsedEndAt = new Date(endedAt);
+      if (isNaN(parsedEndAt)) {
+        return res.status(400).json({ error: "Invalid end date" });
+      }
+    } else {
+      parsedEndAt = existingRequest.parsedEndAt;
+    }
+
+    // Only update fields that are provided
     const updateFields = {};
 
-    if (jewelry_id !== null) updateFields.jewelry_id = jewelry_id;
-    if (request_description !== null) updateFields.request_description = request_description;
-    if (request_status !== null) updateFields.request_status = request_status;
-    if (quote_content !== null) updateFields.quote_content = quote_content;
-    if (quote_amount !== null) updateFields.quote_amount = quote_amount;
-    if (quote_status !== null) updateFields.quote_status = quote_status;
-    if (production_start_date !== null) updateFields.production_start_date = parsedStartDate;
-    if (production_end_date !== null) updateFields.production_end_date = parsedEndDate;
-    if (production_cost !== null) updateFields.production_cost = production_cost;
-    if (production_status !== null) updateFields.production_status = production_status;
-    
-    const request = await Request.findOneAndUpdate(
-      { _id: id },
-      { $set: { updateFields } },
+    if (jewelry_id !== undefined) updateFields.jewelry_id = jewelry_id;
+    if (request_description !== undefined) updateFields.request_description = request_description;
+    if (request_status !== undefined) updateFields.request_status = request_status;
+    if (quote_content !== undefined) updateFields.quote_content = quote_content;
+    if (quote_amount !== undefined) updateFields.quote_amount = quote_amount;
+    if (quote_status !== undefined) updateFields.quote_status = quote_status;
+    if (production_start_date !== undefined) updateFields.production_start_date = parsedStartDate;
+    if (production_end_date !== undefined) updateFields.production_end_date = parsedEndDate;
+    if (production_cost !== undefined) updateFields.production_cost = production_cost;
+    if (production_status !== undefined) updateFields.production_status = production_status;
+    if (production_status !== undefined) updateFields.production_status = production_status;
+    if (total_amount !== undefined) updateFields.total_amount = total_amount;
+    if (endedAt !== undefined) updateFields.endedAt = parsedEndAt;
+
+    const updatedRequest = await Request.findByIdAndUpdate(
+      id,
+      { $set: updateFields },
       { new: true, runValidators: true }
     );
-    
-    if (!request) {
+
+    if (!updatedRequest) {
       return res.status(404).json({ error: "No such request" });
     }
 
-    res.status(200).json(request);
+    res.status(200).json(updatedRequest);
   } catch (error) {
+    console.error('Error updating request:', error);
     res.status(500).json({ error: "Error while updating request" });
   }
 };

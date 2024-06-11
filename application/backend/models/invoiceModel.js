@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const invoiceSchema = new Schema({
-    user_id: {
+    request_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Request',
         required: true
     },
     payment_method: {
