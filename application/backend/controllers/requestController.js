@@ -7,7 +7,12 @@ const jwt = require("jsonwebtoken");
 // get all requests
 const getRequests = async (req, res) => {
   try {
-    const request = await Request.find({});
+    let request
+    if (req.role === "sale_staff") {
+      request = await Request.find({ request_status: "pending"});
+    } else {
+      request = await Request.find({});
+    }    
 
     res.status(200).json(request);
   } catch (error) {
@@ -29,6 +34,10 @@ const getRequest = async (req, res) => {
 
     if (!request) {
       return res.status(404).json({ error: "No such request" });
+    }
+
+    if (req.role === "sale_staff" && request.request_status !== "pending") {
+      return res.status(403).json({ error: "You do not have permission to perform this action" })
     }
 
     res.status(200).json(request);
@@ -59,12 +68,76 @@ const getUserRequests = async (req, res) => {
   }
 };
 
+// get user requests
+const getUserRequest = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { authorization } = req.headers
+    const token = authorization.split(' ')[1]
+    const { _id } = jwt.verify(token, process.env.SECRET)
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    if (!(_id === id)) {
+      return res.status(403).json({error: 'You do not have permission to perform this action'})
+    }
+
+    const requests = await Request.find({ user_id: _id });
+
+    // Check if requests exist
+    if (requests.length === 0) {
+      return res.status(404).json({ error: "No requests found" });
+    }
+
+    res.status(200).json(requests);
+  } catch (error) {
+    console.error('Error fetching request:', error);
+    res.status(500).json({ error: "An error occurred while fetching your requests" });
+  }
+};
+
 // get staff requests
 const getStaffRequests = async (req, res) => {
   try {
     const { authorization } = req.headers
     const token = authorization.split(' ')[1]
     const { _id } = jwt.verify(token, process.env.SECRET)
+
+    const worksOn = await WorksOn.find({ user_id: _id }).select("request_id");
+
+    const requestIds = worksOn.map(w => w.request_id);
+
+    const requests = await Request.find({ _id: { $in: requestIds } });
+
+    // Check if requests exist
+    if (requests) {
+      return res.status(404).json({ error: "No requests found for this staff" });
+    }
+
+    res.status(200).json(requests);
+  } catch (error) {
+    console.error('Error fetching request:', error);
+    res.status(500).json({ error: "An error occurred while fetching staff requests" });
+  }
+};
+
+// get staff request
+const getStaffRequest = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { authorization } = req.headers
+    const token = authorization.split(' ')[1]
+    const { _id } = jwt.verify(token, process.env.SECRET)
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
+
+    if (!(_id === id)) {
+      return res.status(403).json({error: 'You do not have permission to perform this action'})
+    }
 
     const worksOn = await WorksOn.find({ user_id: _id }).select("request_id");
 
@@ -229,6 +302,8 @@ module.exports = {
   getRequest,
   createRequest,
   getStaffRequests,
+  getStaffRequest,
   getUserRequests,
+  getUserRequest,
   updateRequest
 };
