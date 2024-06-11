@@ -34,7 +34,11 @@ const JewelryDetails = () => {
   }, [id]);
 
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (!product) {

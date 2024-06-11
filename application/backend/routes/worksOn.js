@@ -5,18 +5,22 @@ const { createWorksOn, getWorksOnById, getAllWorksOns, updateWorksOnById, delete
 
 const worksOnRoutes = express.Router()
 
-worksOnRoutes.post('/', requireAuth, requireManager, createWorksOn)
+worksOnRoutes.use(requireAuth)
 
-worksOnRoutes.get('/:id', requireAuth, requireManager, getWorksOnById)
+worksOnRoutes.use(requireManager)
 
-worksOnRoutes.get('/', requireAuth, requireManager, getAllWorksOns)
+worksOnRoutes.post('/', createWorksOn)
 
-worksOnRoutes.patch('/:id', requireAuth, requireManager, updateWorksOnById)
+worksOnRoutes.get('/:id', getWorksOnById)
 
-worksOnRoutes.delete('/:id', requireAuth, requireManager, deleteWorksOnById)
+worksOnRoutes.get('/', getAllWorksOns)
 
-worksOnRoutes.patch('/:id/add-staff/:staff_id', requireAuth, requireManager, addStaffToWorksOn);
+worksOnRoutes.patch('/:id', updateWorksOnById)
 
-worksOnRoutes.patch('/:id/remove-staff/:staff_id', requireAuth, requireManager, removeStaffFromWorksOn);
+worksOnRoutes.delete('/:id', deleteWorksOnById)
+
+worksOnRoutes.patch('/:id/add-staff/:staff_id', addStaffToWorksOn);
+
+worksOnRoutes.patch('/:id/remove-staff/:staff_id', removeStaffFromWorksOn);
 
 module.exports = worksOnRoutes;
