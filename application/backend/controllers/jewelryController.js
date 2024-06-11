@@ -114,7 +114,9 @@ const getJewelry = async (req, res) => {
     }
 
     try {
-        const jewelry = await Jewelry.findById(id);
+        const jewelry = await Jewelry.findById(id)
+            .populate('gemstone_id', 'name carat')
+            .populate('material_id', 'name carat');
 
         if (!jewelry) {
             return res.status(404).json({ error: 'No such jewelry' });
@@ -122,7 +124,7 @@ const getJewelry = async (req, res) => {
 
         res.status(200).json(jewelry);
     } catch (error) {
-        res.status(500).json({ error: 'Error while getting a jewelry' });
+        res.status(500).json({ error: error.message });
     }
 };
 
