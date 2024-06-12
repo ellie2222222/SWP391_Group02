@@ -143,6 +143,9 @@ const Navbar = () => {
                   <ListItemText primary="Sales" />
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
+                  <ListItemText primary="Custom Request" />
+                </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
                   <ListItemIcon>
                     <SearchIcon style={{ fontSize: '1.6rem' }} />
                   </ListItemIcon>
@@ -176,6 +179,11 @@ const Navbar = () => {
                 </Grid>
                 <Grid item xs>
                   <CustomButton>Sales</CustomButton>
+                </Grid>
+                <Grid item xs>
+                  <Link to='/request'>
+                    <CustomButton>Custom Request</CustomButton>
+                  </Link>
                 </Grid>
               </Grid>
             {/* Thêm icon login và thanh search */}

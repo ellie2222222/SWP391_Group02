@@ -45,7 +45,11 @@ const JewelryDetails = () => {
   }
 
   if (!product) {
-    return <Typography variant="h5">Product not found</Typography>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h5">Product not found</Typography>
+      </Box>
+    );
   }
 
   return (

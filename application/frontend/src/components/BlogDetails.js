@@ -28,7 +28,7 @@ const BlogDetails = () => {
         setLoading(false);
       })
       .catch(error => {
-        console.error('There was an error fetching the product!', error);
+        console.error('There was an error fetching the blog!', error);
         setLoading(false);
       });
   }, [id]);
@@ -47,7 +47,7 @@ const BlogDetails = () => {
 
   return (
     <Container>
-      <Box display="flex" flexDirection="row" padding="40px 0">
+      <Box display="flex" flexDirection="row" padding="40px 0" minHeight="100vh">
         <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between">
           <Typography variant="h4" component="h1">{blog.blog_title}</Typography>
           <Typography variant="body1"> {blog.blog_content}</Typography>

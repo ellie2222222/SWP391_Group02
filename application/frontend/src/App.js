@@ -7,9 +7,8 @@ import About from "./pages/About";
 import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
-import Order from "./pages/Order";
-
 import BlogContents from "./pages/BlogContents";
+import Request from "./pages/Request";
 function App() {
   return (
     <div className="App">
@@ -24,7 +23,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="/order/:id" element={<Order />} />
+        <Route path="/request" element={<Request />} />
       </Routes>
     </div>
   );
