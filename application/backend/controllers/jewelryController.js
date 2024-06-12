@@ -11,8 +11,6 @@ const validateEmptyFields = (data) => {
 
     if (!name) emptyFields.push('name');
     if (!description) emptyFields.push('description');
-    if (!gemstone_id) emptyFields.push('gemstone_id');
-    if (!gemstone_weight) emptyFields.push('gemstone_weight');
     if (!material_id) emptyFields.push('material_id');
     if (!material_weight) emptyFields.push('material_weight');
     if (!category) emptyFields.push('category');
@@ -33,7 +31,7 @@ const validateInputData = (data) => {
     let validationErrors = [];
 
     if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
-        validationErrors.push('Invalid gemstone ID')
+        validationErrors.push('Invalid gemstones ID')
     }
     if (material_id && !mongoose.Types.ObjectId.isValid(material_id)) {
         validationErrors.push('Invalid material ID')
