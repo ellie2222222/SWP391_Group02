@@ -45,7 +45,7 @@ const JewelryList = () => {
 
   return (
     <Container>
-      <Box padding='40px 0'>
+      <Box padding='40px 0' minHeight="100vh">
         <Grid container spacing={2}>
           {products.map((product, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
@@ -64,7 +64,7 @@ const JewelryList = () => {
                     {product._id}
                   </Typography>
                   <Typography variant="h6" color="text.primary">
-                    {product.price} USD
+                    {product.price} VND
                   </Typography>
                   <CustomButton1  onClick={() => navigate(`/product/${product._id}`)}>
                     Details

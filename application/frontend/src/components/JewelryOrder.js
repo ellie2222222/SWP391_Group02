@@ -17,7 +17,7 @@ const CustomButton1 = styled(Button)({
   },
 });
 
-const JewelryDetails = () => {
+const JewelryOrder = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,22 +56,16 @@ const JewelryDetails = () => {
         </Box>
         <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between">
           <Typography variant="h4" component="h1">{product.name}</Typography>
-          <Typography variant="h5">{product.price} VND</Typography>
           <Typography variant="body1">Gemstone: {product.gemstone_id.name}</Typography>
           <Typography variant="body1">Gemstone Carat: {product.gemstone_id.carat}</Typography>
           <Typography variant="body1">Gemstone Shape: {product.gemstone_id.cut}</Typography>
           <Typography variant="body1">Gemstone Color: {product.gemstone_id.color}</Typography>
           <Typography variant="body1">Gemstone Clarity: {product.gemstone_id.clarity}</Typography>
-          <Typography variant="body1">Gemstone Weight: {product.material_weight} kg</Typography>
           <Typography variant="body1">Materials: {product.material_id.name}</Typography>
           <Typography variant="body1">Material Carat: {product.material_id.carat}</Typography>
-          <Typography variant="body1">Material Weight: {product.material_weight} kg</Typography>
           <Typography variant="body1">Category: {product.category}</Typography>
-          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate('')}>
-            ORDER NOW
-          </CustomButton1>
-          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '0px' }} onClick={() => navigate(`/order/${product._id}`)}>
-            USE THIS SAMPLE AND CREATE CUSTOM ORDER
+          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate(``)}>
+            SEND REQUEST
           </CustomButton1>
         </Box>
       </Box>
@@ -79,4 +73,4 @@ const JewelryDetails = () => {
   );
 };
 
-export default JewelryDetails;
+export default JewelryOrder;

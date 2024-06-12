@@ -115,7 +115,7 @@ const getJewelry = async (req, res) => {
 
     try {
         const jewelry = await Jewelry.findById(id)
-            .populate('gemstone_id', 'name carat')
+            .populate('gemstone_id', 'name carat cut clarity color')
             .populate('material_id', 'name carat');
 
         if (!jewelry) {
