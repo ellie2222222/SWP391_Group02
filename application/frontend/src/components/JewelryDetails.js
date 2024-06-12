@@ -45,7 +45,11 @@ const JewelryDetails = () => {
   }
 
   if (!product) {
-    return <Typography variant="h5">Product not found</Typography>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h5">Product not found</Typography>
+      </Box>
+    );
   }
 
   return (
@@ -69,9 +73,6 @@ const JewelryDetails = () => {
           <Typography variant="body1">Category: {product.category}</Typography>
           <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate('')}>
             ORDER NOW
-          </CustomButton1>
-          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '0px' }} onClick={() => navigate(`/order/${product._id}`)}>
-            USE THIS SAMPLE AND CREATE CUSTOM ORDER
           </CustomButton1>
         </Box>
       </Box>

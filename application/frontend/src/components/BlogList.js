@@ -30,7 +30,7 @@ const BlogLists = () => {
         setLoading(false);
       })
       .catch(error => {
-        console.error('There was an error fetching the products!', error);
+        console.error('There was an error fetching the blogs!', error);
         setLoading(false);
       });
   }, []);
@@ -45,7 +45,7 @@ const BlogLists = () => {
 
   return (
     <Container>
-      <Box padding='40px 0'>
+      <Box padding='40px 0' minHeight="100vh">
         <Grid container spacing={2}>
           {blogs.map((blog, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
