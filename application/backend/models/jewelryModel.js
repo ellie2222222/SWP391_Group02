@@ -17,11 +17,13 @@ const jewelrySchema = new Schema( {
     gemstone_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gemstone',
-        required: true
+       
+        default: null
     },
     gemstone_weight: {
         type: Number,
-        required: true
+        
+        default: null
     },
     material_id: {
         type: mongoose.Schema.Types.ObjectId,

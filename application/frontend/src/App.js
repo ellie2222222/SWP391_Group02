@@ -9,6 +9,7 @@ import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
 import Order from "./pages/Order";
 
+import BlogContents from "./pages/BlogContents";
 function App() {
   return (
     <div className="App">
@@ -17,6 +18,7 @@ function App() {
         <Route path='/login' element={<Login />}></Route>
         <Route path='/products' element={<Products />}></Route>
         <Route path='/blogs' element={<Blogs />}></Route>
+        <Route path='/blog/:id' element={<BlogContents />}></Route>
         <Route path='/aboutus' element={<About />}></Route>
         <Route path='/product/:id' element={<Details />}></Route>
         <Route path="/login" element={<Login />} />

@@ -1,13 +1,12 @@
 import React from 'react'
 import Navbar from "../components/Navbar/Navbar"
-import BlogList from '../components/BlogList'
 import Footer from '../components/Footer/Footer'
-export default function Blogs() {
+import BlogDetails from '../components/BlogDetails'
+export default function BlogContents() {
   return (
     <div>
         <Navbar/>
-        <h2>Blogs</h2>
-        <BlogList/>
+        <BlogDetails/>
         <Footer/>
     </div>
   )
