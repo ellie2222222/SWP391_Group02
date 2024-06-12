@@ -7,6 +7,7 @@ import About from "./pages/About";
 import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
+import AdminRoute from "./routes/routes";
 import BlogContents from "./pages/BlogContents";
 import Request from "./pages/Request";
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path='/product/:id' element={<Details />}></Route>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/admin" element={<AdminRoute></AdminRoute>} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/request" element={<Request />} />
       </Routes>
