@@ -15,7 +15,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import logo from '../assets/imgs/logo.png';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -101,7 +101,12 @@ const Navbar = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
+  const handleLogOut = () => {
+    logout();
+    navigate('/login');
+  }
+  
+  const navigate = useNavigate(); 
   return (
     <CustomAppBar position="static">
       <Toolbar>
@@ -209,7 +214,7 @@ const Navbar = () => {
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                   >
-                    <MenuItem onClick={logout}>Logout</MenuItem>
+                    <MenuItem onClick={handleLogOut} >Logout</MenuItem>
                     <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
                       Profile
                     </MenuItem>

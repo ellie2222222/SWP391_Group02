@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import useAuth from '../hooks/useAuthContext';
 
 const Signup = () => {
@@ -12,7 +13,7 @@ const Signup = () => {
     });
     const [error, setError] = useState('');
     const { signup } = useAuth();
-
+    const navigate = useNavigate();  
     const handleChange = (e) => {
         setUserData({ ...userData, [e.target.name]: e.target.value });
     };
@@ -22,8 +23,10 @@ const Signup = () => {
         try {
             await signup(userData);
             alert('Signup successful! Please log in.');
-        } catch (err) {
-            setError('Signup failed');
+            setError(''); // Xóa lỗi nếu đăng ký thành công
+            navigate('/login'); // Điều hướng về trang đăng nhập
+        } catch (error) {
+            setError(error.message || 'Signup failed'); // Cập nhật lỗi từ server
         }
     };
 
@@ -77,7 +80,7 @@ const Signup = () => {
                 <Button variant="contained" color="primary" type="submit">
                     Sign Up
                 </Button>
-                {error && <Typography color="error">{error}</Typography>}
+                {error && <Typography color="error" style={{ marginTop: '16px' }}>{error}</Typography>}
             </form>
         </Container>
     );

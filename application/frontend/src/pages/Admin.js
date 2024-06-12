@@ -6,9 +6,6 @@ import { Navigate } from 'react-router-dom';
 const Admin = () => {
     const { user } = useAuth();
 
-    if (!user || user.role !== 'admin') {
-        return <Navigate to="/" />;
-    }
 
     return (
         <Container>

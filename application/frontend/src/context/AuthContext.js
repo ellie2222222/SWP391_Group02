@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
@@ -17,15 +18,12 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const backendURI = "https://backend-j9ne.onrender.com" // backend server 
-
     const login = async (email, password) => {
         try {
             const response = await axios.post('http://localhost:4000/api/user/login', { email, password });
             const { token } = response.data;
             const decoded = jwtDecode(token);
             localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(decoded));
             setUser({ ...decoded, token });
             return decoded.role;
         } catch (error) {
@@ -38,14 +36,16 @@ export const AuthProvider = ({ children }) => {
         try {
             await axios.post('http://localhost:4000/api/user/signup', userData);
         } catch (error) {
-            console.error('Signup error:', error);
-            throw error;
+            if (error.response && error.response.data && error.response.data.error) {
+                throw new Error(error.response.data.error); // Ném lỗi chi tiết từ phản hồi của server
+            } else {
+                throw new Error('Signup failed'); // Ném lỗi chung nếu không có phản hồi chi tiết
+            }
         }
     };
 
     const logout = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
         setUser(null);
     };
 
