@@ -38,7 +38,8 @@ const RequestForm = () => {
             );
             setError('')
           } catch (error) {
-            setError(error.response.data.error);
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error)
           }
     };
 

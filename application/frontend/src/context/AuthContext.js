@@ -36,11 +36,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await axios.post('http://localhost:4000/api/user/signup', userData);
         } catch (error) {
-            if (error.response && error.response.data && error.response.data.error) {
-                throw new Error(error.response.data.error); // Ném lỗi chi tiết từ phản hồi của server
-            } else {
-                throw new Error('Signup failed'); // Ném lỗi chung nếu không có phản hồi chi tiết
-            }
+            throw error
         }
     };
 

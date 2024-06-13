@@ -42,7 +42,11 @@ const BlogDetails = () => {
   }
 
   if (!blog) {
-    return <Typography variant="h5">Blog not found</Typography>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h5">Blog not found</Typography>
+      </Box>
+    )
   }
 
   return (

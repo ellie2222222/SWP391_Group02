@@ -223,7 +223,7 @@ const Navbar = () => {
                     onClose={handleMenuClose}
                   >
                     <MenuItem onClick={handleLogOut} >Logout</MenuItem>
-                    <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
+                    <MenuItem component={Link} to={`/profile/${user._id}`} onClick={handleMenuClose}>
                       Profile
                     </MenuItem>
                   </Menu>

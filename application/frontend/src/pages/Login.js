@@ -19,8 +19,9 @@ const Login = () => {
             } else {
                 navigate('/');
             }
-        } catch (err) {
-            setError('Invalid email or password');
+        } catch (error) {
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error)
         }
     };
 
