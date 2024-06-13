@@ -26,7 +26,8 @@ const Signup = () => {
             setError(''); // Xóa lỗi nếu đăng ký thành công
             navigate('/login'); // Điều hướng về trang đăng nhập
         } catch (error) {
-            setError(error.message || 'Signup failed'); // Cập nhật lỗi từ server
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error)
         }
     };
 

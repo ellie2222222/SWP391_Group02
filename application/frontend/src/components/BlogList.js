@@ -43,6 +43,14 @@ const BlogLists = () => {
     );
   }
 
+  if (blogs.length <= 0) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h5">There was an error getting blogs!</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Container>
       <Box padding='40px 0' minHeight="100vh">
