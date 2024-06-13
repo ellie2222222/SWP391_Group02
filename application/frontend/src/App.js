@@ -8,7 +8,7 @@ import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
 import BlogContents from "./pages/BlogContents";
-import { AdminRoute } from "./routes/routes";
+import { AdminRoute, UserRoute } from "./routes/routes";
 import Request from "./pages/Request";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
@@ -30,11 +30,12 @@ function App() {
         <Route path='/profile/:id/requests' element={<UserRequest />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/admin" element={<AdminRoute></AdminRoute>} >
-          <Route path="/admin" element={<Admin/>} ></Route>
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route path="/admin" element={<Admin/>} />
         </Route>
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/request" element={user ? (<Request />) : (<Navigate to ="/login" />)} />
+        <Route element={<UserRoute />}>
+          <Route path="/request" element={<Request />} />
+        </Route>
       </Routes>
     </div>
   );
