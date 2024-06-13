@@ -26,8 +26,8 @@ const Login = () => {
 
     if (user) {
         return <Navigate to="/" />;
+        
     }
-
     return (
         <Container maxWidth="sm">
             <Typography variant="h4" gutterBottom>

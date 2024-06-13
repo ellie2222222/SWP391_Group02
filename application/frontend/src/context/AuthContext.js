@@ -1,23 +1,25 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState([]);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            const decoded = jwtDecode(token);
-            setUser({ ...decoded, token });
+            try {
+                const decoded = jwtDecode(token);
+                setUser({ ...decoded, token });
+                
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                setUser(null);
+            }
         }
         setLoading(false);
-    }, []);
-
+    },[]);
     const login = async (email, password) => {
         try {
             const response = await axios.post('http://localhost:4000/api/user/login', { email, password });
@@ -37,9 +39,9 @@ export const AuthProvider = ({ children }) => {
             await axios.post('http://localhost:4000/api/user/signup', userData);
         } catch (error) {
             if (error.response && error.response.data && error.response.data.error) {
-                throw new Error(error.response.data.error); // Ném lỗi chi tiết từ phản hồi của server
+                throw new Error(error.response.data.error);
             } else {
-                throw new Error('Signup failed'); // Ném lỗi chung nếu không có phản hồi chi tiết
+                throw new Error('Signup failed');
             }
         }
     };
