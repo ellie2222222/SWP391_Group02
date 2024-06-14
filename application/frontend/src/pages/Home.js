@@ -5,8 +5,7 @@ import HomePageBody from '../components/HomePageBody'
 import  useAuth  from '../hooks/useAuthContext';
 
 export default function Home() {
-  const {user} = useAuth();
-  console.log(user);
+
   return (
     <div>
       <Navbar/>

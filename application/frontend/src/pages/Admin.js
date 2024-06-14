@@ -1,16 +1,14 @@
 import React from 'react';
-import { Typography, Container } from '@mui/material';
-import  useAuth  from '../hooks/useAuthContext';
-
+import { Typography, Container,Box } from '@mui/material';
+import Sidebar from '../components/Sidebar';
+import AdminContent from '../components/AdminContent';
 const Admin = () => {
-    const {user} = useAuth();
-    console.log(user);
     return (
-        <Container>
-            <Typography variant="h3" gutterBottom>
-                Admin Page
-            </Typography>
-        </Container>
+        <Box sx={{ display: 'flex' }}>
+            <Sidebar/>
+            <AdminContent/>
+        </Box>
+ 
     );
 };
 
