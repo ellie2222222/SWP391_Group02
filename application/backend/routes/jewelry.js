@@ -1,18 +1,23 @@
-const express = require('express')
-const { getJewelries, getJewelry, createJewelry, deleteJewelry, updateJewelry } = require('../controllers/jewelryController')
-const requireAuth = require('../middleware/requireAuth')
-const {requireAdmin} = require('../middleware/requireRoles')
+const express = require('express');
+const multer = require('multer');
+const { getJewelries, getJewelry, createJewelry, deleteJewelry, updateJewelry } = require('../controllers/jewelryController');
+const requireAuth = require('../middleware/requireAuth');
+const { requireAdmin } = require('../middleware/requireRoles');
+const jewelryRoutes = express.Router();
 
-const jewelryRoutes = express.Router()
+// Multer configuration for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-jewelryRoutes.get('/', getJewelries)
+// Routes
+jewelryRoutes.get('/', getJewelries);
 
-jewelryRoutes.get('/:id', getJewelry)
+jewelryRoutes.get('/:id', getJewelry);
 
-jewelryRoutes.post('/', requireAuth, requireAdmin, createJewelry)
+jewelryRoutes.post('/', requireAuth, requireAdmin, upload.single('image'), createJewelry); // Handle single file upload with field name 'image'
 
-jewelryRoutes.delete('/:id', requireAuth, requireAdmin, deleteJewelry)
+jewelryRoutes.delete('/:id', requireAuth, requireAdmin, deleteJewelry);
 
-jewelryRoutes.patch('/:id', requireAuth, requireAdmin, updateJewelry)
+jewelryRoutes.patch('/:id', requireAuth, requireAdmin, upload.single('image'), updateJewelry); // Handle single file upload with field name 'image'
 
-module.exports = jewelryRoutes
+module.exports = jewelryRoutes;

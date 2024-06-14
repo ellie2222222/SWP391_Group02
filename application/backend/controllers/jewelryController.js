@@ -1,5 +1,7 @@
 const Jewelry = require('../models/jewelryModel');
 const mongoose = require('mongoose');
+const streamifier = require('streamifier');
+const { cloudinary } = require('../cloudinary');
 
 // Helper functions for validation
 const validateEmptyFields = (data) => {
@@ -58,26 +60,107 @@ const validateInputData = (data) => {
     return validationErrors;
 };
 
-// Create a new jewelry
 const createJewelry = async (req, res) => {
-    const emptyFields = validateEmptyFields(req.body);
-    const validationErrors = validateInputData(req.body);
-
-    if (emptyFields) {
-        return res.status(400).json({
-            error: emptyFields
-        });
-    }
-
-    if (validationErrors.length > 0) {
-        return res.status(400).json({
-            error: validationErrors
-        });
-    }
-
     try {
-        const jewelry = await Jewelry.create(req.body);
-        res.status(201).json(jewelry);
+        const { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage } = req.body;
+
+        // Validate empty fields
+        const emptyFieldsError = validateEmptyFields(req.body);
+        if (emptyFieldsError) {
+            return res.status(400).json({ error: emptyFieldsError });
+        }
+
+        // Validate input data
+        const validationErrors = validateInputData(req.body);
+        if (validationErrors.length > 0) {
+            return res.status(400).json({ error: validationErrors.join(', ') });
+        }
+
+        // Upload image to Cloudinary
+        const result = await cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
+            if (error) {
+                return res.status(500).json({ error: error.message });
+            }
+
+            // Create new jewelry item
+            const newJewelry = new Jewelry({
+                name,
+                description,
+                price,
+                gemstone_id,
+                gemstone_weight,
+                material_id,
+                material_weight,
+                category,
+                type,
+                on_sale,
+                sale_percentage,
+                images: [result.secure_url]
+            });
+
+            newJewelry.save().then(() => {
+                res.status(201).json(newJewelry);
+            }).catch(error => {
+                res.status(500).json({ error: error.message });
+            });
+        });
+
+        // Using the multer buffer directly
+        if (req.file && req.file.buffer) {
+            streamifier.createReadStream(req.file.buffer).pipe(result);
+        } else {
+            res.status(400).json({ error: 'No file uploaded' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const updateJewelry = async (req, res) => {
+    try {
+        const { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage } = req.body;
+
+        // Validate empty fields
+        const emptyFieldsError = validateEmptyFields(req.body);
+        if (emptyFieldsError) {
+            return res.status(400).json({ error: emptyFieldsError });
+        }
+
+        // Validate input data
+        const validationErrors = validateInputData(req.body);
+        if (validationErrors.length > 0) {
+            return res.status(400).json({ error: validationErrors.join(', ') });
+        }
+
+        let updateData = {
+            name,
+            description,
+            price,
+            gemstone_id,
+            gemstone_weight,
+            material_id,
+            material_weight,
+            category,
+            type,
+            on_sale,
+            sale_percentage
+        };
+
+        if (req.file) {
+            // Upload new image to Cloudinary
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'jewelry'
+            });
+            updateData.images = [result.secure_url];
+        }
+
+        const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+        if (!updatedJewelry) {
+            return res.status(404).json({ error: 'Jewelry not found' });
+        }
+
+        res.status(200).json(updatedJewelry);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -146,40 +229,6 @@ const deleteJewelry = async (req, res) => {
         res.status(500).json({ error: 'Error while deleting jewelry' });
     }
 };
-
-// Update a jewelry
-const updateJewelry = async (req, res) => {
-    const { id } = req.params;
-    const validationErrors = validateInputData(req.body);
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'Invalid ID' });
-    }
-
-    if (validationErrors.length > 0) {
-        return res.status(400).json({
-            error: validationErrors
-        });
-    }
-
-    try {
-        const jewelry = await Jewelry.findOneAndUpdate(
-            { _id: id },
-            req.body,
-            { new: true, runValidators: true }
-        );
-
-        if (!jewelry) {
-            return res.status(404).json({ error: 'No such jewelry' });
-        }
-
-        res.status(200).json(jewelry);
-    } catch (error) {
-        res.status(500).json({ error: 'Error while updating jewelry' });
-    }
-};
-
-//get by name
 
 module.exports = {
     getJewelries,
