@@ -1,4 +1,4 @@
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
@@ -15,7 +15,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/imgs/logo.png';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -47,7 +47,7 @@ const CustomButton = styled(Button)({
   },
 });
 
-const CustomListItem = styled(ListItem)({  
+const CustomListItem = styled(ListItem)({
   textTransform: 'uppercase',
   '&:hover': {
     backgroundColor: 'transparent', // Xóa hiệu ứng viền mặc định
@@ -62,7 +62,7 @@ const CustomLink = styled(Link)({
 const CustomIconButton = styled(IconButton)({
   color: '#000',
   fontSize: '2.6rem',
-  
+
   '&:hover': {
     backgroundColor: 'transparent',
     color: '#b48c72',
@@ -72,7 +72,7 @@ const CustomTextField = styled(TextField)({
   width: '200px', // Increase the width by 100px
   borderRadius: '30px', // Add border radius to round the corners
   variant: "outlined",
-  padding:'0',
+  padding: '0',
   '& fieldset': {
     borderRadius: '30px',
   },
@@ -105,8 +105,8 @@ const Navbar = () => {
     logout();
     navigate('/login');
   }
-  
-  const navigate = useNavigate(); 
+
+  const navigate = useNavigate();
   return (
     <CustomAppBar position="static">
       <Toolbar>
@@ -165,36 +165,36 @@ const Navbar = () => {
           </>
         ) : (
           <Box sx={{ flexGrow: 2, display: 'flex', justifyContent: 'space-between' }}>
-           
-              <Grid container spacing={0} sx={{ height: '64px' }}> {/* Chiều cao của AppBar */}
-                <Grid item xs>
-                  <Link to='/products'>
-                    <CustomButton>Products</CustomButton>
-                  </Link>
-                </Grid>
-                <Grid item xs>
-                  <Link to='/blogs'>
-                    <CustomButton>Blogs</CustomButton>
-                  </Link>
-                </Grid>
-                <Grid item xs>
-                  <Link to='/aboutus'>
-                    <CustomButton>About Us</CustomButton>
-                  </Link>
-                </Grid>
-                <Grid item xs>
-                  <CustomButton>Sales</CustomButton>
-                </Grid>
-                <Grid item xs>
-                  <Link to='/request'>
-                    <CustomButton>Custom Request</CustomButton>
-                  </Link>
-                </Grid>
+
+            <Grid container spacing={0} sx={{ height: '64px' }}> {/* Chiều cao của AppBar */}
+              <Grid item xs>
+                <Link to='/products'>
+                  <CustomButton>Products</CustomButton>
+                </Link>
               </Grid>
+              <Grid item xs>
+                <Link to='/blogs'>
+                  <CustomButton>Blogs</CustomButton>
+                </Link>
+              </Grid>
+              <Grid item xs>
+                <Link to='/aboutus'>
+                  <CustomButton>About Us</CustomButton>
+                </Link>
+              </Grid>
+              <Grid item xs>
+                <CustomButton>Sales</CustomButton>
+              </Grid>
+              <Grid item xs>
+                <Link to='/request'>
+                  <CustomButton>Custom Request</CustomButton>
+                </Link>
+              </Grid>
+            </Grid>
             {/* Thêm icon login và thanh search */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <CustomTextField
-               
+
                 size="normal"
                 label='Search...'
                 value={search}
@@ -217,7 +217,18 @@ const Navbar = () => {
                   <CustomIconButton color="inherit" onClick={handleMenuOpen}>
                     <AccountCircleIcon fontSize='2.6rem' />
                   </CustomIconButton>
-                  <Menu
+                  {user.role === 'admin' ? (
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={handleLogOut} >Logout</MenuItem>
+                      <MenuItem component={Link} to={`/admin`} onClick={handleMenuClose}>
+                        Dashboard
+                      </MenuItem>
+                    </Menu>
+                  ) : (<Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
@@ -226,7 +237,8 @@ const Navbar = () => {
                     <MenuItem component={Link} to={`/profile/${user._id}`} onClick={handleMenuClose}>
                       Profile
                     </MenuItem>
-                  </Menu>
+                  </Menu>)}
+
                 </>
               ) : (
                 <Link to='/login'>
