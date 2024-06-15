@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography,styled } from '@mui/material';
-
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Add, Edit, Delete } from '@mui/icons-material';
+import axiosInstance from '../utils/axiosInstance';
+import JewelryForm from './JewelryForm';
 const AdminContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -10,36 +13,105 @@ const AdminContent = () => {
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
       }));
+      const [jewelries, setJewelries] = useState([]);
+    const [selectedJewelry, setSelectedJewelry] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const fetchJewelries = async () => {
+        try {
+            const response = await axiosInstance.get('/jewelries');
+            setJewelries(response.data);
+        } catch (error) {
+            console.error("There was an error fetching the jewelries!", error);
+        }
+    };
+
+    const handleAddClick = () => {
+        setSelectedJewelry(null);
+        setIsDialogOpen(true);
+    };
+
+    const handleEditClick = (jewelry) => {
+        setSelectedJewelry(jewelry);
+        setIsDialogOpen(true);
+    };
+
+    const handleDeleteClick = async (id) => {
+        try {
+            await axiosInstance.delete(`/jewelries/${id}`);
+            fetchJewelries();
+        } catch (error) {
+            console.error("There was an error deleting the jewelry!", error);
+        }
+    };
+
+    const handleSubmit = async (values) => {
+        try {
+            if (selectedJewelry) {
+                await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
+            } else {
+                await axiosInstance.post('/jewelries', values);
+            }
+            fetchJewelries();
+            setIsDialogOpen(false);
+        } catch (error) {
+            console.error("There was an error saving the jewelry!", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchJewelries();
+    }, []);
+
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader></DrawerHeader>
-        <Typography paragraph>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
-          enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
-          imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
-          Convallis convallis tellus id interdum velit laoreet id donec ultrices.
-          Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-          adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
-          nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
-          leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
-          feugiat vivamus at augue. At augue eget arcu dictum varius duis at
-          consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-          sapien faucibus et molestie ac.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
-          eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
-          neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
-          tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
-          sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
-          tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
-          gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
-          et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
-          tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
+        <Container>
+            <Button startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick}>
+                Add Jewelry
+            </Button>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell>Price</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {jewelries.map((jewelry) => (
+                            <TableRow key={jewelry._id}>
+                                <TableCell>{jewelry.name}</TableCell>
+                                <TableCell>{jewelry.description}</TableCell>
+                                <TableCell>{jewelry.price}</TableCell>
+                                <TableCell>
+                                    <IconButton color="primary" onClick={() => handleEditClick(jewelry)}>
+                                        <Edit />
+                                    </IconButton>
+                                    <IconButton color="secondary" onClick={() => handleDeleteClick(jewelry._id)}>
+                                        <Delete />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                <DialogTitle>{selectedJewelry ? 'Edit Jewelry' : 'Add Jewelry'}</DialogTitle>
+                <DialogContent>
+                    <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [] }} onSubmit={handleSubmit} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Container>
+        
       </Box>
     );
 };

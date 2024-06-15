@@ -61,7 +61,7 @@ const JewelryList = () => {
                 <CardMedia
                   component="img"
                   height="250"
-                  image='https://www.tierra.vn/files/halo-A7tL5Eltco.webp' // URL tới ảnh sản phẩm hoặc ảnh placeholder
+                  image={product.images} // URL tới ảnh sản phẩm hoặc ảnh placeholder
                   alt={product.name}
                 />
                 <CardContent>

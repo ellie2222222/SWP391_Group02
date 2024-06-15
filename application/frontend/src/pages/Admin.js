@@ -7,6 +7,7 @@ const Admin = () => {
         <Box sx={{ display: 'flex' }}>
             <Sidebar/>
             <AdminContent/>
+            
         </Box>
  
     );
