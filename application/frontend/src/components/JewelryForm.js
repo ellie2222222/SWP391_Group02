@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton } from '@mui/material';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia } from '@mui/material';
 import * as Yup from 'yup';
 import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
-    const [selectedImage, setSelectedImage] = useState(initialValues.images[0] || '');
+    const [selectedImage, setSelectedImage] = useState(initialValues.image || '');
 
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: async (values) => {
             const formData = new FormData();
             Object.keys(values).forEach((key) => {
-                if (key === 'images') {
-                    if (values.images[0]) {
-                        formData.append('image', values.images[0]);  // Ensure this matches the backend's field name
+                if (key === 'image') {
+                    if (values.image) {
+                        formData.append('image', values.image);  // Append the file directly as binary
                     }
                 } else {
                     formData.append(key, values[key]);
@@ -36,14 +36,20 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             type: Yup.string().required("Required."),
             on_sale: Yup.boolean(),
             sale_percentage: Yup.number().typeError("Must be a number"),
-            images: Yup.mixed().required('A file is required'),
+            image: Yup.mixed().required('A file is required'),
         }),
     });
 
     const handleImageChange = (event) => {
         const file = event.currentTarget.files[0];
-        formik.setFieldValue("images", [file]);
-        setSelectedImage(URL.createObjectURL(file));
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                formik.setFieldValue("image", file);
+                setSelectedImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return (
@@ -188,11 +194,16 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 />
                 {selectedImage && (
                     <Box sx={{ mt: 2 }}>
-                        <img src={selectedImage} alt="Selected" style={{ width: '100%', maxHeight: '300px' }} />
+                        <CardMedia
+                            component="img"
+                            alt="Selected"
+                            image={selectedImage}
+                            sx={{ width: '100%', maxHeight: '300px' }}
+                        />
                     </Box>
                 )}
-                {formik.errors.images && (
-                    <Typography variant="caption" color="red">{formik.errors.images}</Typography>
+                {formik.errors.image && (
+                    <Typography variant="caption" color="red">{formik.errors.image}</Typography>
                 )}
                 <Button variant="contained" component="label">
                     <AddPhotoAlternateIcon />
