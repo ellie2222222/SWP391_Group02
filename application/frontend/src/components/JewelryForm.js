@@ -22,16 +22,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 }
             });
 
-            try {
-                const response = await axiosInstance.post('/jewelries', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                console.log(response.data);
-            } catch (error) {
-                console.error(error.response.data);
-            }
+            onSubmit(formData);
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Required."),

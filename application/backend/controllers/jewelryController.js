@@ -20,7 +20,7 @@ const validateEmptyFields = (data) => {
     if (type && type === 'Sample' && !price) emptyFields.push('price');
     if (!on_sale) emptyFields.push('on_sale');
     if (!sale_percentage) emptyFields.push('sale_percentage');
-    
+
     if (emptyFields.length > 0) {
         return "Please fill in the required field"
     }
@@ -70,7 +70,7 @@ const createJewelry = async (req, res) => {
             return res.status(400).json({ error: emptyFieldsError });
         }
 
-        // Validate input data
+        // // Validate input data
         // const validationErrors = validateInputData(req.body);
         // if (validationErrors.length > 0) {
         //     return res.status(400).json({ error: validationErrors.join(', ') });
@@ -120,17 +120,17 @@ const updateJewelry = async (req, res) => {
     try {
         const { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage } = req.body;
 
-        // Validate empty fields
+        // // Validate empty fields
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
         }
 
         // Validate input data
-        const validationErrors = validateInputData(req.body);
-        if (validationErrors.length > 0) {
-            return res.status(400).json({ error: validationErrors.join(', ') });
-        }
+        // const validationErrors = validateInputData(req.body);
+        // if (validationErrors.length > 0) {
+        //     return res.status(400).json({ error: validationErrors.join(', ') });
+        // }
 
         let updateData = {
             name,
@@ -143,7 +143,8 @@ const updateJewelry = async (req, res) => {
             category,
             type,
             on_sale,
-            sale_percentage
+            sale_percentage,
+            images,
         };
 
         if (req.file) {
