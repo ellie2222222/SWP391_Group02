@@ -12,8 +12,9 @@ import { AdminRoute, AuthRoute, UserRoute } from "./routes/routes";
 import Request from "./pages/Request";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
-import UserRequest from "./pages/UserRequest";
 import CustomerRequests from "./pages/CustomerRequests";
+import Requests from "./pages/Requests";
+import RequestInfo from "./pages/RequestInfo";
 function App() {
   const { user } = useAuth()
 
@@ -28,7 +29,6 @@ function App() {
         <Route path='/aboutus' element={<About />}></Route>
         <Route path='/product/:id' element={<Details />}></Route>
         <Route path='/profile/:id' element={<Profile />} />
-        <Route path='/profile/:id/requests' element={<UserRequest />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin" element={<AdminRoute />}>
@@ -38,7 +38,9 @@ function App() {
           <Route path="/request" element={<Request />} />
         </Route>
         <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
-        <Route path="/requests/:id" element={<CustomerRequests />} />
+
+        <Route path="/requests" element={<Requests />} />
+        <Route path="/requests/:id" element={<RequestInfo />} />
       </Routes>
     </div>
   );

@@ -25,37 +25,13 @@ const ProfileDetail = () => {
     const [error, setError] = useState('')
     const navigate = useNavigate();
 
-    const handleViewRequest = async () => {
-        try {
-            const response = await axios.get('http://localhost:4000/api/requests/user-requests',
-              {
-                headers: {
-                  'Authorization': `Bearer ${user.token}`,
-                }
-              }
-            );
-            setRequests(response.data)
-            setError('')
-          } catch (error) {
-            if (error.response === undefined) setError(error.message);
-            else setError(error.response.data.error)
-          }
-    };
-
     return (
         <Container>
             <Box padding="40px 0">
                 <Typography variant="h5" component="p" marginBottom='20px'>View My Request</Typography>
-                <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate(`/profile/${user._id}/requests`)}>
+                <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate(`/requests`)}>
                     VIEW MY REQUESTS
                 </CustomButton1>
-                <Typography variant="h5" component="p" marginBottom='20px'>{error}</Typography>
-            </Box>
-            <Box padding="40px 0">
-              <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate(`/profile/${user._id}/requests`)}>
-                  ASSIGN USER
-              </CustomButton1>
-              <Typography variant="h5" component="p" marginBottom='20px'>{error}</Typography>
             </Box>
         </Container>
     );

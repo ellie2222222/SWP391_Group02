@@ -1,11 +1,12 @@
 import React from 'react'
 import Navbar from "../components/Navbar/Navbar"
 import Footer from '../components/Footer/Footer'
-export default function Request() {
+import RequestList from '../components/RequestList'
+export default function Requests() {
   return (
     <div>
         <Navbar/>
-        <RequestDetails/>
+        <RequestList/>
         <Footer/>
     </div>
   )

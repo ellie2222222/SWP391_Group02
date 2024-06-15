@@ -24,17 +24,19 @@ const RequestDetails = () => {
     const [requests, setRequests] = useState([])
     const [error, setError] = useState('')
     const navigate = useNavigate();
+    const requestId = useParams()
 
     useEffect(() => {
         let fetchApi = '';
         switch (user.role) {
             case 'user':
-                fetchApi = 'http://localhost:4000/api/requests/user-requests/'
+                fetchApi = `http://localhost:4000/api/requests/user-requests/${requestId.id}`
                 break
             default:
-                fetchApi = 'http://localhost:4000/api/requests/staff-requests'
+                fetchApi = `http://localhost:4000/api/requests/staff-requests/${requestId.id}`
                 break
         }   
+        console.log(fetchApi)
         axios.get(fetchApi, {
             headers: {
                 'Authorization': `Bearer ${user.token}`,
