@@ -6,7 +6,7 @@ import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
-    const [selectedImage, setSelectedImage] = useState(initialValues.image || '');
+    const [selectedImage, setSelectedImage] = useState(initialValues.images || '');
 
     const formik = useFormik({
         initialValues: initialValues,
@@ -15,7 +15,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             Object.keys(values).forEach((key) => {
                 if (key === 'image') {
                     if (values.image) {
-                        formData.append('image', values.image);  // Append the file directly as binary
+                        formData.append('image', values.image);
                     }
                 } else {
                     formData.append(key, values[key]);
@@ -192,7 +192,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.sale_percentage && Boolean(formik.errors.sale_percentage)}
                     helperText={formik.touched.sale_percentage && formik.errors.sale_percentage}
                 />
-                {selectedImage && (
+                {selectedImage ? (
                     <Box sx={{ mt: 2 }}>
                         <CardMedia
                             component="img"
@@ -201,7 +201,9 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                             sx={{ width: '100%', maxHeight: '300px' }}
                         />
                     </Box>
-                )}
+                ) : 
+                <></>
+                }
                 {formik.errors.image && (
                     <Typography variant="caption" color="red">{formik.errors.image}</Typography>
                 )}
