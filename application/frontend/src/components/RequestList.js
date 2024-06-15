@@ -69,6 +69,7 @@ const RequestList = () => {
                     <Box>
                         <Typography variant="h5" component="p" marginBottom='20px'>{request._id}</Typography>
                         <Typography variant="h5" component="p" marginBottom='20px'>{request.request_description}</Typography>
+                        <Button onClick={() => navigate(`/requests/${request._id}`)}>View Detail</Button>
                     </Box>  
                 ))}
                 <Typography variant="h5" component="p" marginBottom='20px'>{error}</Typography>

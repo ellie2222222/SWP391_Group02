@@ -38,6 +38,7 @@ function App() {
           <Route path="/request" element={<Request />} />
         </Route>
         <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
+        <Route path="/requests/:id" element={<CustomerRequests />} />
       </Routes>
     </div>
   );
