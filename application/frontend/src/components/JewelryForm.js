@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton } from '@mui/material';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography } from '@mui/material';
 import * as Yup from 'yup';
 import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
@@ -22,7 +22,16 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 }
             });
 
-            onSubmit(formData);
+            try {
+                const response = await axiosInstance.post('/jewelries', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                console.log(response.data);
+            } catch (error) {
+                console.error(error.response.data);
+            }
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Required."),

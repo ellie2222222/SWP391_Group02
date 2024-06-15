@@ -71,10 +71,10 @@ const createJewelry = async (req, res) => {
         }
 
         // Validate input data
-        const validationErrors = validateInputData(req.body);
-        if (validationErrors.length > 0) {
-            return res.status(400).json({ error: validationErrors.join(', ') });
-        }
+        // const validationErrors = validateInputData(req.body);
+        // if (validationErrors.length > 0) {
+        //     return res.status(400).json({ error: validationErrors.join(', ') });
+        // }
 
         // Upload image to Cloudinary
         const result = await cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
