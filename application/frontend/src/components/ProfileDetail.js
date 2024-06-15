@@ -44,12 +44,18 @@ const ProfileDetail = () => {
 
     return (
         <Container>
-            <Box padding="40px 0" minHeight="60vh">
+            <Box padding="40px 0">
                 <Typography variant="h5" component="p" marginBottom='20px'>View My Request</Typography>
                 <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate(`/profile/${user._id}/requests`)}>
                     VIEW MY REQUESTS
                 </CustomButton1>
                 <Typography variant="h5" component="p" marginBottom='20px'>{error}</Typography>
+            </Box>
+            <Box padding="40px 0">
+              <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate(`/profile/${user._id}/requests`)}>
+                  ASSIGN USER
+              </CustomButton1>
+              <Typography variant="h5" component="p" marginBottom='20px'>{error}</Typography>
             </Box>
         </Container>
     );

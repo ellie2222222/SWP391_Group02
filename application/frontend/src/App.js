@@ -8,11 +8,12 @@ import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
 import BlogContents from "./pages/BlogContents";
-import { AdminRoute, UserRoute } from "./routes/routes";
+import { AdminRoute, AuthRoute, UserRoute } from "./routes/routes";
 import Request from "./pages/Request";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
 import UserRequest from "./pages/UserRequest";
+import CustomerRequests from "./pages/CustomerRequests";
 function App() {
   const { user } = useAuth()
 
@@ -33,9 +34,10 @@ function App() {
         <Route path="/admin" element={<AdminRoute />}>
           <Route path="/admin" element={<Admin/>} />
         </Route>
-        <Route element={<UserRoute />}>
+        <Route element={<AuthRoute />}>
           <Route path="/request" element={<Request />} />
         </Route>
+        <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
       </Routes>
     </div>
   );

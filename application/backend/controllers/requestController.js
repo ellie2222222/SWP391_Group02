@@ -257,7 +257,7 @@ const updateRequest = async (req, res) => {
       return res.status(400).json('Quote amount must be a positive number');
     }
 
-    // Validate toatal amount
+    // Validate total amount
     if (total_amount != null && (typeof total_amount !== 'number' || total_amount <= 0)) {
       return res.status(400).json('Total amount must be a positive number');
     }

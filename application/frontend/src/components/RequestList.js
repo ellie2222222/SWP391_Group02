@@ -26,20 +26,27 @@ const RequestList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/requests/user-requests',
-            {
-                headers: {
-                    'Authorization': `Bearer ${user.token}`,
-                }
+        let fetchApi = '';
+        switch (user.role) {
+            case 'user':
+                fetchApi = 'http://localhost:4000/api/requests/user-requests'
+                break
+            default:
+                fetchApi = 'http://localhost:4000/api/requests/staff-requests'
+                break
+        }   
+        axios.get(fetchApi, {
+            headers: {
+                'Authorization': `Bearer ${user.token}`,
             }
-        )
+        })
             .then(response => {
                 setRequests(response.data)
                 setError('')
                 setLoading(false);
             })
             .catch(error => {
-                console.error('There was an error fetching the products!', error);
+                console.error('There was an error fetching requests!', error);
                 setLoading(false);
                 if (error.response === undefined) setError(error.message);
                 else setError(error.response.data.error)
@@ -50,14 +57,6 @@ const RequestList = () => {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
                 <CircularProgress />
-            </Box>
-        );
-    }
-
-    if (requests.length <= 0) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                <Typography variant="h5">There was an error getting requests!</Typography>
             </Box>
         );
     }
