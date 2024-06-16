@@ -74,7 +74,7 @@ const JewelryList = () => {
                   <Typography variant="h6" color="text.primary">
                     {product.price} VND
                   </Typography>
-                  <CustomButton1  onClick={() => navigate(`/product/${product._id}`)}>
+                  <CustomButton1  onClick={() => navigate(`/products/${product._id}`)}>
                     Details
                   </CustomButton1>
                 </CardContent>

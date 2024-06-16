@@ -67,7 +67,9 @@ const RequestList = () => {
                 <Typography variant="h2" component="p" marginBottom='20px' textAlign='center'>Requests</Typography>
                 {requests.map((request, index) => (
                     <Box>
-                        <Typography variant="h5" component="p" marginBottom='20px'>{request._id}</Typography>
+                        <Typography variant="h5" component="p" marginBottom='20px'>Request #{index + 1}</Typography>
+                        <Typography variant="h5" component="p" marginBottom='20px'>Request ID: {request._id}</Typography>
+                        <Typography variant="h5" component="p" marginBottom='20px'>User ID:{request.user_id}</Typography>
                         <Typography variant="h5" component="p" marginBottom='20px'>{request.request_description}</Typography>
                         <Button onClick={() => navigate(`/requests/${request._id}`)}>View Detail</Button>
                     </Box>  

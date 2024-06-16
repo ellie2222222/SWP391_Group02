@@ -80,11 +80,7 @@ const getUserRequest = async (req, res) => {
       return res.status(400).json({ error: 'Invalid ID' });
     }
 
-    if (!(_id === id)) {
-      return res.status(403).json({error: 'You do not have permission to perform this action'})
-    }
-
-    const requests = await Request.find({ user_id: _id });
+    const requests = await Request.find({ user_id: _id, _id: id }); 
 
     // Check if requests exist
     if (requests.length === 0) {
@@ -293,8 +289,12 @@ const updateRequest = async (req, res) => {
       if (isNaN(parsedEndAt)) {
         return res.status(400).json({ error: "Invalid end date" });
       }
+      
+      if (parsedEndAt <= existingRequest.createdAt) {
+        return res.status(400).json({ error: "End date must be after creation date" });
+      }
     } else {
-      parsedEndAt = existingRequest.parsedEndAt;
+      parsedEndAt = existingRequest.endedAt;
     }
 
     // Only update fields that are provided
