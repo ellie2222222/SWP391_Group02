@@ -75,25 +75,21 @@ const createJewelry = async (req, res) => {
     try {
         const { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage } = req.body;
 
-        // Validate empty fields
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
         }
 
-        // // Validate input data
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
         }
 
-        // Upload image to Cloudinary
-        const result = await cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
+        const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
             if (error) {
                 return res.status(500).json({ error: error.message });
             }
 
-            // Create new jewelry item
             const newJewelry = new Jewelry({
                 name,
                 description,
@@ -106,7 +102,8 @@ const createJewelry = async (req, res) => {
                 type,
                 on_sale,
                 sale_percentage,
-                images: [result.secure_url]
+                images: [result.secure_url],
+                image_public_ids: [result.public_id] // Store public_id here
             });
 
             newJewelry.save().then(() => {
@@ -116,9 +113,8 @@ const createJewelry = async (req, res) => {
             });
         });
 
-        // Using the multer buffer directly
         if (req.file && req.file.buffer) {
-            streamifier.createReadStream(req.file.buffer).pipe(result);
+            streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
         } else {
             res.status(400).json({ error: 'No file uploaded' });
         }
@@ -129,17 +125,10 @@ const createJewelry = async (req, res) => {
 
 const updateJewelry = async (req, res) => {
     try {
-        const { name, 
-                description, 
-                price, 
-                gemstone_id, 
-                gemstone_weight, 
-                material_id, 
-                material_weight, 
-                category, type, 
-                on_sale, 
-                sale_percentage 
-               } = req.body;
+        const { 
+            name, description, price, gemstone_id, gemstone_weight, 
+            material_id, material_weight, category, type, on_sale, sale_percentage 
+        } = req.body;
 
         // Validate empty fields if necessary
         const emptyFieldsError = validateEmptyFields(req.body);
@@ -173,6 +162,10 @@ const updateJewelry = async (req, res) => {
         if (sale_percentage) updateData.sale_percentage = sale_percentage;
 
         if (req.file) {
+            // Delete old image from Cloudinary
+            const deletePromises = existingJewelry.image_public_ids.map(publicId => cloudinary.uploader.destroy(publicId));
+            await Promise.all(deletePromises);
+
             // Upload new image to Cloudinary using the buffer
             const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, async (error, result) => {
                 if (error) {
@@ -180,6 +173,7 @@ const updateJewelry = async (req, res) => {
                 }
 
                 updateData.images = [result.secure_url];
+                updateData.image_public_ids = [result.public_id];
 
                 // Perform the update after uploading the image
                 try {
@@ -253,11 +247,15 @@ const deleteJewelry = async (req, res) => {
     }
 
     try {
-        const jewelry = await Jewelry.findOneAndDelete({ _id: id });
+        const jewelry = await Jewelry.findByIdAndDelete(id);
 
         if (!jewelry) {
             return res.status(404).json({ error: 'No such jewelry' });
         }
+
+        // Delete associated images from Cloudinary
+        const deletePromises = jewelry.image_public_ids.map(publicId => cloudinary.uploader.destroy(publicId));
+        await Promise.all(deletePromises);
 
         res.status(200).json(jewelry);
     } catch (error) {
