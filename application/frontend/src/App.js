@@ -8,7 +8,7 @@ import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
 import BlogContents from "./pages/BlogContents";
-import { AdminRoute, AuthRoute, UserRoute } from "./routes/routes";
+import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
 import Request from "./pages/Request";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
@@ -22,25 +22,35 @@ function App() {
     <div className="App">
       <Routes>
         <Route path='/' element={<Home />}></Route>
-        <Route path='/login' element={<Login />}></Route>
+
         <Route path='/products' element={<Products />}></Route>
+        <Route path='/products/:id' element={<Details />}></Route>
+
         <Route path='/blogs' element={<Blogs />}></Route>
         <Route path='/blog/:id' element={<BlogContents />}></Route>
+
         <Route path='/aboutus' element={<About />}></Route>
-        <Route path='/products/:id' element={<Details />}></Route>
         <Route path='/profile/:id' element={<Profile />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
         <Route path="/admin" element={<AdminRoute />}>
           <Route path="/admin" element={<Admin/>} />
         </Route>
+
         <Route element={<AuthRoute />}>
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/requests/:id" element={<RequestInfo />} />
+        </Route>
+
+        <Route element={<UserRoute />}>
           <Route path="/request" element={<Request />} />
         </Route>
-        <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
 
-        <Route path="/requests" element={<Requests />} />
-        <Route path="/requests/:id" element={<RequestInfo />} />
+        <Route element={<ManagerOrSaleRoute />}>
+          <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
+        </Route>
       </Routes>
     </div>
   );

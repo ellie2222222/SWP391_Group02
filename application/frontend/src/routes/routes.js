@@ -12,6 +12,11 @@ const ManagerRoute = () => {
   return user && user.role === 'manager' ? <Outlet /> : <Navigate to="/" />;
 };
 
+const ManagerOrSaleRoute = () => {
+  const { user } = useAuth();
+  return user && (user.role === 'manager' || user.role === 'sale_staff') ? <Outlet /> : <Navigate to="/" />;
+};
+
 const DesignStaffRoute = () => {
   const { user } = useAuth();
   return user && user.role === 'design_staff' ? <Outlet /> : <Navigate to="/" />;
@@ -37,4 +42,4 @@ const AuthRoute = () => {
   return user ? <Outlet /> : <Navigate to="/" />;
 };
 
-export { AdminRoute, ManagerRoute, DesignStaffRoute, SaleStaffRoute, ProductionStaffRoute, UserRoute, AuthRoute };
+export { AdminRoute, ManagerRoute, DesignStaffRoute, SaleStaffRoute, ProductionStaffRoute, UserRoute, AuthRoute, ManagerOrSaleRoute };

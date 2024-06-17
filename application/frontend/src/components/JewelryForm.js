@@ -35,8 +35,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             category: Yup.string().required("Required."),
             type: Yup.string().required("Required."),
             on_sale: Yup.boolean(),
-            sale_percentage: Yup.number().typeError("Must be a number"),
-            image: Yup.mixed().required('A file is required'),
+            sale_percentage: Yup.number().typeError("Must be a number")
         }),
     });
 

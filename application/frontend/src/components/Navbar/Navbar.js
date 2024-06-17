@@ -185,11 +185,20 @@ const Navbar = () => {
               <Grid item xs>
                 <CustomButton>Sales</CustomButton>
               </Grid>
-              <Grid item xs>
-                <Link to='/request'>
-                  <CustomButton>Custom Request</CustomButton>
-                </Link>
-              </Grid>
+              {user && user.role === 'user' && (
+                <Grid item xs>
+                  <Link to='/request'>
+                    <CustomButton>Custom Request</CustomButton>
+                  </Link>
+                </Grid>
+              )}
+              {user && (user.role === 'manager' || user.role === 'sale_staff') && (
+                <Grid item xs>
+                  <Link to='/requests/customer-requests-view'>
+                    <CustomButton>Customer Requests</CustomButton>
+                  </Link>
+                </Grid>
+              )}
             </Grid>
             {/* Thêm icon login và thanh search */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
