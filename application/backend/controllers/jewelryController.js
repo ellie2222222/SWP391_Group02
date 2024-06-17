@@ -6,7 +6,7 @@ const { cloudinary } = require('../cloudinary');
 // Helper functions for validation
 const validateEmptyFields = (data) => {
     const {
-        name, description, gemstone_id, gemstone_weight,
+        name, description,
         material_id, material_weight, price, category, type, on_sale, sale_percentage,
     } = data;
     let emptyFields = [];
@@ -29,29 +29,40 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    const { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage, type } = data;
+    let { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage, type } = data;
     let validationErrors = [];
 
+    // Trim IDs if they exist
+    if (gemstone_id) gemstone_id = gemstone_id.trim();
+    if (material_id) material_id = material_id.trim();
+
     if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
-        validationErrors.push('Invalid gemstones ID')
+        validationErrors.push('Invalid gemstones ID');
     }
     if (material_id && !mongoose.Types.ObjectId.isValid(material_id)) {
-        validationErrors.push('Invalid material ID')
+        validationErrors.push('Invalid material ID');
     }
-    if (price != null && (typeof price !== 'number' || price <= 0)) {
+
+    // Convert values to numbers before checking
+    price = parseFloat(price);
+    material_weight = parseFloat(material_weight);
+    gemstone_weight = parseFloat(gemstone_weight);
+    sale_percentage = parseFloat(sale_percentage);
+
+    if (price != null && (!Number.isFinite(price) || price <= 0)) {
         validationErrors.push('Price must be a positive number');
     }
-    if (material_weight != null && (typeof material_weight !== 'number' || material_weight <= 0)) {
+    if (material_weight != null && (!Number.isFinite(material_weight) || material_weight <= 0)) {
         validationErrors.push('Material weight must be a positive number');
     }
-    if (gemstone_weight != null && (typeof gemstone_weight !== 'number' || gemstone_weight <= 0)) {
+    if (gemstone_weight != null && (!Number.isFinite(gemstone_weight) || gemstone_weight <= 0)) {
         validationErrors.push('Gemstone weight must be a positive number');
     }
-    if (sale_percentage != null && (typeof sale_percentage !== 'number' || sale_percentage < 0 || sale_percentage > 100)) {
+    if (sale_percentage != null && (!Number.isFinite(sale_percentage) || sale_percentage < 0 || sale_percentage > 100)) {
         validationErrors.push('Sale percentage must be a positive number between 0 and 100');
     }
 
-    const allowedType = ['Custom', 'Sample']
+    const allowedType = ['Custom', 'Sample'];
 
     if (!allowedType.includes(type)) {
         validationErrors.push("Invalid type");
@@ -71,10 +82,10 @@ const createJewelry = async (req, res) => {
         }
 
         // // Validate input data
-        // const validationErrors = validateInputData(req.body);
-        // if (validationErrors.length > 0) {
-        //     return res.status(400).json({ error: validationErrors.join(', ') });
-        // }
+        const validationErrors = validateInputData(req.body);
+        if (validationErrors.length > 0) {
+            return res.status(400).json({ error: validationErrors.join(', ') });
+        }
 
         // Upload image to Cloudinary
         const result = await cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
@@ -118,24 +129,28 @@ const createJewelry = async (req, res) => {
 
 const updateJewelry = async (req, res) => {
     try {
-        const {
-            name,
-            description,
-            price,
-            gemstone_id,
-            gemstone_weight,
-            material_id,
-            material_weight,
-            category,
-            type,
-            on_sale,
-            sale_percentage
-        } = req.body;
+        const { name, 
+                description, 
+                price, 
+                gemstone_id, 
+                gemstone_weight, 
+                material_id, 
+                material_weight, 
+                category, type, 
+                on_sale, 
+                sale_percentage 
+               } = req.body;
 
         // Validate empty fields if necessary
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
+        }
+
+        // Validate input data
+        const validationErrors = validateInputData(req.body);
+        if (validationErrors.length > 0) {
+            return res.status(400).json({ error: validationErrors.join(', ') });
         }
 
         // Find the existing jewelry item
@@ -148,9 +163,9 @@ const updateJewelry = async (req, res) => {
         if (name) updateData.name = name;
         if (description) updateData.description = description;
         if (price) updateData.price = price;
-        if (gemstone_id) updateData.gemstone_id = gemstone_id;
+        if (gemstone_id) updateData.gemstone_id = gemstone_id ? gemstone_id.trim() : null;
         if (gemstone_weight) updateData.gemstone_weight = gemstone_weight;
-        if (material_id) updateData.material_id = material_id;
+        if (material_id) updateData.material_id = material_id ? material_id.trim() : null;
         if (material_weight) updateData.material_weight = material_weight;
         if (category) updateData.category = category;
         if (type) updateData.type = type;
