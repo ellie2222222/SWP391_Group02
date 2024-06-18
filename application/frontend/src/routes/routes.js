@@ -4,7 +4,13 @@ import useAuth from '../hooks/useAuthContext';
 
 const AdminRoute = () => {
   const { user } = useAuth();
-  return user && user.role === 'admin' ? <Outlet /> : <Navigate to="/" />;
+  const allowedRoles = ['admin', 'manager', 'design_staff', 'sale_staff','production_staff'];
+
+  return user && allowedRoles.includes(user.role) ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/" />
+  );
 };
 
 const ManagerRoute = () => {

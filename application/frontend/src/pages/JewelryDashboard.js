@@ -1,9 +1,10 @@
 import React from 'react';
-import { Typography, Container,Box } from '@mui/material';
+import {Box } from '@mui/material';
 import Sidebar from '../components/Sidebar';
 import AdminContent from '../components/AdminContent';
-const Admin = () => {
+const JewelryDashboard = () => {
     return (
+        
         <Box sx={{ display: 'flex' }}>
             <Sidebar/>
             <AdminContent/>
@@ -12,4 +13,4 @@ const Admin = () => {
     );
 };
 
-export default Admin;
+export default JewelryDashboard;

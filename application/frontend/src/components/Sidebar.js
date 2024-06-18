@@ -16,7 +16,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-
+import { Link } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
@@ -92,7 +92,7 @@ const CustomListItemButton = styled(ListItemButton)({
     justifyContent: 'initial',
     px: 2.5,
     padding:'0 20px',
-    
+    color:'#000',
 });
 
 
@@ -145,32 +145,38 @@ export default function MiniDrawer() {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
-                        <CustomListItemButton>
-                            <CustomListItemIcon
-                            >
-                                <PeopleIcon />
-                            </CustomListItemIcon>
-                            <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
-                        </CustomListItemButton>
+                    <ListItem key="Jewelry" disablePadding sx={{ display: 'block' }}>
+                        <Link to='/admin'>
+                            <CustomListItemButton>
+                                <CustomListItemIcon
+                                >
+                                    <PeopleIcon />
+                                </CustomListItemIcon>
+                                <ListItemText primary="Jewelry" sx={{ opacity: open ? 1 : 0 }} />
+                            </CustomListItemButton>
+                        </Link>
                     </ListItem>
                     <ListItem key="Orders" disablePadding sx={{ display: 'block' }}>
-                        <CustomListItemButton>
-                            <CustomListItemIcon
-                            >
-                                <ShoppingCartIcon />
-                            </CustomListItemIcon>
-                            <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
-                        </CustomListItemButton>
+                        <Link>
+                            <CustomListItemButton>
+                                <CustomListItemIcon
+                                >
+                                    <ShoppingCartIcon />
+                                </CustomListItemIcon>
+                                <ListItemText primary="Orders" sx={{ opacity: open ? 1 : 0 }} />
+                            </CustomListItemButton>
+                        </Link>
                     </ListItem>
-                    <ListItem key="Jewelry" disablePadding sx={{ display: 'block' }}>
-                        <CustomListItemButton>
-                            <CustomListItemIcon
-                            >
-                                <LocalOfferIcon />
-                            </CustomListItemIcon>
-                            <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
-                        </CustomListItemButton>
+                    <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
+                        <Link to='/admin/users'>
+                            <CustomListItemButton>
+                                <CustomListItemIcon
+                                >
+                                    <LocalOfferIcon />
+                                </CustomListItemIcon>
+                                <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                            </CustomListItemButton>
+                        </Link>
                     </ListItem>
                 </List>
                 <Divider />

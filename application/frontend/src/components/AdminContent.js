@@ -5,6 +5,19 @@ import { Add, Edit, Delete } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import JewelryForm from './JewelryForm';
 
+const CustomButton1 = styled(Button)({
+    outlineColor: '#000',
+    backgroundColor: '#b48c72',
+    color: '#fff',
+    width: '100%',
+    fontSize: '1rem',
+    marginTop: '20px',
+    '&:hover': {
+      color: '#b48c72', // Thay đổi màu chữ khi hover
+      backgroundColor: 'transparent',
+    },
+  });
+
 const AdminContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -69,9 +82,9 @@ const AdminContent = () => {
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             <Container>
-                <Button startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick}>
+                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick} sx={{backgroundColor:'#b48c72'}}>
                     Add Jewelry
-                </Button>
+                </CustomButton1>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>

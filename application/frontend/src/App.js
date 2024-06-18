@@ -6,7 +6,8 @@ import Blogs from "./pages/Blogs";
 import About from "./pages/About";
 import Details from "./pages/Details";
 import Signup from "./pages/Signup";
-import Admin from "./pages/Admin";
+import JewelryDashboard from "./pages/JewelryDashboard";
+import UsersDashboard from "./pages/UsersDashboard";
 import BlogContents from "./pages/BlogContents";
 import Warranty from './pages/Warranty'; // Import the new page
 
@@ -36,11 +37,11 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/admin" element={<Admin />} />
         <Route path="/warranties" element={<Warranty />} /> {/* Add the new route */}
 
-        <Route path="/admin" element={<AdminRoute />}>
-          <Route path="/admin" element={<Admin/>} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<JewelryDashboard/>} />
+          <Route path="/admin/users" element={<UsersDashboard/>} />
         </Route>
 
         <Route element={<AuthRoute />}>
@@ -55,6 +56,7 @@ function App() {
         <Route element={<ManagerOrSaleRoute />}>
           <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
         </Route>
+
       </Routes>
     </div>
   );
