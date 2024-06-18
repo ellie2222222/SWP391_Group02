@@ -142,32 +142,9 @@ const updateJewelry = async (req, res) => {
             return res.status(400).json({ error: validationErrors.join(', ') });
         }
 
-        let updateData = {
-            name,
-            description,
-            price,
-            gemstone_id,
-            gemstone_weight,
-            material_id,
-            material_weight,
-            category,
-            type,
-            on_sale,
-            sale_percentage,
-            images,
-        };
-
-        if (req.file) {
-            // Upload new image to Cloudinary
-            const result = await cloudinary.uploader.upload(req.file.path, {
-                folder: 'jewelry'
-            });
-            updateData.images = [result.secure_url];
-        }
-
-        const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true });
-
-        if (!updatedJewelry) {
+        // Find the existing jewelry item
+        const existingJewelry = await Jewelry.findById(req.params.id);
+        if (!existingJewelry) {
             return res.status(404).json({ error: 'Jewelry not found' });
         }
 
