@@ -102,6 +102,11 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  const handleLogOut = () => {
+    logout();
+    navigate('/login');
+  }
+
   return (
     <CustomAppBar position="static">
       <Toolbar>
@@ -239,25 +244,32 @@ const Navbar = () => {
               />
               {user ? (
                 <>
-                  <CustomIconButton color="inherit" onClick={handleMenuOpen}>
-                    <AccountCircleIcon fontSize="2.6rem" />
-                  </CustomIconButton>
+                <CustomIconButton color="inherit" onClick={handleMenuOpen}>
+                  <AccountCircleIcon fontSize='2.6rem' />
+                </CustomIconButton>
+                {user.role === 'admin' ? (
                   <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                   >
-                    <MenuItem onClick={logout}>Logout</MenuItem>
-                    <MenuItem
-                      component={Link}
-                      to="/profile"
-                      onClick={handleMenuClose}
-                    >
-                      Profile
+                    <MenuItem onClick={handleLogOut} >Logout</MenuItem>
+                    <MenuItem component={Link} to={`/admin`} onClick={handleMenuClose}>
+                      Dashboard
                     </MenuItem>
                   </Menu>
-                  z{" "}
-                </>
+                ) : (<Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem onClick={handleLogOut} >Logout</MenuItem>
+                  <MenuItem component={Link} to={`/profile/${user._id}`} onClick={handleMenuClose}>
+                    Profile
+                  </MenuItem>
+                </Menu>)}
+
+              </>
               ) : (
                 <Link to="/login">
                   <CustomIconButton color="inherit">
