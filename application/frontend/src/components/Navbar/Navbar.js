@@ -141,6 +141,11 @@ const Navbar = () => {
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
                   <ListItemText primary="Sales" />
+                  </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
+                  <CustomLink to='/warranties'>
+                    <ListItemText primary="Warranty" />
+                  </CustomLink>
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
                   <ListItemIcon>
@@ -175,7 +180,14 @@ const Navbar = () => {
                   </Link>
                 </Grid>
                 <Grid item xs>
+                <Link to='/sales'>
                   <CustomButton>Sales</CustomButton>
+                  </Link>
+                </Grid>
+                <Grid item xs>
+                <Link to='/warranties'>
+                  <CustomButton>Warranty</CustomButton>
+                  </Link>
                 </Grid>
               </Grid>
             {/* Thêm icon login và thanh search */}

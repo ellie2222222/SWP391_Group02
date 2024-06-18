@@ -8,6 +8,8 @@ import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
 import BlogContents from "./pages/BlogContents";
+import Warranty from './pages/Warranty'; // Import the new page
+
 function App() {
   return (
     <div className="App">
@@ -22,6 +24,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/warranties" element={<Warranty />} /> {/* Add the new route */}
       </Routes>
     </div>
   );

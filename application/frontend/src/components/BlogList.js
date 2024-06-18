@@ -45,15 +45,27 @@ const BlogLists = () => {
 
   return (
     <Container>
-      <Box padding='40px 0'>
-        <Grid container spacing={2}>
+      <Box padding='60px 0'>
+        <Grid container spacing={4}>
           {blogs.map((blog, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-              <Card onClick={() => navigate(`/blog/${blog._id}`)}>
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
+            <Grid item xs={12} key={index} >
+              <Card onClick={() => navigate(`/blog/${blog._id}`)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', boxShadow: '0 3px 8px rgba(0, 0, 0, 0.1)', borderRadius: '10px' }}>
+                <CardMedia
+                  component="img"
+                  image={blog.image_url}
+                  alt={blog.blog_title}
+                  style={{ width: '40%', height: '180px', borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
+                />
+                <CardContent style={{ flex: '1 0 auto' }}>
+                  <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                    {blog.category}  {new Date(blog.createdAt).toLocaleDateString()}
+                  </Typography>
+                  <Typography gutterBottom variant="h6" component="div" style={{ fontWeight: 'bold' }}>
                     {blog.blog_title}
-                  </Typography>                 
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" component="div" style={{ marginTop: '8px' }}>
+                    {blog.excerpt}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -63,5 +75,6 @@ const BlogLists = () => {
     </Container>
   );
 }
+
 
 export default BlogLists;
