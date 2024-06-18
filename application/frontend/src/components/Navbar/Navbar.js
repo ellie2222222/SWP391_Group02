@@ -15,7 +15,7 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/imgs/logo.png";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -83,6 +83,7 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate()
 
   const { user, logout } = useAuth();
 
