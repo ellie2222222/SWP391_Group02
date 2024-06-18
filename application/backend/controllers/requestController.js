@@ -100,15 +100,15 @@ const getStaffRequests = async (req, res) => {
     const { authorization } = req.headers
     const token = authorization.split(' ')[1]
     const { _id } = jwt.verify(token, process.env.SECRET)
-
-    const worksOn = await WorksOn.find({ user_id: _id }).select("request_id");
-
+  
+    const worksOn = await WorksOn.find({ staff_ids: _id });
+    
     const requestIds = worksOn.map(w => w.request_id);
-
+    
     const requests = await Request.find({ _id: { $in: requestIds } });
-
+    
     // Check if requests exist
-    if (requests) {
+    if (requests.length === 0) {
       return res.status(404).json({ error: "No requests found for this staff" });
     }
 
@@ -133,17 +133,17 @@ const getStaffRequest = async (req, res) => {
 
     // Find request
     const requests = await Request.findOne({ _id: id }); 
-
+    
     // Check if requests exist
-    if (requests) {
+    if (!requests) {
       return res.status(404).json({ error: "No request found" });
     }
-    console.log(requests)
-    // Check if request is staff's request
-    const worksOn = await WorksOn.find({ request_id: requests._id }).select("staff_id");
 
-    if (worksOn !== _id) {
-      return res.status(403).json({ error: "You do not have permission to perform this action"})
+    // Check if request is staff's request
+    const worksOn = await WorksOn.findOne({ request_id: requests._id, staff_ids: _id });
+
+    if (!worksOn) {
+        return res.status(403).json({ error: "You do not have permission to perform this action" });
     }
 
     res.status(200).json(requests);

@@ -31,10 +31,19 @@ const RequestDetails = () => {
         let fetchApi = '';
         switch (user.role) {
             case 'user':
-                fetchApi = `/user-requests/${id}`
+                fetchApi = `user-requests/${id}`
+                break
+            case 'sale_staff':
+                fetchApi = `staff-requests/${id}`
+                break
+            case 'design_staff':
+                fetchApi = `staff-requests/${id}`
+                break
+            case 'production_staff':
+                fetchApi = `staff-requests/${id}`
                 break
             default:
-                fetchApi = `/${id}`
+                fetchApi = `${id}`
                 break
         }
 
@@ -42,6 +51,7 @@ const RequestDetails = () => {
             try {
                 const response = await axiosInstance.get(`/requests/${fetchApi}`);
                 setRequest(response.data)
+                console.log(response.data)
                 setError('')
                 setLoading(false);
             } catch (error) {

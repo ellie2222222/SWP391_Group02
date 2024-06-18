@@ -29,6 +29,7 @@ const JewelryDetails = () => {
       try {
         const response = await axiosInstance.get(`/jewelries/${id}`);
         setProduct(response.data);
+        console.log(response.data.gemstone_id)
         setLoading(false);
       } catch (error) {
         console.error('There was an error fetching the product!', error);
@@ -64,14 +65,23 @@ const JewelryDetails = () => {
         <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between">
           <Typography variant="h4" component="h1">{product.name}</Typography>
           <Typography variant="h5">{product.price} VND</Typography>
-          <Typography variant="h6">Gemstone: {product.gemstone_id.name}</Typography>
-          <Typography variant="h6">Gemstone Carat: {product.gemstone_id.carat}</Typography>
-          <Typography variant="h6">Gemstone Shape: {product.gemstone_id.cut}</Typography>
-          <Typography variant="h6">Gemstone Color: {product.gemstone_id.color}</Typography>
-          <Typography variant="h6">Gemstone Clarity: {product.gemstone_id.clarity}</Typography>
-          <Typography variant="h6">Gemstone Weight: {product.material_weight} kg</Typography>
-          <Typography variant="h6">Materials: {product.material_id.name}</Typography>
-          <Typography variant="h6">Material Carat: {product.material_id.carat}</Typography>
+          {product.gemstone_id && (
+            <>
+              <Typography variant="h6">Gemstone: {product.gemstone_id.name}</Typography>
+              <Typography variant="h6">Gemstone Carat: {product.gemstone_id.carat}</Typography>
+              <Typography variant="h6">Gemstone Shape: {product.gemstone_id.cut}</Typography>
+              <Typography variant="h6">Gemstone Color: {product.gemstone_id.color}</Typography>
+              <Typography variant="h6">Gemstone Clarity: {product.gemstone_id.clarity}</Typography>
+            </>
+          )}
+          <Typography variant="h6">Gemstone Weight: {product.gemstone_weight} kg</Typography>
+          {product.material_id && (
+            <>
+              <Typography variant="h6">Materials: {product.material_id.name}</Typography>
+              <Typography variant="h6">Material Carat: {product.material_id.carat}</Typography>
+            </>
+          )}
+          
           <Typography variant="h6">Material Weight: {product.material_weight} kg</Typography>
           <Typography variant="h6">Category: {product.category}</Typography>
           <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate('')}>

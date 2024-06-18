@@ -30,16 +30,16 @@ const RequestList = () => {
         let fetchApi = '';
         switch (user.role) {
             case 'user':
-                fetchApi = '/user-requests'
+                fetchApi = 'user-requests'
                 break
             default:
-                fetchApi = '/staff-requests'
+                fetchApi = 'staff-requests'
                 break
         }
 
         const fetchRequests = async () => {
             try {
-                const response = await axiosInstance.get('/requests');
+                const response = await axiosInstance.get(`/requests/${fetchApi}`);
                 setRequests(response.data)
                 setError('')
                 setLoading(false);

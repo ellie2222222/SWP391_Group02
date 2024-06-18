@@ -24,6 +24,7 @@ const CustomerRequestList = () => {
     const [requests, setRequests] = useState([]);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -39,10 +40,21 @@ const CustomerRequestList = () => {
         };
 
         fetchRequests();
-    }, [user.token]);
+    }, [user.token, refresh]);
 
-    const handleAcceptRequest = () => {
+    const handleAcceptRequest = async (requestId) => {
+        try {
+            await axiosInstance.post(`/works-on`, { request_id: requestId })
 
+            await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'assigned' })
+
+            setError('');
+            setLoading(false);
+            setRefresh(prev => !prev);
+        } catch (error) {
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error);
+        }
     }
 
     if (loading) {
@@ -64,7 +76,7 @@ const CustomerRequestList = () => {
                         <Typography variant="h5" component="p" marginBottom='20px'>User ID: {request.user_id}</Typography>
                         <Typography variant="h5" component="p" marginBottom='20px'>Description: {request.request_description}</Typography>
                         <Typography variant="h5" component="p">Status: {request.request_status}</Typography>
-                        <CustomButton1>Accept Request</CustomButton1>
+                        <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
                         <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
                     </Box>
                 ))}
