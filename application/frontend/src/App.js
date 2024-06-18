@@ -47,9 +47,6 @@ function App() {
         <Route element={<AuthRoute />}>
           <Route path="/requests" element={<Requests />} />
           <Route path="/requests/:id" element={<RequestInfo />} />
-        </Route>
-
-        <Route element={<UserRoute />}>
           <Route path="/request" element={<Request />} />
         </Route>
 

@@ -45,7 +45,7 @@ const UserRoute = () => {
 
 const AuthRoute = () => {
   const { user } = useAuth();
-  return user ? <Outlet /> : <Navigate to="/" />;
+  return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export { AdminRoute, ManagerRoute, DesignStaffRoute, SaleStaffRoute, ProductionStaffRoute, UserRoute, AuthRoute, ManagerOrSaleRoute };

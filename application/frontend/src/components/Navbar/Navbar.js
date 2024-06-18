@@ -208,14 +208,11 @@ const Navbar = () => {
                   <CustomButton>Warranty</CustomButton>
                 </Link>
               </Grid>
-              {user && user.role === "user" && (
                 <Grid item xs>
                   <Link to="/request">
-                    <CustomButton>Custom Request</CustomButton>
+                    <CustomButton>Custom</CustomButton>
                   </Link>
-                </Grid>
-              )}
-              {user &&
+                </Grid>              {user &&
                 (user.role === "manager" || user.role === "sale_staff") && (
                   <Grid item xs>
                     <Link to="/requests/customer-requests-view">
