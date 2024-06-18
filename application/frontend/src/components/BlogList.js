@@ -3,6 +3,7 @@ import { Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Conta
 import { styled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -24,21 +25,32 @@ const BlogLists = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/blogs') // Thay đổi URL tới API của bạn
-      .then(response => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await axiosInstance.get('/blogs');
         setBlogs(response.data);
         setLoading(false);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the products!', error);
+      } catch (error) {
+        console.error('There was an error fetching the blogs!', error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchBlogs()
   }, []);
 
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (blogs.length <= 0) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h5">There was an error getting blogs!</Typography>
       </Box>
     );
   }

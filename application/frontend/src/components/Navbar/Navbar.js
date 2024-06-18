@@ -226,7 +226,7 @@ const Navbar = () => {
                       Profile
                     </MenuItem>
                   </Menu>
-                </>
+z                </>
               ) : (
                 <Link to='/login'>
                   <CustomIconButton color="inherit">

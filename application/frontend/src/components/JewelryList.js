@@ -3,6 +3,7 @@ import { Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Conta
 import { styled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -24,15 +25,18 @@ const JewelryList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/jewelries') // Thay đổi URL tới API của bạn
-      .then(response => {
-        setProducts(response.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the products!', error);
-        setLoading(false);
-      });
+      const fetchJewelries = async () => {
+          try {
+              const response = await axiosInstance.get('/jewelries');
+              setProducts(response.data);
+              setLoading(false);
+          } catch (error) {
+              console.error('There was an error fetching the products!', error);
+              setLoading(false);
+          }
+      };
+
+      fetchJewelries()
   }, []);
 
   if (loading) {
@@ -43,9 +47,17 @@ const JewelryList = () => {
     );
   }
 
+  if (products.length <= 0) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Typography variant="h5">There was an error getting products!</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Container>
-      <Box padding='40px 0'>
+      <Box padding='40px 0' minHeight="100vh">
         <Grid container spacing={2}>
           {products.map((product, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
@@ -53,7 +65,7 @@ const JewelryList = () => {
                 <CardMedia
                   component="img"
                   height="250"
-                  image='https://www.tierra.vn/files/halo-A7tL5Eltco.webp' // URL tới ảnh sản phẩm hoặc ảnh placeholder
+                  image={product.images} // URL tới ảnh sản phẩm hoặc ảnh placeholder
                   alt={product.name}
                 />
                 <CardContent>
@@ -64,9 +76,9 @@ const JewelryList = () => {
                     {product._id}
                   </Typography>
                   <Typography variant="h6" color="text.primary">
-                    {product.price} USD
+                    {product.price} VND
                   </Typography>
-                  <CustomButton1  onClick={() => navigate(`/product/${product._id}`)}>
+                  <CustomButton1  onClick={() => navigate(`/products/${product._id}`)}>
                     Details
                   </CustomButton1>
                 </CardContent>

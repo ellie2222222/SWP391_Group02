@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { TextField, Button, Container, Typography } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 
@@ -8,7 +8,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, user } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,11 +19,16 @@ const Login = () => {
             } else {
                 navigate('/');
             }
-        } catch (err) {
-            setError('Invalid email or password');
+        } catch (error) {
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error)
         }
     };
 
+    if (user) {
+        return <Navigate to="/" />;
+        
+    }
     return (
         <Container maxWidth="sm">
             <Typography variant="h4" gutterBottom>
@@ -50,6 +55,9 @@ const Login = () => {
                 </Button>
                 {error && <Typography color="error">{error}</Typography>}
             </form>
+            <Typography variant="body2" align="center" style={{ marginTop: '1rem' }}>
+                Don't have an account? <Link to="/signup">Sign up</Link>
+            </Typography>
         </Container>
     );
 };
