@@ -144,7 +144,6 @@ const updateJewelry = async (req, res) => {
             type,
             on_sale,
             sale_percentage,
-            images,
         };
 
         if (req.file) {
@@ -152,7 +151,7 @@ const updateJewelry = async (req, res) => {
             const result = await cloudinary.uploader.upload(req.file.path, {
                 folder: 'jewelry'
             });
-            updateData.images = [result.secure_url];
+            updateData.image = [result.secure_url];
         }
 
         const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true });

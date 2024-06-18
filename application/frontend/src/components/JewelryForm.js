@@ -23,6 +23,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             });
 
             onSubmit(formData);
+            console.log(values);
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Required."),
