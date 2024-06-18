@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, styled, TextField } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -23,24 +24,22 @@ const RequestForm = () => {
     const [description, setDescription] = useState('')
     const { user } = useAuth()
     const [error, setError] = useState('')
+    const [loading, setLoading] = useState(true)
     const navigate = useNavigate();
 
     const handleRequest = async () => {
         try {
-            const response = await axios.post('http://localhost:4000/api/requests',
-              { request_description: description },
-              {
+            await axiosInstance.post(`/requests`, {request_description: description}, {
                 headers: {
-                  'Authorization': `Bearer ${user.token}`,
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 }
-              }
-            );
-            setError('')
-          } catch (error) {
+            });
+            setError('');
+            setLoading(false);
+        } catch (error) {
             if (error.response === undefined) setError(error.message);
-            else setError(error.response.data.error)
-          }
+            else setError(error.response.data.error);
+        }
     };
 
     return (

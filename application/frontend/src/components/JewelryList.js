@@ -3,6 +3,7 @@ import { Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Conta
 import { styled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -24,15 +25,18 @@ const JewelryList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/jewelries') // Thay đổi URL tới API của bạn
-      .then(response => {
-        setProducts(response.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the products!', error);
-        setLoading(false);
-      });
+      const fetchJewelries = async () => {
+          try {
+              const response = await axiosInstance.get('/jewelries');
+              setProducts(response.data);
+              setLoading(false);
+          } catch (error) {
+              console.error('There was an error fetching the products!', error);
+              setLoading(false);
+          }
+      };
+
+      fetchJewelries()
   }, []);
 
   if (loading) {
@@ -74,7 +78,7 @@ const JewelryList = () => {
                   <Typography variant="h6" color="text.primary">
                     {product.price} VND
                   </Typography>
-                  <CustomButton1  onClick={() => navigate(`/product/${product._id}`)}>
+                  <CustomButton1  onClick={() => navigate(`/products/${product._id}`)}>
                     Details
                   </CustomButton1>
                 </CardContent>

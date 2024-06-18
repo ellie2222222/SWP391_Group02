@@ -7,13 +7,11 @@ const usersRoutes = express.Router()
 
 usersRoutes.use(requireAuth)
 
-usersRoutes.use(requireAdmin)
+usersRoutes.patch('/role-assignment/:id', requireAdmin, assignRole)
 
-usersRoutes.patch('/role-assignment/:id', assignRole)
+usersRoutes.delete('/:id', requireAdmin, deleteUser);
 
-usersRoutes.delete('/:id', deleteUser);
-
-usersRoutes.get('/', getUsers)
+usersRoutes.get('/', requireAdmin, getUsers)
 
 usersRoutes.get('/:id', getUser)
 

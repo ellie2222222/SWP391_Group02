@@ -57,6 +57,9 @@ const jewelrySchema = new Schema( {
     //fix
     images: [{
         type: String
+    }],
+    image_public_ids: [{
+        type: String
     }]
 }, {timestamps: true})
 

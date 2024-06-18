@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, styled, TextField } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -27,23 +28,22 @@ const CustomerRequestList = () => {
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                const response = await axios.get('http://localhost:4000/api/requests', {
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                    }
-                });
+                const response = await axiosInstance.get(`/requests`);
                 setRequests(response.data);
                 setError('');
+                setLoading(false);
             } catch (error) {
                 if (error.response === undefined) setError(error.message);
                 else setError(error.response.data.error);
-            } finally {
-                setLoading(false);
             }
         };
 
         fetchRequests();
     }, [user.token]);
+
+    const handleAcceptRequest = () => {
+
+    }
 
     if (loading) {
         return (
@@ -57,10 +57,15 @@ const CustomerRequestList = () => {
         <Container>
             <Box padding="40px 0">
                 <Typography variant="h2" component="p" marginBottom="20px" textAlign="center">Requests</Typography>
-                {requests.map((request) => (
-                    <Box key={request._id} marginBottom="20px">
-                        <Typography variant="h5" component="p">{request._id}</Typography>
-                        <Typography variant="h5" component="p">{request.request_status}</Typography>
+                {requests.map((request, index) => (
+                    <Box marginBottom="20px" key={index}>
+                        <Typography variant="h5" component="p" marginBottom='20px'>Request #{index + 1}</Typography>
+                        <Typography variant="h5" component="p" marginBottom='20px'>Request ID: {request._id}</Typography>
+                        <Typography variant="h5" component="p" marginBottom='20px'>User ID: {request.user_id}</Typography>
+                        <Typography variant="h5" component="p" marginBottom='20px'>Description: {request.request_description}</Typography>
+                        <Typography variant="h5" component="p">Status: {request.request_status}</Typography>
+                        <CustomButton1>Accept Request</CustomButton1>
+                        <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
                     </Box>
                 ))}
                 {error && (

@@ -52,7 +52,7 @@ app.use('/api/materials', materialRoutes)
 app.use('/api/gemstones', gemstoneRoutes)
 app.use('/api/warranties', warrantyRoutes)
 app.use('/api/blogs', blogRoutes) 
-app.use('/api/worksOns', worksOnRoutes)
+app.use('/api/works-on', worksOnRoutes)
 app.use('/api/designs', designRoutes)
 app.use('/api/invoice', invoiceRoutes);
 

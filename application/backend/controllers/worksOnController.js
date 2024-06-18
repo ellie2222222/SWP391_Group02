@@ -1,16 +1,19 @@
 const WorksOn = require('../models/worksOnModel')
 const Request = require('../models/requestModel')
 const User = require('../models/userModel')
+const jwt = require('jsonwebtoken')
+const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose')
 
 //check if an array of IDs exists in the database and has staffs role
 const checkStaffRoles = async (staff_ids) => {
-    const staff = await User.find({ _id: { $in: staff_ids }, role: { $in: ['sale_staff', 'design_staff', 'production_staff'] } })
+    const staff = await User.find({ _id: { $in: staff_ids }, role: { $in: ['manager', 'sale_staff', 'design_staff', 'production_staff'] } })
     if (staff.length !== staff_ids.length) {
-        throw new Error('One or more staff IDs are invalid or do not have the appropriate role')
+        throw new Error('One or more staff IDs are invalid, do not have the appropriate role or duplicate IDs in input data')
     }
 };
 const checkStaffRole = async (staff_id) => {
-    const staff = await User.findOne({ _id: staff_id, role: { $in: ['sale_staff', 'design_staff', 'production_staff'] } });
+    const staff = await User.findOne({ _id: staff_id, role: { $in: ['manager', 'sale_staff', 'design_staff', 'production_staff'] } });
     if (!staff) {
         throw new Error('Staff ID is invalid or does not have the appropriate role');
     }
@@ -19,28 +22,39 @@ const checkStaffRole = async (staff_id) => {
 // Create a new WorksOn
 const createWorksOn = async (req, res) => {
     try {
-        const { request_id, staff_ids, endedAt } = req.body;
+        const { request_id } = req.body;
+        const { authorization } = req.headers;
+        const token = authorization.split(' ')[1];
+        const { _id } = jwt.verify(token, process.env.SECRET);
 
         // Check request_id
         const request = await Request.findById(request_id);
         if (!request) {
-            return res.status(404).json({ message: 'Request not found' })
+            return res.status(404).json({ error: 'Request not found' })
         }
+
+        //Find manager
+        const manager = await User.findOne({ role: "manager" })
+        if (!manager) {
+            return res.status(404).json({ error: 'No manager found' })
+        }
+
+        // add ids to list staff_ids
+        const staff_ids = [new ObjectId(_id), manager._id]
 
         // Check staff_ids
         await checkStaffRoles(staff_ids);
 
         const worksOn = new WorksOn({
             request_id,
-            staff_ids,
-            endedAt
+            staff_ids
         });
 
         await worksOn.save()
 
         res.status(201).json(worksOn)
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ error: error.message })
     }
 };
 
@@ -52,12 +66,12 @@ const getWorksOnById = async (req, res) => {
             .populate('staff_ids');
 
         if (!worksOn) {
-            return res.status(404).json({ message: 'WorksOn not found' })
+            return res.status(404).json({ error: 'WorksOn not found' })
         }
 
         res.json(worksOn);
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ error: error.message })
     }
 };
 
@@ -70,57 +84,88 @@ const getAllWorksOns = async (req, res) => {
 
         res.json(worksOns);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 // Update a WorksOn by ID
 const updateWorksOnById = async (req, res) => {
     try {
-        const { request_id, staff_ids, endedAt } = req.body;
+        const { id } = req.params
+        const { request_id, endedAt } = req.body;
+
+        // Check if worksOn id is valid
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid ID" })
+        }
+
+        // Check if request id is valid
+        if (!mongoose.Types.ObjectId.isValid(request_id)) {
+            return res.status(400).json({ error: "Invalid request ID" })
+        }
 
         // Check if the request_id exists
         const request = await Request.findById(request_id);
         if (!request) {
-            return res.status(404).json({ message: 'Request not found' })
+            return res.status(404).json({ error: 'Request not found' })
         }
 
-        // Check if all staff_ids exist and have the appropriate role
-        await checkStaffRoles(staff_ids);
+        if (endedAt) {
+            parsedEndAt = new Date(endedAt);
+            if (isNaN(parsedEndAt)) {
+                return res.status(400).json({ error: "Invalid end date" });
+            }
 
-        const worksOn = await WorksOn.findByIdAndUpdate(
-            req.params.id,
+            if (parsedEndAt <= request.createdAt) {
+                return res.status(400).json({ error: "End date must be after creation date" });
+            }
+        } else {
+            parsedEndAt = request.endedAt;
+        }
+
+        const updatedFields = {}
+        if (request_id) updatedFields.request_id = request_id;
+        if (endedAt) updatedFields.endedAt = endedAt;
+
+        const worksOn = await WorksOn.findByIdAndUpdate(id, {
+            request_id: updatedFields.request_id,
+            endedAt: updatedFields.endedAt
+        },
             {
-                request_id,
-                staff_ids,
-                endedAt
-            },
-            { new: true, // Return the updated document
-            runValidators: true }
+                new: true, // Return the updated document
+                runValidators: true
+            }
         );
 
         if (!worksOn) {
-            return res.status(404).json({ message: 'WorksOn not found' })
+            return res.status(404).json({ error: 'WorksOn not found' })
         }
 
         res.json(worksOn);
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ error: error.message })
     }
 };
 
 // Delete a WorksOn by ID
 const deleteWorksOnById = async (req, res) => {
     try {
-        const worksOn = await WorksOn.findByIdAndDelete(req.params.id);
+        const { id } = req.params
 
-        if (!worksOn) {
-            return res.status(404).json({ message: 'WorksOn not found' })
+        // Check if works on id is valid
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid ID" })
         }
 
-        res.json({ message: 'WorksOn deleted successfully' })
+        const worksOn = await WorksOn.findByIdAndDelete(id);
+
+        if (!worksOn) {
+            return res.status(404).json({ error: 'WorksOn not found' })
+        }
+
+        res.status(200).json(worksOn)
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ error: error.message })
     }
 };
 
@@ -129,10 +174,20 @@ const addStaffToWorksOn = async (req, res) => {
     try {
         const { id, staff_id } = req.params
 
+        // Check if works on id is valid
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid works on ID" })
+        }
+
+        // Check if staff id is valid
+        if (!mongoose.Types.ObjectId.isValid(staff_id)) {
+            return res.status(400).json({ error: "Invalid staff ID" })
+        }
+
         // Check if the WorksOn exists
         const worksOn = await WorksOn.findById(id)
         if (!worksOn) {
-            return res.status(404).json({ message: 'WorksOn not found' })
+            return res.status(404).json({ error: 'WorksOn not found' })
         }
 
         // Check if the staff_id is valid and has the appropriate role
@@ -142,11 +197,13 @@ const addStaffToWorksOn = async (req, res) => {
         if (!worksOn.staff_ids.includes(staff_id)) {
             worksOn.staff_ids.push(staff_id)
             await worksOn.save()
+        } else {
+            return res.status(400).json({ error: "Staff already exist" })
         }
 
-        res.json(worksOn)
+        res.status(200).json(worksOn)
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ error: error.message })
     }
 };
 
@@ -154,11 +211,20 @@ const addStaffToWorksOn = async (req, res) => {
 const removeStaffFromWorksOn = async (req, res) => {
     try {
         const { id, staff_id } = req.params
+        // Check if works on id is valid
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid works on ID" })
+        }
+
+        // Check if staff id is valid
+        if (!mongoose.Types.ObjectId.isValid(staff_id)) {
+            return res.status(400).json({ error: "Invalid staff ID" })
+        }
 
         // Check if the WorksOn exists
         const worksOn = await WorksOn.findById(id)
         if (!worksOn) {
-            return res.status(404).json({ message: 'WorksOn not found' });
+            return res.status(404).json({ error: 'WorksOn not found' });
         }
 
         // Remove staff_id from the staff_ids array
@@ -167,7 +233,7 @@ const removeStaffFromWorksOn = async (req, res) => {
 
         res.json(worksOn);
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ error: error.message })
     }
 }
 
@@ -180,3 +246,5 @@ module.exports = {
     addStaffToWorksOn,
     removeStaffFromWorksOn
 }
+
+

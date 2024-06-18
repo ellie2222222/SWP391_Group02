@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, styled } from '@mui/material';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -18,19 +19,22 @@ const CustomButton1 = styled(Button)({
 
 const BlogDetails = () => {
   const { id } = useParams();
-  const [blog, setBlogs] = useState(null);
+  const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://localhost:4000/api/blogs/${id}`)
-      .then(response => {
-        setBlogs(response.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the blog!', error);
-        setLoading(false);
-      });
+      const fetchBlog = async () => {
+        try {
+          const response = await axiosInstance.get(`/blogs/${id}`);
+          setBlog(response.data);
+          setLoading(false);
+        } catch (error) {
+          console.error('There was an error fetching the blogs!', error);
+          setLoading(false);
+        }
+      };
+  
+      fetchBlog()
   }, [id]);
 
   if (loading) {

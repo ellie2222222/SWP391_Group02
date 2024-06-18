@@ -8,12 +8,15 @@ import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
 import BlogContents from "./pages/BlogContents";
-import { AdminRoute, AuthRoute, UserRoute } from "./routes/routes";
+import Warranty from './pages/Warranty'; // Import the new page
+
+import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
 import Request from "./pages/Request";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
-import UserRequest from "./pages/UserRequest";
 import CustomerRequests from "./pages/CustomerRequests";
+import Requests from "./pages/Requests";
+import RequestInfo from "./pages/RequestInfo";
 function App() {
   const { user } = useAuth()
 
@@ -21,24 +24,37 @@ function App() {
     <div className="App">
       <Routes>
         <Route path='/' element={<Home />}></Route>
-        <Route path='/login' element={<Login />}></Route>
+
         <Route path='/products' element={<Products />}></Route>
+        <Route path='/products/:id' element={<Details />}></Route>
+
         <Route path='/blogs' element={<Blogs />}></Route>
         <Route path='/blog/:id' element={<BlogContents />}></Route>
+
         <Route path='/aboutus' element={<About />}></Route>
-        <Route path='/product/:id' element={<Details />}></Route>
         <Route path='/profile/:id' element={<Profile />} />
-        <Route path='/profile/:id/requests' element={<UserRequest />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/warranties" element={<Warranty />} /> {/* Add the new route */}
+
         <Route path="/admin" element={<AdminRoute />}>
           <Route path="/admin" element={<Admin/>} />
         </Route>
+
         <Route element={<AuthRoute />}>
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/requests/:id" element={<RequestInfo />} />
+        </Route>
+
+        <Route element={<UserRoute />}>
           <Route path="/request" element={<Request />} />
         </Route>
-        <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
-        <Route path="/requests/:id" element={<CustomerRequests />} />
+
+        <Route element={<ManagerOrSaleRoute />}>
+          <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
+        </Route>
       </Routes>
     </div>
   );

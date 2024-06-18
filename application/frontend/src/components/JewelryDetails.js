@@ -3,10 +3,11 @@ import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, styled } from '@mui/material';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
-  backgroundColor:'#b48c72',
+  backgroundColor: '#b48c72',
   color: '#fff',
   width: '100%',
   fontSize: '1rem',
@@ -24,16 +25,18 @@ const JewelryDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:4000/api/jewelries/${id}`)
-      .then(response => {
+    const fetchJewelry = async () => {
+      try {
+        const response = await axiosInstance.get(`/jewelries/${id}`);
         setProduct(response.data);
-        console.log(response.data)
         setLoading(false);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('There was an error fetching the product!', error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchJewelry()
   }, [id]);
 
   if (loading) {
@@ -56,7 +59,7 @@ const JewelryDetails = () => {
     <Container>
       <Box display="flex" flexDirection="row" padding="40px 0">
         <Box flex={1} paddingRight="20px">
-          <img src='https://www.tierra.vn/files/halo-A7tL5Eltco.webp' alt={product.name} style={{ width: '100%', height:'100%' }} />
+          <img src='https://www.tierra.vn/files/halo-A7tL5Eltco.webp' alt={product.name} style={{ width: '100%', height: '100%' }} />
         </Box>
         <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between">
           <Typography variant="h4" component="h1">{product.name}</Typography>

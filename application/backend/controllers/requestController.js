@@ -80,11 +80,7 @@ const getUserRequest = async (req, res) => {
       return res.status(400).json({ error: 'Invalid ID' });
     }
 
-    if (!(_id === id)) {
-      return res.status(403).json({error: 'You do not have permission to perform this action'})
-    }
-
-    const requests = await Request.find({ user_id: _id });
+    const requests = await Request.findOne({ user_id: _id, _id: id }); 
 
     // Check if requests exist
     if (requests.length === 0) {
@@ -135,19 +131,19 @@ const getStaffRequest = async (req, res) => {
       return res.status(400).json({ error: 'Invalid ID' });
     }
 
-    if (!(_id === id)) {
-      return res.status(403).json({error: 'You do not have permission to perform this action'})
-    }
-
-    const worksOn = await WorksOn.find({ user_id: _id }).select("request_id");
-
-    const requestIds = worksOn.map(w => w.request_id);
-
-    const requests = await Request.find({ _id: { $in: requestIds } });
+    // Find request
+    const requests = await Request.findOne({ _id: id }); 
 
     // Check if requests exist
     if (requests) {
-      return res.status(404).json({ error: "No requests found for this staff" });
+      return res.status(404).json({ error: "No request found" });
+    }
+    console.log(requests)
+    // Check if request is staff's request
+    const worksOn = await WorksOn.find({ request_id: requests._id }).select("staff_id");
+
+    if (worksOn !== _id) {
+      return res.status(403).json({ error: "You do not have permission to perform this action"})
     }
 
     res.status(200).json(requests);
@@ -293,8 +289,12 @@ const updateRequest = async (req, res) => {
       if (isNaN(parsedEndAt)) {
         return res.status(400).json({ error: "Invalid end date" });
       }
+      
+      if (parsedEndAt <= existingRequest.createdAt) {
+        return res.status(400).json({ error: "End date must be after creation date" });
+      }
     } else {
-      parsedEndAt = existingRequest.parsedEndAt;
+      parsedEndAt = existingRequest.endedAt;
     }
 
     // Only update fields that are provided
