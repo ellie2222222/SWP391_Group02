@@ -54,6 +54,11 @@ const jewelrySchema = new Schema( {
         required: true,
         default: 0
     },
+    available: {
+        type: Boolean,
+        required: true,
+        default: true
+    },
     //fix
     images: [{
         type: String

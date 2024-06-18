@@ -9,7 +9,10 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     const [selectedImage, setSelectedImage] = useState(initialValues.images || '');
 
     const formik = useFormik({
-        initialValues: initialValues,
+        initialValues: {
+            ...initialValues,
+            available: initialValues.available ?? true,
+        },
         onSubmit: async (values) => {
             const formData = new FormData();
             Object.keys(values).forEach((key) => {
@@ -36,7 +39,8 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             category: Yup.string().required("Required."),
             type: Yup.string().required("Required."),
             on_sale: Yup.boolean(),
-            sale_percentage: Yup.number().typeError("Must be a number")
+            sale_percentage: Yup.number().typeError("Must be a number"),
+            available: Yup.boolean(),
         }),
     });
 
@@ -191,6 +195,17 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.sale_percentage && Boolean(formik.errors.sale_percentage)}
                     helperText={formik.touched.sale_percentage && formik.errors.sale_percentage}
+                />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={formik.values.available}
+                            onChange={formik.handleChange}
+                            name="available"
+                            color="primary"
+                        />
+                    }
+                    label="Available"
                 />
                 {selectedImage ? (
                     <Box sx={{ mt: 2 }}>

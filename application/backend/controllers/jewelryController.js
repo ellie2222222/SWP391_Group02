@@ -7,7 +7,7 @@ const { cloudinary } = require('../cloudinary');
 const validateEmptyFields = (data) => {
     const {
         name, description,
-        material_id, material_weight, price, category, type, on_sale, sale_percentage,
+        material_id, material_weight, price, category, type, on_sale, sale_percentage, available
     } = data;
     let emptyFields = [];
 
@@ -29,10 +29,9 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    let { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage, type } = data;
+    let { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage, type, on_sale } = data;
     let validationErrors = [];
 
-    // Trim IDs if they exist
     if (gemstone_id) gemstone_id = gemstone_id.trim();
     if (material_id) material_id = material_id.trim();
 
@@ -58,12 +57,17 @@ const validateInputData = (data) => {
     if (gemstone_weight != null && (!Number.isFinite(gemstone_weight) || gemstone_weight <= 0)) {
         validationErrors.push('Gemstone weight must be a positive number');
     }
+    if (on_sale === 'false') {
+        sale_percentage = 0;
+    }
+    if (on_sale === 'true' && sale_percentage <= 0) {
+        validationErrors.push('Sale percentage must not 0 when it is on sale');
+    }
     if (sale_percentage != null && (!Number.isFinite(sale_percentage) || sale_percentage < 0 || sale_percentage > 100)) {
         validationErrors.push('Sale percentage must be a positive number between 0 and 100');
     }
 
     const allowedType = ['Custom', 'Sample'];
-
     if (!allowedType.includes(type)) {
         validationErrors.push("Invalid type");
     }
@@ -73,7 +77,11 @@ const validateInputData = (data) => {
 
 const createJewelry = async (req, res) => {
     try {
-        const { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage } = req.body;
+        let { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
+
+        // Trim IDs
+        if (gemstone_id) gemstone_id = gemstone_id.trim();
+        if (material_id) material_id = material_id.trim();
 
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
@@ -83,6 +91,10 @@ const createJewelry = async (req, res) => {
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
+        }
+
+        if (on_sale === 'false') {
+            sale_percentage = 0;
         }
 
         const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
@@ -102,8 +114,9 @@ const createJewelry = async (req, res) => {
                 type,
                 on_sale,
                 sale_percentage,
+                available,
                 images: [result.secure_url],
-                image_public_ids: [result.public_id] // Store public_id here
+                image_public_ids: [result.public_id]
             });
 
             newJewelry.save().then(() => {
@@ -125,9 +138,9 @@ const createJewelry = async (req, res) => {
 
 const updateJewelry = async (req, res) => {
     try {
-        const { 
+        let { 
             name, description, price, gemstone_id, gemstone_weight, 
-            material_id, material_weight, category, type, on_sale, sale_percentage 
+            material_id, material_weight, category, type, on_sale, sale_percentage, available
         } = req.body;
 
         // Validate empty fields if necessary
@@ -140,6 +153,10 @@ const updateJewelry = async (req, res) => {
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
+        }
+
+        if (on_sale === 'false') {
+            sale_percentage = 0;
         }
 
         // Find the existing jewelry item
@@ -158,8 +175,9 @@ const updateJewelry = async (req, res) => {
         if (material_weight) updateData.material_weight = material_weight;
         if (category) updateData.category = category;
         if (type) updateData.type = type;
-        if (on_sale !== undefined) updateData.on_sale = on_sale;
+        if (on_sale) updateData.on_sale = on_sale;
         if (sale_percentage) updateData.sale_percentage = sale_percentage;
+        if (available) updateData.available = available;
 
         if (req.file) {
             // Delete old image from Cloudinary
