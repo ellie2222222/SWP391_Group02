@@ -4,7 +4,7 @@ import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, Tabl
 import { Add, Edit, Delete } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import JewelryForm from './JewelryForm';
-
+import UserForm from './UserForm';
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
@@ -29,7 +29,7 @@ const UserDashboardContent = () => {
     }));
 
     const [users, setUsers] = useState([]);
-    const [selectedJewelry, setSelectedJewelry] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const fetchJewelries = async () => {
@@ -43,12 +43,12 @@ const UserDashboardContent = () => {
     };
 
     const handleAddClick = () => {
-        setSelectedJewelry(null);
+        setSelectedUser(null);
         setIsDialogOpen(true);
     };
 
-    const handleEditClick = (jewelry) => {
-        setSelectedJewelry(jewelry);
+    const handleEditClick = (user) => {
+        setSelectedUser(user);
         setIsDialogOpen(true);
     };
 
@@ -63,8 +63,8 @@ const UserDashboardContent = () => {
 
     const handleSubmit = async (values) => {
         try {
-            if (selectedJewelry) {
-                await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
+            if (selectedUser) {
+                await axiosInstance.patch(`/jewelries/${selectedUser._id}`, values);
             } else {
                 await axiosInstance.post('/jewelries', values);
             }
@@ -90,9 +90,11 @@ const UserDashboardContent = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>ID</TableCell>
+                                <TableCell>Phone Number</TableCell>
                                 <TableCell>Name</TableCell>
+                                <TableCell>Email</TableCell>
                                 <TableCell>Password</TableCell>
+                                <TableCell>address</TableCell>
                                 <TableCell>Role</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
@@ -101,10 +103,12 @@ const UserDashboardContent = () => {
                             {users.map((user) => (
                                 <TableRow key={user._id}>
                                      <TableCell>
-                                        {user._id}
+                                        {user.phone_number}
                                     </TableCell>
                                     <TableCell>{user.username}</TableCell>
+                                    <TableCell>{user.email}</TableCell>
                                     <TableCell>{user.password}</TableCell>
+                                    <TableCell>{user.address}</TableCell>
                                     <TableCell>{user.role}</TableCell>
                                    
                                     <TableCell>
@@ -121,9 +125,9 @@ const UserDashboardContent = () => {
                     </Table>
                 </TableContainer>
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                    <DialogTitle>{selectedJewelry ? 'Edit Jewelry' : 'Add Jewelry'}</DialogTitle>
+                    <DialogTitle>Edit User</DialogTitle>
                     <DialogContent>
-                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [] }} onSubmit={handleSubmit} />
+                        <UserForm initialValues={selectedUser || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [] }} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setIsDialogOpen(false)} color="primary">
