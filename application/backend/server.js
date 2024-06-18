@@ -14,7 +14,8 @@ const warrantyRoutes = require('./routes/warranty')
 const blogRoutes = require('./routes/blog')
 const worksOnRoutes = require('./routes/worksOn');
 const designRoutes = require('./routes/design');
-const invoiceRoutes = require('./routes/invoice')
+const invoiceRoutes = require('./routes/invoice');
+
 //application
 const app = express()
 
