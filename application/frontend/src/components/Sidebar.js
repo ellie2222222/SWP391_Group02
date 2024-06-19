@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import useAuth from '../hooks/useAuthContext';
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -99,6 +100,7 @@ const CustomListItemButton = styled(ListItemButton)({
 export default function MiniDrawer() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const { user } = useAuth()
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -167,18 +169,33 @@ export default function MiniDrawer() {
                             </CustomListItemButton>
                         </Link>
                     </ListItem>
-                    <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
-                        <Link to='/admin/users'>
-                            <CustomListItemButton>
-                                <CustomListItemIcon
-                                >
-                                     <PeopleIcon />
-                                   
-                                </CustomListItemIcon>
-                                <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
-                            </CustomListItemButton>
-                        </Link>
-                    </ListItem>
+                    {user.role !== 'admin' && user.role !== 'user' && (
+                        <ListItem key="Requests" disablePadding sx={{ display: 'block' }}>
+                            <Link to='/admin/requests'>
+                                <CustomListItemButton>
+                                    <CustomListItemIcon
+                                    >
+                                        <ShoppingCartIcon />
+                                    </CustomListItemIcon>
+                                    <ListItemText primary="Requests" sx={{ opacity: open ? 1 : 0 }} />
+                                </CustomListItemButton>
+                            </Link>
+                        </ListItem>
+                    )}
+                    {user.role === 'admin' && (
+                        <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
+                            <Link to='/admin/users'>
+                                <CustomListItemButton>
+                                    <CustomListItemIcon
+                                    >
+                                        <PeopleIcon />
+                                    
+                                    </CustomListItemIcon>
+                                    <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                                </CustomListItemButton>
+                            </Link>
+                        </ListItem>
+                    )}
                     <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
                         <Link to=''>
                             <CustomListItemButton>

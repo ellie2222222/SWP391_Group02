@@ -14,10 +14,10 @@ const Login = () => {
         e.preventDefault();
         try {
             const role = await login(email, password);
-            if (role === 'admin') {
-                navigate('/admin');
-            } else {
+            if (role === 'user') {
                 navigate('/');
+            } else {
+                navigate('/admin');
             }
         } catch (error) {
             if (error.response === undefined) setError(error.message);
@@ -26,9 +26,9 @@ const Login = () => {
     };
 
     if (user) {
-        return <Navigate to="/" />;
-        
+        return <Navigate to="/" />;    
     }
+
     return (
         <Container maxWidth="sm">
             <Typography variant="h4" gutterBottom>

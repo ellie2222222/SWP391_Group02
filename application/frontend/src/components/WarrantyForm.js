@@ -22,7 +22,7 @@ const CustomButton1 = styled(Button)({
 
 const WarrantyForm = () => {
   const [userId, setUserId] = useState('');
-  const [jewelryId, setJewelryId] = useState('');
+  const [requestId, setRequestId] = useState('');
   const [warrantyContent, setWarrantyContent] = useState('');
   const [warrantyStartDate, setWarrantyStartDate] = useState('');
   const [warrantyEndDate, setWarrantyEndDate] = useState('');
@@ -37,7 +37,7 @@ const WarrantyForm = () => {
     setError('');
     setLoading(true);
 
-    if (!userId || !jewelryId) {
+    if (!userId || !requestId) {
       setError('Please fill out all required fields.');
       setLoading(false);
       return;
@@ -48,7 +48,7 @@ const WarrantyForm = () => {
         '/warranties', 
         { 
           user_id: userId, 
-          jewelry_id: jewelryId, 
+          request_id: requestId, 
           warranty_content: warrantyContent, 
           warranty_start_date: warrantyStartDate, 
           warranty_end_date: warrantyEndDate 
@@ -80,11 +80,11 @@ const WarrantyForm = () => {
           />
           <TextField
             fullWidth
-            label="Jewelry ID"
+            label="Request ID"
             margin="normal"
             variant="outlined"
-            value={jewelryId}
-            onChange={(e) => setJewelryId(e.target.value)}
+            value={requestId}
+            onChange={(e) => setRequestId(e.target.value)}
           />
           <TextField
             fullWidth

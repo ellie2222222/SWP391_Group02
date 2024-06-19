@@ -19,7 +19,7 @@ const requestSchema = new Schema( {
     request_status: {
         type: String,
         required: true,
-        enum: ['pending', 'assigned','completed'],
+        enum: ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'payment', 'cancelled'],
         default: 'pending'
     },
     quote_content: {

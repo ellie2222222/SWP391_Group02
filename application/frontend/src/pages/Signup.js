@@ -22,9 +22,8 @@ const Signup = () => {
         e.preventDefault();
         try {
             await signup(userData);
-            alert('Signup successful! Please log in.');
             setError(''); // Xóa lỗi nếu đăng ký thành công
-            navigate('/login'); // Điều hướng về trang đăng nhập
+            navigate('/'); // Điều hướng về trang đăng nhập
         } catch (error) {
             if (error.response === undefined) setError(error.message);
             else setError(error.response.data.error)

@@ -105,8 +105,12 @@ const getStaffRequests = async (req, res) => {
     
     const requestIds = worksOn.map(w => w.request_id);
     
-    const requests = await Request.find({ _id: { $in: requestIds } });
-    
+    const requests = await Request.find({ _id: { $in: requestIds } })
+      .populate({
+        path: 'user_id',
+        select: 'email'
+      });
+
     // Check if requests exist
     if (requests.length === 0) {
       return res.status(404).json({ error: "No requests found for this staff" });
@@ -231,7 +235,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'assigned', 'completed'];
+    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'payment', 'cancelled'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }
