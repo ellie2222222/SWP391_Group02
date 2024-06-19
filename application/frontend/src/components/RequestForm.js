@@ -1,173 +1,188 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia } from '@mui/material';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography } from '@mui/material';
 import * as Yup from 'yup';
-import axiosInstance from '../utils/axiosInstance';
 
 const RequestForm = ({ initialValues, onSubmit }) => {
-   
-    const formik = useFormik({
-        onSubmit: async (values) => {
+    const filterBlankValues = (values) => {
+        const filteredValues = {};
 
-            return onSubmit(values);
-        },
+        Object.keys(values).forEach((key) => {
+            if (values[key] !== '' && values[key] !== null && values[key] !== undefined) {
+                filteredValues[key] = values[key];
+            }
+        });
+
+        return filteredValues;
+    };
+
+    // Filter initial values to remove blank/null/undefined values
+    const filteredInitialValues = filterBlankValues({
+        ...initialValues,
+        user_id: initialValues.user_id ? initialValues.user_id._id : '', // Extract _id from user_id object
+    });
+
+    const formik = useFormik({
+        initialValues: filteredInitialValues,
         validationSchema: Yup.object({
-            name: Yup.string().required("Required."),
-            on_sale: Yup.boolean(),
-            sale_percentage: Yup.number().typeError("Must be a number"),
+            user_id: Yup.string().required("Required."),
+            request_description: Yup.string().required("Required."),
+            request_status: Yup.string().required("Required."),
+            quote_amount: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
+            quote_content: Yup.string(),
+            quote_status: Yup.string(),
+            production_start_date: Yup.date(),
+            production_end_date: Yup.date(),
+            production_status: Yup.string(),
+            total_amount: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
         }),
+        onSubmit: async (values) => {
+            await onSubmit(values);
+        }
     });
 
     return (
         <Container maxWidth="sm">
             <Typography variant="h4" gutterBottom>
-                Edit Request    
+                Edit Request
             </Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
                 <TextField
-                    name="name"
-                    label="Name"
+                    name="user_id"
+                    label="User ID"
                     variant="outlined"
-                    value={formik.values.name}
+                    value={formik.values.user_id}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
+                    error={formik.touched.user_id && Boolean(formik.errors.user_id)}
+                    helperText={formik.touched.user_id && formik.errors.user_id}
                 />
                 <TextField
-                    name="description"
-                    label="Description"
+                    name="request_description"
+                    label="Request Description"
                     variant="outlined"
-                    value={formik.values.description}
+                    value={formik.values.request_description}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.description && Boolean(formik.errors.description)}
-                    helperText={formik.touched.description && formik.errors.description}
-                />
-                <TextField
-                    name="price"
-                    label="Price"
-                    type="number"
-                    variant="outlined"
-                    value={formik.values.price}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.price && Boolean(formik.errors.price)}
-                    helperText={formik.touched.price && formik.errors.price}
-                />
-                <TextField
-                    name="gemstone_id"
-                    label="Gemstone ID"
-                    variant="outlined"
-                    value={formik.values.gemstone_id}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.gemstone_id && Boolean(formik.errors.gemstone_id)}
-                    helperText={formik.touched.gemstone_id && formik.errors.gemstone_id}
-                />
-                <TextField
-                    name="gemstone_weight"
-                    label="Gemstone Weight"
-                    type="number"
-                    variant="outlined"
-                    value={formik.values.gemstone_weight}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.gemstone_weight && Boolean(formik.errors.gemstone_weight)}
-                    helperText={formik.touched.gemstone_weight && formik.errors.gemstone_weight}
-                />
-                <TextField
-                    name="material_id"
-                    label="Material ID"
-                    variant="outlined"
-                    value={formik.values.material_id}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.material_id && Boolean(formik.errors.material_id)}
-                    helperText={formik.touched.material_id && formik.errors.material_id}
-                />
-                <TextField
-                    name="material_weight"
-                    label="Material Weight"
-                    type="number"
-                    variant="outlined"
-                    value={formik.values.material_weight}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.material_weight && Boolean(formik.errors.material_weight)}
-                    helperText={formik.touched.material_weight && formik.errors.material_weight}
+                    error={formik.touched.request_description && Boolean(formik.errors.request_description)}
+                    helperText={formik.touched.request_description && formik.errors.request_description}
                 />
                 <FormControl variant="outlined" fullWidth>
-                    <InputLabel id="category-label">Category</InputLabel>
+                    <InputLabel id="request-status-label">Request Status</InputLabel>
                     <Select
-                        labelId="category-label"
-                        name="category"
-                        value={formik.values.category}
+                        labelId="request-status-label"
+                        name="request_status"
+                        value={formik.values.request_status}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        label="Category"
-                        error={formik.touched.category && Boolean(formik.errors.category)}
+                        label="Request Status"
+                        error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                     >
-                        <MenuItem value="Ring">Ring</MenuItem>
-                        <MenuItem value="Necklace">Necklace</MenuItem>
-                        <MenuItem value="Bracelet">Bracelet</MenuItem>
-                        <MenuItem value="Earring">Earring</MenuItem>
-                        <MenuItem value="Other">Other</MenuItem>
+                        <MenuItem value="pending">Pending</MenuItem>
+                        <MenuItem value="accepted">Accepted</MenuItem>
+                        <MenuItem value="completed">Completed</MenuItem>
+                        <MenuItem value="design">Design</MenuItem>
+                        <MenuItem value="quote">Quote</MenuItem>
+                        <MenuItem value="production">Production</MenuItem>
+                        <MenuItem value="payment">Payment</MenuItem>
+                        <MenuItem value="cancelled">Cancelled</MenuItem>
                     </Select>
-                    {formik.touched.category && formik.errors.category && (
-                        <Typography variant="caption" color="red">{formik.errors.category}</Typography>
+                    {formik.touched.request_status && formik.errors.request_status && (
+                        <Typography variant="caption" color="red">{formik.errors.request_status}</Typography>
                     )}
                 </FormControl>
-                <FormControl variant="outlined" fullWidth>
-                    <InputLabel id="type-label">Type</InputLabel>
-                    <Select
-                        labelId="type-label"
-                        name="type"
-                        value={formik.values.type}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        label="Type"
-                        error={formik.touched.type && Boolean(formik.errors.type)}
-                    >
-                        <MenuItem value="Sample">Sample</MenuItem>
-                        <MenuItem value="Custom">Custom</MenuItem>
-                    </Select>
-                    {formik.touched.type && formik.errors.type && (
-                        <Typography variant="caption" color="red">{formik.errors.type}</Typography>
-                    )}
-                </FormControl>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={formik.values.on_sale}
-                            onChange={formik.handleChange}
-                            name="on_sale"
-                            color="primary"
-                        />
-                    }
-                    label="On Sale"
-                />
                 <TextField
-                    name="sale_percentage"
-                    label="Sale Percentage"
+                    name="quote_amount"
+                    label="Quote Amount"
                     type="number"
                     variant="outlined"
-                    value={formik.values.sale_percentage}
+                    value={formik.values.quote_amount}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.sale_percentage && Boolean(formik.errors.sale_percentage)}
-                    helperText={formik.touched.sale_percentage && formik.errors.sale_percentage}
+                    error={formik.touched.quote_amount && Boolean(formik.errors.quote_amount)}
+                    helperText={formik.touched.quote_amount && formik.errors.quote_amount}
                 />
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={formik.values.available}
-                            onChange={formik.handleChange}
-                            name="available"
-                            color="primary"
-                        />
-                    }
-                    label="Available"
+                <TextField
+                    name="quote_content"
+                    label="Quote Content"
+                    variant="outlined"
+                    value={formik.values.quote_content}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.quote_content && Boolean(formik.errors.quote_content)}
+                    helperText={formik.touched.quote_content && formik.errors.quote_content}
+                />
+                <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="quote-status-label">Quote Status</InputLabel>
+                    <Select
+                        labelId="quote-status-label"
+                        name="quote_status"
+                        value={formik.values.quote_status}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        label="Quote Status"
+                        error={formik.touched.quote_status && Boolean(formik.errors.quote_status)}
+                    >
+                        <MenuItem value="pending">Pending</MenuItem>
+                        <MenuItem value="approved">Approved</MenuItem>
+                        <MenuItem value="rejected">Rejected</MenuItem>
+                    </Select>
+                    {formik.touched.quote_status && formik.errors.quote_status && (
+                        <Typography variant="caption" color="red">{formik.errors.quote_status}</Typography>
+                    )}
+                </FormControl>
+                <TextField
+                    name="production_start_date"
+                    label="Production Start Date"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    variant="outlined"
+                    value={formik.values.production_start_date}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.production_start_date && Boolean(formik.errors.production_start_date)}
+                    helperText={formik.touched.production_start_date && formik.errors.production_start_date}
+                />
+                <TextField
+                    name="production_end_date"
+                    label="Production End Date"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    variant="outlined"
+                    value={formik.values.production_end_date}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.production_end_date && Boolean(formik.errors.production_end_date)}
+                    helperText={formik.touched.production_end_date && formik.errors.production_end_date}
+                />
+                <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="production-status-label">Production Status</InputLabel>
+                    <Select
+                        labelId="production-status-label"
+                        name="production_status"
+                        value={formik.values.production_status}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        label="Production Status"
+                        error={formik.touched.production_status && Boolean(formik.errors.production_status)}
+                    >
+                        <MenuItem value="ongoing">Ongoing</MenuItem>
+                        <MenuItem value="completed">Completed</MenuItem>
+                    </Select>
+                    {formik.touched.production_status && formik.errors.production_status && (
+                        <Typography variant="caption" color="red">{formik.errors.production_status}</Typography>
+                    )}
+                </FormControl>
+                <TextField
+                    name="total_amount"
+                    label="Total Amount"
+                    type="number"
+                    variant="outlined"
+                    value={formik.values.total_amount}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.total_amount && Boolean(formik.errors.total_amount)}
+                    helperText={formik.touched.total_amount && formik.errors.total_amount}
                 />
                 <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                     Submit

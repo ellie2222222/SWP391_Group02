@@ -11,7 +11,6 @@ const CustomButton1 = styled(Button)({
     color: '#fff',
     width: '100%',
     fontSize: '1rem',
-    marginTop: '20px',
     '&:hover': {
       color: '#b48c72', // Thay đổi màu chữ khi hover
       backgroundColor: 'transparent',
@@ -31,20 +30,32 @@ const RequestDashboardContent = () => {
     const [requests, setRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isQuoteDetailDialogOpen, setIsQuoteDetailDialogOpen] = useState(false);
+    const [isProductionDetailDialogOpen, setIsProductionDetailDialogOpen] = useState(false);
 
     const fetchRequests = async () => {
         try {
             const response = await axiosInstance.get('/requests/staff-requests');
             setRequests(response.data);
-            console.log(response.data)
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
         }
     };
 
-    const handleEditClick = (jewelry) => {
-        setSelectedRequest(jewelry);
-        setIsDialogOpen(true);
+    const handleEditClick = (request) => {
+        setSelectedRequest(request);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleQuoteDetailOpen = (request) => {
+        setSelectedRequest(request);
+        setIsQuoteDetailDialogOpen(true);
+    };
+
+    const handleProductionDetailOpen = (request) => {
+        setSelectedRequest(request);
+        setIsProductionDetailDialogOpen(true);
     };
 
     const handleSubmit = async (values) => {
@@ -54,10 +65,16 @@ const RequestDashboardContent = () => {
             }
 
             fetchRequests();
-            setIsDialogOpen(false);
+            handleCloseAllDialogs();
         } catch (error) {
             console.error("There was an error saving the request!", error);
         }
+    };
+
+    const handleCloseAllDialogs = () => {
+        setIsEditDialogOpen(false);
+        setIsQuoteDetailDialogOpen(false);
+        setIsProductionDetailDialogOpen(false);
     };
 
     useEffect(() => {
@@ -75,21 +92,29 @@ const RequestDashboardContent = () => {
                                 <TableCell>Sender</TableCell>
                                 <TableCell>Description</TableCell>
                                 <TableCell>Request Status</TableCell>
-                                <TableCell>Quote</TableCell>
+                                <TableCell align="center">Quote</TableCell>
                                 <TableCell>Design</TableCell>
-                                <TableCell>Production</TableCell>
+                                <TableCell align="center">Production</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {requests.map((request) => (
-                                <TableRow key={request.user_id}>
+                            {requests.map((request, index) => (
+                                <TableRow key={index}>
                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
                                     <TableCell>{request.request_description}</TableCell>
-                                    <TableCell>{request.request_status}</TableCell>
-                                    <TableCell>{request.quote_status ? request.quote_status : 'N/A'}</TableCell>
+                                    <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
+                                    <TableCell>
+                                        <CustomButton1 color="primary" onClick={() => handleQuoteDetailOpen(request)}>
+                                            Detail
+                                        </CustomButton1>
+                                    </TableCell>
                                     <TableCell>{request.design_status ? request.design_status : 'N/A'}</TableCell>
-                                    <TableCell>{request.production_status ? request.production_status : 'N/A'}</TableCell>
+                                    <TableCell>
+                                        <CustomButton1 color="primary" onClick={() => handleProductionDetailOpen(request)}>
+                                            Detail
+                                        </CustomButton1>
+                                    </TableCell>
                                     <TableCell>
                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>
                                             <Edit />
@@ -100,14 +125,40 @@ const RequestDashboardContent = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+                <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
                     <DialogTitle>Edit Request</DialogTitle>
                     <DialogContent>
                         <RequestForm initialValues={selectedRequest} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                        <Button onClick={handleCloseAllDialogs} color="primary">
                             Cancel
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog open={isQuoteDetailDialogOpen} onClose={handleCloseAllDialogs}>
+                    <DialogTitle>Quote Detail</DialogTitle>
+                    <DialogContent>
+                        <Typography>Quote Amount: {(selectedRequest && selectedRequest.quote_amount) ? selectedRequest.quote_amount : 'N/A'}</Typography>
+                        <Typography>Quote Content: {(selectedRequest && selectedRequest.quote_content) ? selectedRequest.quote_content : 'N/A'}</Typography>
+                        <Typography>Quote Status: {(selectedRequest && selectedRequest.quote_status) ? selectedRequest.quote_status : 'N/A'}</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseAllDialogs} color="primary">
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog open={isProductionDetailDialogOpen} onClose={handleCloseAllDialogs}>
+                    <DialogTitle>Production Detail</DialogTitle>
+                    <DialogContent>
+                        <Typography>Production Start Date: {(selectedRequest && selectedRequest.production_start_date) ? selectedRequest.production_start_date : 'N/A'}</Typography>
+                        <Typography>Production End Date: {(selectedRequest && selectedRequest.production_end_date) ? selectedRequest.production_end_date : 'N/A'}</Typography>
+                        <Typography>Production Status: {(selectedRequest && selectedRequest.production_status) ? selectedRequest.production_status : 'N/A'}</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseAllDialogs} color="primary">
+                            Close
                         </Button>
                     </DialogActions>
                 </Dialog>
