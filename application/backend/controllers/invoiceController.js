@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Invoice = require('../models/invoiceModel');
 const User = require('../models/userModel');
-const Jewelry = require('../models/jewelryModel');
 const Request = require('../models/requestModel');
 
 // Helper function to validate ObjectId
@@ -22,14 +21,7 @@ const createInvoice = async (req, res) => {
             return res.status(404).json({ message: 'Request not found' });
         }
 
-        // Check if the jewelry exists
-        const jewelry = await Jewelry.findById(request.jewelry_id);
-        if (!jewelry) {
-            return res.status(404).json({ message: 'Jewelry not found' });
-        }
-
         // Extract the necessary information from the request
-        const jewelry_id = request.jewelry_id;
         const total_amount = request.total_amount;
 
         // Check if total_amount is valid
@@ -38,7 +30,7 @@ const createInvoice = async (req, res) => {
         }
 
         // Create the invoice
-        const invoice = new Invoice({ request_id, payment_method, jewelry_id, total_amount });
+        const invoice = new Invoice({ request_id, payment_method, total_amount });
         await invoice.save();
         res.status(201).json(invoice);
     } catch (error) {

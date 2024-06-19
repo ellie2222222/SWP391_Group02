@@ -1,6 +1,6 @@
 const Design = require('../models/designModel')
 const mongoose = require('mongoose')
-const Jewelry = require('../models/jewelryModel')
+const Request = require('../models/requestModel')
 const jwt = require('jsonwebtoken')
 
 // get all design
@@ -55,28 +55,28 @@ const createDesign = async (req, res) => {
       return res.status(400).json({error: 'Invalid user ID'})
     }
 
-    const { jewelry_id, images } = req.body
+    const { request_id, images } = req.body
 
-    if (!jewelry_id) {
+    if (!request_id) {
       return res.status(400).json({error: "Please fill in the required field!"})
     }
 
-    if (!mongoose.Types.ObjectId.isValid(jewelry_id)) {
-      return res.status(400).json({error: 'Invalid jewelry ID'})
+    if (!mongoose.Types.ObjectId.isValid(request_id)) {
+      return res.status(400).json({error: 'Invalid request ID'})
     }
     
     try {
-      const jewelryExists = await Jewelry.findById(jewelry_id);
-      if (!jewelryExists) {
-          return res.status(404).json({ error: 'No such jewelry with the given jewelry_id' });
+      const requestExists = await Request.findById(request_id);
+      if (!requestExists) {
+          return res.status(404).json({ error: 'No such request with the given request_id' });
       }
 
-      const jewelry = await Design.findOne({jewelry_id: jewelry_id})
-      if (jewelry) {
-        return res.status(400).json({ error: 'This jewelry already have a design' });
+      const request = await Design.findOne({request_id: request_id})
+      if (request) {
+        return res.status(400).json({ error: 'This request already have a design' });
       }
 
-      const design = await Design.create({ user_id: _id, jewelry_id, images })
+      const design = await Design.create({ user_id: _id, request_id, images })
 
       res.status(201).json(design)
     } catch (error) {
@@ -109,7 +109,7 @@ const deleteDesign = async (req, res) => {
 const updateDesign = async (req, res) => {
     try {
         const { id } = req.params
-        const { jewelry_id, images } = req.body; // Extract jewelry_id from request body
+        const { request_id, images } = req.body; // Extract request_id from request body
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({error: 'Invalid ID'})
@@ -126,20 +126,20 @@ const updateDesign = async (req, res) => {
             }
         }
     
-        // Check if the jewelry_id exists
-        if (jewelry_id) {
-            if (!mongoose.Types.ObjectId.isValid(jewelry_id)) {
-                return res.status(400).json({error: 'Invalid Jewelry ID'})
+        // Check if the request_id exists
+        if (request_id) {
+            if (!mongoose.Types.ObjectId.isValid(request_id)) {
+                return res.status(400).json({error: 'Invalid Request ID'})
             }
 
-            const jewelryExists = await Jewelry.findById(jewelry_id);
-            if (!jewelryExists) {
-                return res.status(404).json({ error: 'No such jewelry with the given jewelry_id' });
+            const requestExists = await Request.findById(request_id);
+            if (!requestExists) {
+                return res.status(404).json({ error: 'No such request with the given request_id' });
             }
 
-            const jewelry = await Design.findOne({jewelry_id: jewelry_id})
-            if (jewelry) {
-              return res.status(400).json({ error: 'This jewelry already have a design' });
+            const request = await Design.findOne({request_id: request_id})
+            if (request) {
+              return res.status(400).json({ error: 'This request already have a design' });
             }
         }
 
@@ -147,7 +147,7 @@ const updateDesign = async (req, res) => {
             { _id: id },
             { $set: {
               design_name: req.body.design_name, 
-              jewelry_id, 
+              request_id, 
               images: req.body.images 
             }},
             {

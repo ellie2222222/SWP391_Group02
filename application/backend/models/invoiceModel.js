@@ -12,11 +12,6 @@ const invoiceSchema = new Schema({
         type: String,
         required: true
     },
-    jewelry_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Jewelry',
-        required: true
-    },
     total_amount: {
         type: Number,
         required: true

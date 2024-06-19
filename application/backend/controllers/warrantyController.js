@@ -2,7 +2,7 @@ const Warranty = require("../models/warrantyModel");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
-const Jewelry = require("../models/jewelryModel");
+const Request = require("../models/requestModel");
 
 // get all warranties
 const getWarranties = async (req, res) => {
@@ -53,9 +53,9 @@ const getWarranty = async (req, res) => {
 // Create a new warranty
 const createWarranty = async (req, res) => {
   try {
-    const { warranty_content, user_id, jewelry_id, warranty_start_date, warranty_end_date } = req.body;
+    const { warranty_content, user_id, request_id, warranty_start_date, warranty_end_date } = req.body;
 
-    if (!warranty_content || !user_id || !jewelry_id || !warranty_start_date || !warranty_end_date) {
+    if (!warranty_content || !user_id || !request_id || !warranty_start_date || !warranty_end_date) {
       return res.status(400).json({ error: "Please fill in all required fields!" });
     }
 
@@ -75,8 +75,8 @@ const createWarranty = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(user_id)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
-    if (!mongoose.Types.ObjectId.isValid(jewelry_id)) {
-      return res.status(400).json({ error: "Invalid jewelry ID" });
+    if (!mongoose.Types.ObjectId.isValid(request_id)) {
+      return res.status(400).json({ error: "Invalid request ID" });
     }
 
     // Add to the database
@@ -85,19 +85,19 @@ const createWarranty = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const jewelry = await Jewelry.findById(jewelry_id);
-    if (!jewelry) {
-      return res.status(404).json({ error: "Jewelry not found" });
+    const request = await Request.findById(request_id);
+    if (!request) {
+      return res.status(404).json({ error: "Request not found" });
     }
 
-    const existJewelry = await Warranty.findOne({jewelry_id: jewelry_id})
-    if (existJewelry) {
-      return res.status(400).json({ error: 'This jewelry already have a warranty' });
+    const existRequest = await Warranty.findOne({request_id: request_id})
+    if (existRequest) {
+      return res.status(400).json({ error: 'This request already have a warranty' });
     }
 
     const warranty = await Warranty.create({
       user_id,
-      jewelry_id,
+      request_id,
       warranty_content,
       warranty_start_date: parsedStartDate,
       warranty_end_date: parsedEndDate,
@@ -114,7 +114,7 @@ const createWarranty = async (req, res) => {
 const updateWarranty = async (req, res) => {
   try {
     const { id } = req.params;
-    const { jewelry_id, warranty_content, warranty_start_date, warranty_end_date } = req.body;
+    const { request_id, warranty_content, warranty_start_date, warranty_end_date } = req.body;
 
     // Check for a valid ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -122,13 +122,13 @@ const updateWarranty = async (req, res) => {
     }
 
     // Check for a valid ID
-    if (jewelry_id && !mongoose.Types.ObjectId.isValid(jewelry_id)) {
-      return res.status(400).json({ error: "Invalid jewelry ID" });
+    if (request_id && !mongoose.Types.ObjectId.isValid(request_id)) {
+      return res.status(400).json({ error: "Invalid request ID" });
     } 
 
-    const jewelry = await Warranty.findOne({jewelry_id: jewelry_id})
-    if (jewelry) {
-      return res.status(400).json({ error: "This jewelry already have warranty" });
+    const request = await Warranty.findOne({request_id: request_id})
+    if (request) {
+      return res.status(400).json({ error: "This request already have warranty" });
     }
 
     const { authorization } = req.headers;
@@ -176,7 +176,7 @@ const updateWarranty = async (req, res) => {
 
     // Create an update object
     const updateData = {};
-    if (jewelry_id) updateData.jewelry_id = jewelry_id;
+    if (request_id) updateData.request_id = request_id;
     if (warranty_content) updateData.warranty_content = warranty_content;
     if (warranty_start_date) updateData.warranty_start_date = parsedStartDate;
     if (warranty_end_date) updateData.warranty_end_date = parsedEndDate;

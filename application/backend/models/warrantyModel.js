@@ -8,9 +8,9 @@ const warrantySchema = new Schema( {
         ref: 'User', 
         required: true
     },
-    jewelry_id: {
+    request_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Jewelry', 
+        ref: 'Request', 
         required: true
     },
     warranty_content: {
