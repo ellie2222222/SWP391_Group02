@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, TextField, Button, Typography, Box, CircularProgress } from '@mui/material';
 import { styled } from '@mui/system';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import useAuth from '../hooks/useAuthContext';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -12,7 +14,7 @@ const CustomButton1 = styled(Button)({
   fontSize: '1rem',
   marginTop: '20px',
   '&:hover': {
-    color: '#b48c72', // Change text color on hover
+    color: '#b48c72',
     border: '1px solid #b48c72',
     backgroundColor: 'transparent',
   },
@@ -27,7 +29,8 @@ const WarrantyForm = () => {
   const [warranty, setWarranty] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const {user} = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,22 +44,19 @@ const WarrantyForm = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:4000/api/warranties', 
+      const response = await axiosInstance.post(
+        '/warranties', 
         { 
           user_id: userId, 
           jewelry_id: jewelryId, 
           warranty_content: warrantyContent, 
           warranty_start_date: warrantyStartDate, 
           warranty_end_date: warrantyEndDate 
-        },
-        {
-          headers: {
-            "Authorization": `Bearer ${user.token}`
-          }
         }
-      );// Adjust URL if needed
+      );
       setWarranty(response.data.warranty);
       setLoading(false);
+      navigate('/warranties'); // Redirect to warranty list page
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -86,7 +86,7 @@ const WarrantyForm = () => {
             value={jewelryId}
             onChange={(e) => setJewelryId(e.target.value)}
           />
-           <TextField
+          <TextField
             fullWidth
             label="Warranty Content"
             margin="normal"
@@ -94,7 +94,7 @@ const WarrantyForm = () => {
             value={warrantyContent}
             onChange={(e) => setWarrantyContent(e.target.value)}
           />
-           <TextField
+          <TextField
             fullWidth
             label="Warranty Start Date"
             margin="normal"
@@ -102,7 +102,7 @@ const WarrantyForm = () => {
             value={warrantyStartDate}
             onChange={(e) => setWarrantyStartDate(e.target.value)}
           />
-           <TextField
+          <TextField
             fullWidth
             label="Warranty End Date"
             margin="normal"
@@ -122,7 +122,6 @@ const WarrantyForm = () => {
             <Typography component="p">Warranty Content: {warranty.warranty_content}</Typography>
             <Typography component="p">Start Date: {new Date(warranty.warranty_start_date).toLocaleDateString()}</Typography>
             <Typography component="p">End Date: {new Date(warranty.warranty_end_date).toLocaleDateString()}</Typography>
-            
           </Box>
         )}
         {error && (

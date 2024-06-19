@@ -14,7 +14,7 @@ const CustomButton1 = styled(Button)({
     fontSize: '1rem',
     marginTop: '20px',
     '&:hover': {
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        color: '#b48c75', // Thay đổi màu chữ khi hover
         backgroundColor: 'transparent',
     },
 });

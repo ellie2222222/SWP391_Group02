@@ -10,6 +10,8 @@ import JewelryDashboard from "./pages/JewelryDashboard";
 import UsersDashboard from "./pages/UsersDashboard";
 import BlogContents from "./pages/BlogContents";
 import Warranty from './pages/Warranty'; // Import the new page
+import WarrantyList from "./pages/WarrantyList";
+import WarrantyLists from "./components/WarrantyLists";
 
 import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
 import Request from "./pages/Request";
@@ -38,7 +40,8 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/warranties" element={<Warranty />} /> {/* Add the new route */}
+        <Route path="/warranties/create" element={<Warranty />} /> {/* Add the new route */}
+        <Route path="/warranties" element={<WarrantyList />} />
 
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<JewelryDashboard/>} />

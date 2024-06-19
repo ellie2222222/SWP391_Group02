@@ -204,8 +204,13 @@ const Navbar = () => {
                 </Link>
               </Grid>
               <Grid item xs>
-                <Link to="/warranties">
+                <Link to="/warranties/create">
                   <CustomButton>Warranty</CustomButton>
+                </Link>
+              </Grid>
+              <Grid item xs>
+                <Link to="/warranties">
+                  <CustomButton>Warranty List</CustomButton>
                 </Link>
               </Grid>
                 <Grid item xs>
