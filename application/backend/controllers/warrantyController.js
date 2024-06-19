@@ -29,7 +29,7 @@ const getWarranty = async (req, res) => {
     const token = authorization.split(' ')[1];
     const { _id, role } = jwt.verify(token, process.env.SECRET);
 
-    if (role !== 'manager') {
+    if (role !== 'manager' && role !== "sale_staff") {
         const uid = await Warranty.findById(id).select('user_id');
         if (!uid || uid.user_id.toString() !== _id) {
             return res.status(403).json({ error: 'You do not have permissions to perform this action' });

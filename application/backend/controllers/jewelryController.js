@@ -222,7 +222,7 @@ const getJewelries = async (req, res) => {
             query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
         }
         if (category) {
-            query.category = category;
+            query.category = new RegExp(category, 'i');
         }
         if (on_sale !== undefined) {
             query.on_sale = on_sale === 'true'; // Convert string to boolean
