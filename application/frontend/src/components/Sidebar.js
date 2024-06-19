@@ -150,7 +150,7 @@ export default function MiniDrawer() {
                             <CustomListItemButton>
                                 <CustomListItemIcon
                                 >
-                                    <PeopleIcon />
+                                    <LocalOfferIcon />
                                 </CustomListItemIcon>
                                 <ListItemText primary="Jewelry" sx={{ opacity: open ? 1 : 0 }} />
                             </CustomListItemButton>
@@ -172,9 +172,22 @@ export default function MiniDrawer() {
                             <CustomListItemButton>
                                 <CustomListItemIcon
                                 >
-                                    <LocalOfferIcon />
+                                     <PeopleIcon />
+                                   
                                 </CustomListItemIcon>
                                 <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                            </CustomListItemButton>
+                        </Link>
+                    </ListItem>
+                    <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
+                        <Link to=''>
+                            <CustomListItemButton>
+                                <CustomListItemIcon
+                                >
+                                     <PeopleIcon />
+                                   
+                                </CustomListItemIcon>
+                                <ListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
                             </CustomListItemButton>
                         </Link>
                     </ListItem>

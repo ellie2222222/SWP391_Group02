@@ -65,7 +65,7 @@ const JewelryList = () => {
                 <CardMedia
                   component="img"
                   height="250"
-                  image={product.images} // URL tới ảnh sản phẩm hoặc ảnh placeholder
+                  image={product.images[0]} // URL tới ảnh sản phẩm hoặc ảnh placeholder
                   alt={product.name}
                 />
                 <CardContent>
