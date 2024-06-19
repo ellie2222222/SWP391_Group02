@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import CustomerRequests from "./pages/CustomerRequests";
 import Requests from "./pages/Requests";
 import RequestInfo from "./pages/RequestInfo";
+import CustomerRequest from "./pages/CustomerRequest";
 function App() {
   const { user } = useAuth()
 
@@ -52,6 +53,7 @@ function App() {
 
         <Route element={<ManagerOrSaleRoute />}>
           <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
+          <Route path="/requests/customer-requests-view/:id" element={<CustomerRequest />} />
         </Route>
 
       </Routes>

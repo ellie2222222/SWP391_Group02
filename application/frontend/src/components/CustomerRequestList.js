@@ -77,7 +77,7 @@ const CustomerRequestList = () => {
                         <Typography variant="h5" component="p" marginBottom='20px'>Description: {request.request_description}</Typography>
                         <Typography variant="h5" component="p">Status: {request.request_status}</Typography>
                         <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
-                        <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
+                        <CustomButton1 onClick={() => navigate(`/requests/customer-requests-view/${request._id}`)}>View Detail</CustomButton1>
                     </Box>
                 ))}
                 {error && (

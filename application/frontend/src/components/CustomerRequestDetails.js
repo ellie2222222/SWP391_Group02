@@ -19,7 +19,7 @@ const CustomButton1 = styled(Button)({
     },
 });
 
-const RequestDetails = () => {
+const CustomerRequestDetails = () => {
     const [loading, setLoading] = useState(true);
     const { user } = useAuth()
     const [request, setRequest] = useState(null)
@@ -28,19 +28,9 @@ const RequestDetails = () => {
     const { id } = useParams()
 
     useEffect(() => {
-        let fetchApi = '';
-        switch (user.role) {
-            case 'user':
-                fetchApi = `user-requests/${id}`
-                break
-            default:
-                fetchApi = `staff-requests/${id}`
-                break
-        }
-
         const fetchRequest = async () => {
             try {
-                const response = await axiosInstance.get(`/requests/${fetchApi}`);
+                const response = await axiosInstance.get(`/requests/${id}`);
                 setRequest(response.data)
                 console.log(response.data)
                 setError('')
@@ -80,4 +70,4 @@ const RequestDetails = () => {
     );
 };
 
-export default RequestDetails;
+export default CustomerRequestDetails;
