@@ -214,7 +214,7 @@ const updateJewelry = async (req, res) => {
 };
 
 const getJewelries = async (req, res) => {
-    const { name, category } = req.query;
+    const { name, category, on_sale, sortByPrice, sortBySalePercentage } = req.query;
 
     try {
         let query = {};
@@ -224,8 +224,26 @@ const getJewelries = async (req, res) => {
         if (category) {
             query.category = category;
         }
+        if (on_sale !== undefined) {
+            query.on_sale = on_sale === 'true'; // Convert string to boolean
+        }
+        let sort = {};
+        if (sortByPrice) {
+            if (sortByPrice === 'asc') {
+                sort.price = 1; // ascending
+            } else if (sortByPrice === 'desc') {
+                sort.price = -1; // descending
+            }
+        }
+        if (sortBySalePercentage) {
+            if (sortBySalePercentage === 'asc') {
+                sort.sale_percentage = 1; // ascending
+            } else if (sortBySalePercentage === 'desc') {
+                sort.sale_percentage = -1; // descending
+            }
+        }
 
-        const jewelries = await Jewelry.find(query);
+        const jewelries = await Jewelry.find(query).sort(sort);
         res.status(200).json(jewelries);
     } catch (error) {
         res.status(500).json({ error: 'Error while getting jewelries' });
