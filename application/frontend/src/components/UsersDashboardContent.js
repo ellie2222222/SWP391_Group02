@@ -5,18 +5,6 @@ import { Add, Edit, Delete } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import JewelryForm from './JewelryForm';
 import UserForm from './UserForm';
-const CustomButton1 = styled(Button)({
-    outlineColor: '#000',
-    backgroundColor: '#b48c72',
-    color: '#fff',
-    width: '100%',
-    fontSize: '1rem',
-    marginTop: '20px',
-    '&:hover': {
-      color: '#b48c72', // Thay đổi màu chữ khi hover
-      backgroundColor: 'transparent',
-    },
-  });
 
 const UserDashboardContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
@@ -42,10 +30,6 @@ const UserDashboardContent = () => {
         }
     };
 
-    const handleAddClick = () => {
-        setSelectedUser(null);
-        setIsDialogOpen(true);
-    };
 
     const handleEditClick = (user) => {
         setSelectedUser(user);
@@ -63,11 +47,7 @@ const UserDashboardContent = () => {
 
     const handleSubmit = async (values) => {
         try {
-            if (selectedUser) {
-                await axiosInstance.patch(`/jewelries/${selectedUser._id}`, values);
-            } else {
-                await axiosInstance.post('/jewelries', values);
-            }
+            await axiosInstance.patch(`/users/role-assignment/${selectedUser._id}`, values);
             fetchJewelries();
             setIsDialogOpen(false);
         } catch (error) {
@@ -83,9 +63,6 @@ const UserDashboardContent = () => {
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             <Container>
-                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick} sx={{backgroundColor:'#b48c72'}}>
-                    Add Jewelry
-                </CustomButton1>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -127,7 +104,7 @@ const UserDashboardContent = () => {
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <DialogTitle>Edit User</DialogTitle>
                     <DialogContent>
-                        <UserForm initialValues={selectedUser || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [] }} onSubmit={handleSubmit} />
+                        <UserForm initialValues={selectedUser} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setIsDialogOpen(false)} color="primary">
