@@ -268,56 +268,57 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate and parse dates if provided
-    let parsedStartDate, parsedEndDate, parsedEndAt;
-
-    if (production_start_date) {
-      parsedStartDate = new Date(production_start_date);
-      if (isNaN(parsedStartDate)) {
-        return res.status(400).json({ error: "Invalid production start date" });
-      }
-    } else {
-      parsedStartDate = existingRequest.production_start_date;
+    let parsedStartDate = production_start_date ? new Date(production_start_date) : existingRequest.production_start_date;
+    
+    if (production_start_date && isNaN(parsedStartDate)) {
+      return res.status(400).json({ error: "Invalid production start date" });
     }
 
-    if (production_end_date) {
-      parsedEndDate = new Date(production_end_date);
-      if (isNaN(parsedEndDate)) {
-        return res.status(400).json({ error: "Invalid production end date" });
-      }
-    } else {
-      parsedEndDate = existingRequest.production_end_date;
+    let parsedEndDate = production_end_date ? new Date(production_end_date) : existingRequest.production_end_date;
+    if (production_end_date && isNaN(parsedEndDate)) {
+      return res.status(400).json({ error: "Invalid production end date" });
     }
 
-    if (endedAt) {
-      parsedEndAt = new Date(endedAt);
-      if (isNaN(parsedEndAt)) {
-        return res.status(400).json({ error: "Invalid end date" });
-      }
-      
-      if (parsedEndAt <= existingRequest.createdAt) {
-        return res.status(400).json({ error: "End date must be after creation date" });
-      }
-    } else {
-      parsedEndAt = existingRequest.endedAt;
+    let parsedEndAt = endedAt ? new Date(endedAt) : existingRequest.endedAt;
+    if (endedAt && (isNaN(parsedEndAt) || parsedEndAt <= existingRequest.createdAt)) {
+      return res.status(400).json({ error: "End date must be valid and after creation date" });
     }
 
     // Only update fields that are provided
-    const updateFields = {};
+    const updateFields = {
+      ...(jewelry_id !== undefined && { jewelry_id }),
+      ...(request_description !== undefined && { request_description }),
+      ...(request_status !== undefined && { request_status }),
+      ...(quote_content !== undefined && { quote_content }),
+      ...(quote_amount !== undefined && { quote_amount }),
+      ...(quote_status !== undefined && { quote_status }),
+      ...(production_start_date !== undefined && { production_start_date: parsedStartDate }),
+      ...(production_end_date !== undefined && { production_end_date: parsedEndDate }),
+      ...(production_cost !== undefined && { production_cost }),
+      ...(production_status !== undefined && { production_status }),
+      ...(total_amount !== undefined && { total_amount }),
+      ...(endedAt !== undefined && { endedAt: parsedEndAt }),
+    };
+    
+    if (
+      (existingRequest.quote_amount == null || existingRequest.quote_content == null )
+      &&
+      quote_amount != null && quote_content != null 
+    ) {
+      updateFields.quote_status = 'pending';
+      updateFields.request_status = 'quote';
+    }
 
-    if (jewelry_id !== undefined) updateFields.jewelry_id = jewelry_id;
-    if (request_description !== undefined) updateFields.request_description = request_description;
-    if (request_status !== undefined) updateFields.request_status = request_status;
-    if (quote_content !== undefined) updateFields.quote_content = quote_content;
-    if (quote_amount !== undefined) updateFields.quote_amount = quote_amount;
-    if (quote_status !== undefined) updateFields.quote_status = quote_status;
-    if (production_start_date !== undefined) updateFields.production_start_date = parsedStartDate;
-    if (production_end_date !== undefined) updateFields.production_end_date = parsedEndDate;
-    if (production_cost !== undefined) updateFields.production_cost = production_cost;
-    if (production_status !== undefined) updateFields.production_status = production_status;
-    if (production_status !== undefined) updateFields.production_status = production_status;
-    if (total_amount !== undefined) updateFields.total_amount = total_amount;
-    if (endedAt !== undefined) updateFields.endedAt = parsedEndAt;
+    if (
+      (existingRequest.production_start_date == null || existingRequest.production_end_date == null || existingRequest.production_cost == null )
+      &&
+      production_start_date != null && production_start_date != null && production_cost != null
+    ) {
+      updateFields.production_status = 'ongoing';
+      updateFields.request_status = 'production';
+    }
 
+    // Update
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
       { $set: updateFields },

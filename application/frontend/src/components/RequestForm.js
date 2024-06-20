@@ -1,25 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography } from '@mui/material';
 import * as Yup from 'yup';
 
-const RequestForm = ({ initialValues, onSubmit }) => {
+const convertToInputDateFormat = (dateStr) => {
+    const date = new Date(dateStr);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+};
+
+const RequestForm = ({ initialValues, onSubmit, role }) => {
     const filterBlankValues = (values) => {
         const filteredValues = {};
-
         Object.keys(values).forEach((key) => {
             if (values[key] !== '' && values[key] !== null && values[key] !== undefined) {
                 filteredValues[key] = values[key];
             }
         });
-
         return filteredValues;
     };
 
-    // Filter initial values to remove blank/null/undefined values
     const filteredInitialValues = filterBlankValues({
         ...initialValues,
-        user_id: initialValues.user_id ? initialValues.user_id._id : '', // Extract _id from user_id object
+        user_id: initialValues.user_id ? initialValues.user_id._id : '',
+        production_start_date: initialValues.production_start_date ? convertToInputDateFormat(new Date(initialValues.production_start_date).toLocaleDateString()) : '',
+        production_end_date: initialValues.production_end_date ? convertToInputDateFormat(new Date(initialValues.production_end_date).toLocaleDateString()) : ''
     });
 
     const formik = useFormik({
@@ -33,6 +40,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
             quote_status: Yup.string(),
             production_start_date: Yup.date(),
             production_end_date: Yup.date(),
+            production_cost: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
             production_status: Yup.string(),
             total_amount: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
         }),
@@ -56,6 +64,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.user_id && Boolean(formik.errors.user_id)}
                     helperText={formik.touched.user_id && formik.errors.user_id}
+                    InputProps={{ readOnly: role !== 'manager' }}
                 />
                 <TextField
                     name="request_description"
@@ -66,6 +75,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.request_description && Boolean(formik.errors.request_description)}
                     helperText={formik.touched.request_description && formik.errors.request_description}
+                    InputProps={{ readOnly: role !== 'manager' }}
                 />
                 <FormControl variant="outlined" fullWidth>
                     <InputLabel id="request-status-label">Request Status</InputLabel>
@@ -77,6 +87,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                         onBlur={formik.handleBlur}
                         label="Request Status"
                         error={formik.touched.request_status && Boolean(formik.errors.request_status)}
+                        readOnly={role !== 'manager'}
                     >
                         <MenuItem value="pending">Pending</MenuItem>
                         <MenuItem value="accepted">Accepted</MenuItem>
@@ -101,6 +112,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.quote_amount && Boolean(formik.errors.quote_amount)}
                     helperText={formik.touched.quote_amount && formik.errors.quote_amount}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'sale_staff' }}
                 />
                 <TextField
                     name="quote_content"
@@ -111,6 +123,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.quote_content && Boolean(formik.errors.quote_content)}
                     helperText={formik.touched.quote_content && formik.errors.quote_content}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'sale_staff' }}
                 />
                 <FormControl variant="outlined" fullWidth>
                     <InputLabel id="quote-status-label">Quote Status</InputLabel>
@@ -122,6 +135,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                         onBlur={formik.handleBlur}
                         label="Quote Status"
                         error={formik.touched.quote_status && Boolean(formik.errors.quote_status)}
+                        readOnly={role !== 'manager'}
                     >
                         <MenuItem value="pending">Pending</MenuItem>
                         <MenuItem value="approved">Approved</MenuItem>
@@ -142,6 +156,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_start_date && Boolean(formik.errors.production_start_date)}
                     helperText={formik.touched.production_start_date && formik.errors.production_start_date}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
                 />
                 <TextField
                     name="production_end_date"
@@ -154,6 +169,19 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_end_date && Boolean(formik.errors.production_end_date)}
                     helperText={formik.touched.production_end_date && formik.errors.production_end_date}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
+                />
+                <TextField
+                    name="production_cost"
+                    label="Production Cost"
+                    type="number"
+                    variant="outlined"
+                    value={formik.values.production_cost}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.production_cost && Boolean(formik.errors.production_cost)}
+                    helperText={formik.touched.production_cost && formik.errors.production_cost}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
                 />
                 <FormControl variant="outlined" fullWidth>
                     <InputLabel id="production-status-label">Production Status</InputLabel>
@@ -165,6 +193,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                         onBlur={formik.handleBlur}
                         label="Production Status"
                         error={formik.touched.production_status && Boolean(formik.errors.production_status)}
+                        InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
                     >
                         <MenuItem value="ongoing">Ongoing</MenuItem>
                         <MenuItem value="completed">Completed</MenuItem>
@@ -183,6 +212,7 @@ const RequestForm = ({ initialValues, onSubmit }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.total_amount && Boolean(formik.errors.total_amount)}
                     helperText={formik.touched.total_amount && formik.errors.total_amount}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'sale_staff' }}
                 />
                 <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                     Submit

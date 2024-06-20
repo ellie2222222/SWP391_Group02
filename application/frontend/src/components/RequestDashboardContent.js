@@ -4,6 +4,7 @@ import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, Tabl
 import { Add, Edit, Delete } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import RequestForm from './RequestForm';
+import useAuth from '../hooks/useAuthContext'
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -33,6 +34,7 @@ const RequestDashboardContent = () => {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isQuoteDetailDialogOpen, setIsQuoteDetailDialogOpen] = useState(false);
     const [isProductionDetailDialogOpen, setIsProductionDetailDialogOpen] = useState(false);
+    const { user } = useAuth()
 
     const fetchRequests = async () => {
         try {
@@ -89,6 +91,7 @@ const RequestDashboardContent = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell>Request ID</TableCell>
                                 <TableCell>Sender</TableCell>
                                 <TableCell>Description</TableCell>
                                 <TableCell>Request Status</TableCell>
@@ -101,6 +104,7 @@ const RequestDashboardContent = () => {
                         <TableBody>
                             {requests.map((request, index) => (
                                 <TableRow key={index}>
+                                    <TableCell>{request._id}</TableCell>
                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
                                     <TableCell>{request.request_description}</TableCell>
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
@@ -126,9 +130,8 @@ const RequestDashboardContent = () => {
                     </Table>
                 </TableContainer>
                 <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
-                    <DialogTitle>Edit Request</DialogTitle>
                     <DialogContent>
-                        <RequestForm initialValues={selectedRequest} onSubmit={handleSubmit} />
+                        <RequestForm initialValues={selectedRequest} role={user.role} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseAllDialogs} color="primary">
@@ -154,6 +157,7 @@ const RequestDashboardContent = () => {
                     <DialogContent>
                         <Typography>Production Start Date: {(selectedRequest && selectedRequest.production_start_date) ? selectedRequest.production_start_date : 'N/A'}</Typography>
                         <Typography>Production End Date: {(selectedRequest && selectedRequest.production_end_date) ? selectedRequest.production_end_date : 'N/A'}</Typography>
+                        <Typography>Production Cost: {(selectedRequest && selectedRequest.production_cost) ? selectedRequest.production_cost : 'N/A'}</Typography>
                         <Typography>Production Status: {(selectedRequest && selectedRequest.production_status) ? selectedRequest.production_status : 'N/A'}</Typography>
                     </DialogContent>
                     <DialogActions>
