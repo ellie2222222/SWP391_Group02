@@ -177,7 +177,8 @@ const createRequest = async (req, res) => {
     request_status: 'pending',
     quote_content: null,
     quote_amount: null,
-    quote_status: 'pending',
+    quote_status: null,
+    design_status: null,
     production_start_date: null,
     production_end_date: null,
     production_cost: null,
@@ -246,6 +247,12 @@ const updateRequest = async (req, res) => {
       return res.status(400).json({ error: "Invalid quote status" });
     }
 
+    // Validate design status
+    const allowedDesignStatuses = ["ongoing", "completed"];
+    if (design_status && !allowedDesignStatuses.includes(design_status)) {
+      return res.status(400).json({ error: "Invalid design status" });
+    }
+
     // Validate production status
     const allowedProductionStatuses = ["ongoing", "completed"];
     if (production_status && !allowedProductionStatuses.includes(production_status)) {
@@ -292,6 +299,7 @@ const updateRequest = async (req, res) => {
       ...(quote_content !== undefined && { quote_content }),
       ...(quote_amount !== undefined && { quote_amount }),
       ...(quote_status !== undefined && { quote_status }),
+      ...(design_status !== undefined && { design_status }),
       ...(production_start_date !== undefined && { production_start_date: parsedStartDate }),
       ...(production_end_date !== undefined && { production_end_date: parsedEndDate }),
       ...(production_cost !== undefined && { production_cost }),

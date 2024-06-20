@@ -32,6 +32,10 @@ const requestSchema = new Schema( {
         type: String,
         enum: ['pending', 'approved', 'rejected']
     },
+    design_status: {
+        type: String,
+        enum: ['ongoing', 'completed']
+    },
     production_start_date: {
         type: Date
     },

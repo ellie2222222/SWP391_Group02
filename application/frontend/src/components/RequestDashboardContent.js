@@ -33,6 +33,7 @@ const RequestDashboardContent = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isQuoteDetailDialogOpen, setIsQuoteDetailDialogOpen] = useState(false);
+    const [isDesignDetailDialogOpen, setIsDesignDetailDialogOpen] = useState(false);
     const [isProductionDetailDialogOpen, setIsProductionDetailDialogOpen] = useState(false);
     const { user } = useAuth()
 
@@ -53,6 +54,11 @@ const RequestDashboardContent = () => {
     const handleQuoteDetailOpen = (request) => {
         setSelectedRequest(request);
         setIsQuoteDetailDialogOpen(true);
+    };
+
+    const handleDesignDetailOpen = (request) => {
+        setSelectedRequest(request);
+        setIsDesignDetailDialogOpen(true);
     };
 
     const handleProductionDetailOpen = (request) => {
@@ -76,6 +82,7 @@ const RequestDashboardContent = () => {
     const handleCloseAllDialogs = () => {
         setIsEditDialogOpen(false);
         setIsQuoteDetailDialogOpen(false);
+        setIsDesignDetailDialogOpen(false);
         setIsProductionDetailDialogOpen(false);
     };
 
@@ -96,7 +103,7 @@ const RequestDashboardContent = () => {
                                 <TableCell>Description</TableCell>
                                 <TableCell>Request Status</TableCell>
                                 <TableCell align="center">Quote</TableCell>
-                                <TableCell>Design</TableCell>
+                                <TableCell align="center">Design</TableCell>
                                 <TableCell align="center">Production</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
@@ -113,7 +120,11 @@ const RequestDashboardContent = () => {
                                             Detail
                                         </CustomButton1>
                                     </TableCell>
-                                    <TableCell>{request.design_status ? request.design_status : 'N/A'}</TableCell>
+                                    <TableCell>
+                                        <CustomButton1 color="primary" onClick={() => handleDesignDetailOpen(request)}>
+                                            Detail
+                                        </CustomButton1>
+                                    </TableCell>
                                     <TableCell>
                                         <CustomButton1 color="primary" onClick={() => handleProductionDetailOpen(request)}>
                                             Detail
@@ -145,6 +156,17 @@ const RequestDashboardContent = () => {
                         <Typography>Quote Amount: {(selectedRequest && selectedRequest.quote_amount) ? selectedRequest.quote_amount : 'N/A'}</Typography>
                         <Typography>Quote Content: {(selectedRequest && selectedRequest.quote_content) ? selectedRequest.quote_content : 'N/A'}</Typography>
                         <Typography>Quote Status: {(selectedRequest && selectedRequest.quote_status) ? selectedRequest.quote_status : 'N/A'}</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseAllDialogs} color="primary">
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog open={isDesignDetailDialogOpen} onClose={handleDesignDetailOpen}>
+                    <DialogTitle>Design Detail</DialogTitle>
+                    <DialogContent>
+                        <Typography>Design Status: {(selectedRequest && selectedRequest.design_status) ? selectedRequest.design_status : 'N/A'}</Typography>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseAllDialogs} color="primary">
