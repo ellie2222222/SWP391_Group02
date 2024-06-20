@@ -108,7 +108,7 @@ const assignRole = async (req, res) => {
 
 // get all users
 const getUsers = async (req, res) => {
-  const { username } = req.query;
+  const { username, sort } = req.query;
 
   try {
     let query = {};
@@ -116,13 +116,21 @@ const getUsers = async (req, res) => {
       query.username = new RegExp(username, 'i'); // 'i' for case-insensitive search
     }
 
-    const users = await User.find(query)
+    // Determine the sort field and order
+    let sortField = {};
+    if (sort) {
+      const [field, order] = sort.split('_');
+      sortField[field] = order === 'asc' ? 1 : -1;
+    }
 
-    return res.status(200).json({ users })
+    const users = await User.find(query).sort(sortField);
+
+    return res.status(200).json({ users });
   } catch (error) {
-    return res.status(500).json({ error: "Error while getting users" })
+    return res.status(500).json({ error: "Error while getting users" });
   }
 }
+
 
 const getUser = async (req, res) => {
   try {

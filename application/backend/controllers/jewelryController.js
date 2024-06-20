@@ -214,7 +214,7 @@ const updateJewelry = async (req, res) => {
 };
 
 const getJewelries = async (req, res) => {
-    const { name, category, on_sale, sortByPrice, sortBySalePercentage } = req.query;
+    const { name, category, on_sale, sortByPrice, sortBySalePercentage, sortByName } = req.query;
 
     try {
         let query = {};
@@ -240,6 +240,13 @@ const getJewelries = async (req, res) => {
                 sort.sale_percentage = 1; // ascending
             } else if (sortBySalePercentage === 'desc') {
                 sort.sale_percentage = -1; // descending
+            }
+        }
+        if (sortByName) {
+            if (sortByName === 'asc') {
+                sort.name = 1; // ascending
+            } else if (sortByName === 'desc') {
+                sort.name = -1; // descending
             }
         }
 

@@ -20,4 +20,6 @@ jewelryRoutes.delete('/:id', requireAuth, requireAdmin, deleteJewelry);
 
 jewelryRoutes.patch('/:id', requireAuth, requireAdmin, upload.single('image'), updateJewelry); // Handle single file upload with field name 'image'
 
+// GET /api/jewelries?sortByName=asc
+// GET /api/jewelries?sortByName=desc
 module.exports = jewelryRoutes;
