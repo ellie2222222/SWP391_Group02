@@ -38,6 +38,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
             quote_amount: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
             quote_content: Yup.string(),
             quote_status: Yup.string(),
+            design_status: Yup.string(),
             production_start_date: Yup.date(),
             production_end_date: Yup.date(),
             production_cost: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
@@ -140,6 +141,25 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                         <MenuItem value="pending">Pending</MenuItem>
                         <MenuItem value="approved">Approved</MenuItem>
                         <MenuItem value="rejected">Rejected</MenuItem>
+                    </Select>
+                    {formik.touched.quote_status && formik.errors.quote_status && (
+                        <Typography variant="caption" color="red">{formik.errors.quote_status}</Typography>
+                    )}
+                </FormControl>
+                <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="design-status-label">Design Status</InputLabel>
+                    <Select
+                        labelId="design-status-label"
+                        name="design_status"
+                        value={formik.values.design_status}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        label="Quote Status"
+                        error={formik.touched.design_status && Boolean(formik.errors.design_status)}
+                        readOnly={role !== 'manager'}
+                    >
+                        <MenuItem value="ongoing">Ongoing</MenuItem>
+                        <MenuItem value="completed">Completed</MenuItem>
                     </Select>
                     {formik.touched.quote_status && formik.errors.quote_status && (
                         <Typography variant="caption" color="red">{formik.errors.quote_status}</Typography>

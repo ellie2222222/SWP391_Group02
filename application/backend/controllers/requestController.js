@@ -208,6 +208,7 @@ const updateRequest = async (req, res) => {
       quote_content,
       quote_amount,
       quote_status,
+      design_status,
       production_start_date,
       production_end_date,
       production_cost,
