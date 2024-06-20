@@ -154,9 +154,9 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                         value={formik.values.design_status}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        label="Quote Status"
+                        label="Design Status"
                         error={formik.touched.design_status && Boolean(formik.errors.design_status)}
-                        readOnly={role !== 'manager'}
+                        readOnly={role !== 'manager' && role !== 'design_staff' && formik.values.quote_status === 'approved' }
                     >
                         <MenuItem value="ongoing">Ongoing</MenuItem>
                         <MenuItem value="completed">Completed</MenuItem>
@@ -176,7 +176,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_start_date && Boolean(formik.errors.production_start_date)}
                     helperText={formik.touched.production_start_date && formik.errors.production_start_date}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
+                    InputProps={{ readOnly: (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }}
                 />
                 <TextField
                     name="production_end_date"
@@ -189,7 +189,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_end_date && Boolean(formik.errors.production_end_date)}
                     helperText={formik.touched.production_end_date && formik.errors.production_end_date}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
+                    InputProps={{ readOnly: (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }}
                 />
                 <TextField
                     name="production_cost"
@@ -201,7 +201,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_cost && Boolean(formik.errors.production_cost)}
                     helperText={formik.touched.production_cost && formik.errors.production_cost}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
+                    InputProps={{ readOnly: (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }}
                 />
                 <FormControl variant="outlined" fullWidth>
                     <InputLabel id="production-status-label">Production Status</InputLabel>
@@ -213,7 +213,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                         onBlur={formik.handleBlur}
                         label="Production Status"
                         error={formik.touched.production_status && Boolean(formik.errors.production_status)}
-                        InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' && (formik.values.request_status === 'accepted' || formik.values.quote_status) === 'pending' }}
+                        readOnly={ (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }
                     >
                         <MenuItem value="ongoing">Ongoing</MenuItem>
                         <MenuItem value="completed">Completed</MenuItem>

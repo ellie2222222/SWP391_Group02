@@ -39,7 +39,7 @@ const RequestDashboardContent = () => {
 
     const fetchRequests = async () => {
         try {
-            const response = await axiosInstance.get('/requests/staff-requests');
+            const response = await axiosInstance.get('/requests/staff-requests'); 
             setRequests(response.data);
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
@@ -102,6 +102,7 @@ const RequestDashboardContent = () => {
                                 <TableCell>Sender</TableCell>
                                 <TableCell>Description</TableCell>
                                 <TableCell>Request Status</TableCell>
+                                <TableCell>Jewelry ID</TableCell>
                                 <TableCell align="center">Quote</TableCell>
                                 <TableCell align="center">Design</TableCell>
                                 <TableCell align="center">Production</TableCell>
@@ -115,6 +116,7 @@ const RequestDashboardContent = () => {
                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
                                     <TableCell>{request.request_description}</TableCell>
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
+                                    <TableCell>{request.jewelry_id ? request.jewelry_id : 'N/A'}</TableCell>
                                     <TableCell>
                                         <CustomButton1 color="primary" onClick={() => handleQuoteDetailOpen(request)}>
                                             Detail
@@ -163,9 +165,10 @@ const RequestDashboardContent = () => {
                         </Button>
                     </DialogActions>
                 </Dialog>
-                <Dialog open={isDesignDetailDialogOpen} onClose={handleDesignDetailOpen}>
+                <Dialog open={isDesignDetailDialogOpen} onClose={handleCloseAllDialogs}>
                     <DialogTitle>Design Detail</DialogTitle>
                     <DialogContent>
+                        <Typography>Design Status: {(selectedRequest && selectedRequest.design_status) ? selectedRequest.design_status : 'N/A'}</Typography>
                         <Typography>Design Status: {(selectedRequest && selectedRequest.design_status) ? selectedRequest.design_status : 'N/A'}</Typography>
                     </DialogContent>
                     <DialogActions>
