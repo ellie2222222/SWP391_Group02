@@ -11,14 +11,10 @@ import UsersDashboard from "./pages/UsersDashboard";
 import BlogContents from "./pages/BlogContents";
 import Warranty from './pages/Warranty'; // Import the new page
 import WarrantyList from "./pages/WarrantyList";
-import WarrantyLists from "./components/WarrantyLists";
-
 import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
-import CustomerRequests from "./pages/CustomerRequests";
 import Requests from "./pages/Requests";
-import CustomerRequest from "./pages/CustomerRequest";
 import RequestDashboard from "./pages/RequestDashboard";
 import CustomRequest from "./pages/CustomRequest";
 function App() {

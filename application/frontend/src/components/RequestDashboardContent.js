@@ -6,6 +6,8 @@ import axiosInstance from '../utils/axiosInstance';
 import RequestForm from './RequestForm';
 import useAuth from '../hooks/useAuthContext'
 import SaleStaffDashboard from './SaleStaffDashboard';
+import ProductionStaffDashboard from './ProductionStaffDashboard';
+import DesignStaffDashboard from './DesignStaffDashboard';
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
@@ -62,7 +64,6 @@ const RequestDashboardContent = () => {
         setSelectedRequest(request);
         setIsJewelryDetailDialogOpen(true);
     };
-
 
     const handleQuoteDetailOpen = (request) => {
         setSelectedRequest(request);
@@ -266,6 +267,12 @@ const RequestDashboardContent = () => {
             )}
             {user.role === 'sale_staff' && (
                 <SaleStaffDashboard />
+            )}
+            {user.role === 'design_staff' && (
+                <DesignStaffDashboard />
+            )}
+            {user.role === 'production_staff' && (
+                <ProductionStaffDashboard />
             )}
         </Box>
     );

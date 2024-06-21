@@ -9,10 +9,32 @@ const getRequests = async (req, res) => {
   try {
     let request
     if (req.role === "sale_staff") {
-      request = await Request.find({ request_status: "pending" });
+      request = await Request.find({ request_status: "pending" })
+      .populate({
+        path: 'user_id',
+        select: 'email'
+      })
+      .populate({
+        path: 'jewelry_id',
+        populate: [
+          { path: 'material_id' },
+          { path: 'gemstone_id' }
+        ]
+      });
     } else {
-      request = await Request.find({});
-    }
+      request = await Request.find({})
+      .populate({
+        path: 'user_id',
+        select: 'email'
+      })
+      .populate({
+        path: 'jewelry_id',
+        populate: [
+          { path: 'material_id' },
+          { path: 'gemstone_id' }
+        ]
+      });
+    }      
 
     res.status(200).json(request);
   } catch (error) {
