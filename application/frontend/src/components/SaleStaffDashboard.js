@@ -68,7 +68,7 @@ export default function SaleStaffDashboard() {
                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
                                     <TableCell>{request.request_description}</TableCell>
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
-                                    <TableCell>ID</TableCell>
+                                    <TableCell>{request.jewelry_id ? request.jewelry_id : 'Custom' }</TableCell>
                                     <TableCell>
                                         <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
                                     </TableCell>
