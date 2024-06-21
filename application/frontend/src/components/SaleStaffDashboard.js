@@ -59,21 +59,24 @@ export default function SaleStaffDashboard() {
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
-              
+
                     <TableBody>
                         {requests.map((request, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{request._id}</TableCell>
-                                <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
-                                <TableCell>{request.request_description}</TableCell>
-                                <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
-                                <TableCell>ID</TableCell>
-                                <TableCell>
-                                    <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
-                                </TableCell>
-                            </TableRow>
+                            request.request_status === 'pending' && (
+                                <TableRow key={index}>
+                                    <TableCell>{request._id}</TableCell>
+                                    <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
+                                    <TableCell>{request.request_description}</TableCell>
+                                    <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
+                                    <TableCell>ID</TableCell>
+                                    <TableCell>
+                                        <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
+                                    </TableCell>
+                                </TableRow>
+                            )
                         ))}
                     </TableBody>
+
                 </Table>
             </TableContainer>
         </Container>
