@@ -112,112 +112,8 @@ const RequestDashboardContent = () => {
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
-            {user.role ==='manager' && (
-                 <Container>
-                 <TableContainer component={Paper}>
-                     <Table>
-                         <TableHead>
-                             <TableRow>
-                                 <TableCell>Request ID</TableCell>
-                                 <TableCell>Sender</TableCell>
-                                 <TableCell>Description</TableCell>
-                                 <TableCell>Request Status</TableCell>
-                                 <TableCell>Jewelry ID</TableCell>
-                                 <TableCell align="center">Quote</TableCell>
-                                 <TableCell align="center">Design</TableCell>
-                                 <TableCell align="center">Production</TableCell>
-                                 <TableCell>Actions</TableCell>
-                             </TableRow>
-                         </TableHead>
-                         <TableBody>
-                             {requests.map((request, index) => (
-                                 <TableRow key={index}>
-                                     <TableCell>{request._id}</TableCell>
-                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
-                                     <TableCell>{request.request_description}</TableCell>
-                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
-                                     <TableCell>{request.jewelry_id ? request.jewelry_id : 'N/A'}</TableCell>
-                                     <TableCell>
-                                         <CustomButton1 color="primary" onClick={() => handleQuoteDetailOpen(request)}>
-                                             Detail
-                                         </CustomButton1>
-                                     </TableCell>
-                                     <TableCell>
-                                         <CustomButton1 color="primary" onClick={() => handleDesignDetailOpen(request)}>
-                                             Detail
-                                         </CustomButton1>
-                                     </TableCell>
-                                     <TableCell>
-                                         <CustomButton1 color="primary" onClick={() => handleProductionDetailOpen(request)}>
-                                             Detail
-                                         </CustomButton1>
-                                     </TableCell>
-                                     <TableCell>
-                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>
-                                             <Edit />
-                                         </IconButton>
-                                     </TableCell>
-                                 </TableRow>
-                             ))}
-                         </TableBody>
-                     </Table>
-                 </TableContainer>
-                 <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
-                     <DialogContent>
-                         <RequestForm initialValues={selectedRequest} role={user.role} onSubmit={handleSubmit} />
-                     </DialogContent>
-                     <DialogActions>
-                         <Button onClick={handleCloseAllDialogs} color="primary">
-                             Cancel
-                         </Button>
-                     </DialogActions>
-                 </Dialog>
-                 <Dialog open={isQuoteDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                     <DialogTitle>Quote Detail</DialogTitle>
-                     <DialogContent>
-                         <Typography>Quote Amount: {(selectedRequest && selectedRequest.quote_amount) ? selectedRequest.quote_amount : 'N/A'}</Typography>
-                         <Typography>Quote Content: {(selectedRequest && selectedRequest.quote_content) ? selectedRequest.quote_content : 'N/A'}</Typography>
-                         <Typography>Quote Status: {(selectedRequest && selectedRequest.quote_status) ? selectedRequest.quote_status : 'N/A'}</Typography>
-                     </DialogContent>
-                     <DialogActions>
-                         <Button onClick={handleCloseAllDialogs} color="primary">
-                             Close
-                         </Button>
-                     </DialogActions>
-                 </Dialog>
-                 <Dialog open={isDesignDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                     <DialogTitle>Design Detail</DialogTitle>
-                     <DialogContent>
-                         <Typography>Design Status: {(selectedRequest && selectedRequest.design_status) ? selectedRequest.design_status : 'N/A'}</Typography>
-                         <Typography>Design Status: {(selectedRequest && selectedRequest.design_status) ? selectedRequest.design_status : 'N/A'}</Typography>
-                     </DialogContent>
-                     <DialogActions>
-                         <Button onClick={handleCloseAllDialogs} color="primary">
-                             Close
-                         </Button>
-                     </DialogActions>
-                 </Dialog>
-                 <Dialog open={isProductionDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                     <DialogTitle>Production Detail</DialogTitle>
-                     <DialogContent>
-                         <Typography>Production Start Date: {(selectedRequest && selectedRequest.production_start_date) ? selectedRequest.production_start_date : 'N/A'}</Typography>
-                         <Typography>Production End Date: {(selectedRequest && selectedRequest.production_end_date) ? selectedRequest.production_end_date : 'N/A'}</Typography>
-                         <Typography>Production Cost: {(selectedRequest && selectedRequest.production_cost) ? selectedRequest.production_cost : 'N/A'}</Typography>
-                         <Typography>Production Status: {(selectedRequest && selectedRequest.production_status) ? selectedRequest.production_status : 'N/A'}</Typography>
-                     </DialogContent>
-                     <DialogActions>
-                         <Button onClick={handleCloseAllDialogs} color="primary">
-                             Close
-                         </Button>
-                     </DialogActions>
-                 </Dialog>
-                </Container>
-            )}
-            {user.role === 'sale_staff' && (
-                <SaleStaffDashboard></SaleStaffDashboard>
-            )}
-           
-            <Container>
+            {user.role === 'manager' &&(
+                <Container>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -367,6 +263,10 @@ const RequestDashboardContent = () => {
                     </DialogActions>
                 </Dialog>
             </Container>
+            )}
+            {user.role == 'sale_staff' && (
+                <SaleStaffDashboard></SaleStaffDashboard>
+            )}
         </Box>
     );
 };
