@@ -17,6 +17,7 @@ import Profile from "./pages/Profile";
 import Requests from "./pages/Requests";
 import RequestDashboard from "./pages/RequestDashboard";
 import CustomRequest from "./pages/CustomRequest";
+import QuotedRequest from "./pages/QuotedRequest";
 function App() {
   const { user } = useAuth()
 
@@ -43,6 +44,7 @@ function App() {
           <Route path="/admin" element={<JewelryDashboard/>} />
           <Route path="/admin/users" element={<UsersDashboard/>} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
+          <Route path="/admin/quotedRequest" element={<QuotedRequest/>}></Route>
         </Route>
 
         <Route element={<UserRoute />}>
