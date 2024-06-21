@@ -18,6 +18,7 @@ const requireAuth = async (req, res, next) => {
         }
 
         req.role = role
+        req.id = id
         next()
     } catch (error) {
         res.status(403).json({error: "Request is not authorized"})
