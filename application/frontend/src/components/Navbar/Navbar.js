@@ -107,6 +107,7 @@ const Navbar = () => {
     logout();
     navigate('/login');
   }
+  const allowRole = ['admin', 'sale_staff','manager', 'design_staff', 'production_staff' ]
 
   return (
     <CustomAppBar position="static">
@@ -250,7 +251,7 @@ const Navbar = () => {
                 <CustomIconButton color="inherit" onClick={handleMenuOpen}>
                   <AccountCircleIcon fontSize='2.6rem' />
                 </CustomIconButton>
-                {user.role === 'admin' ? (
+                {allowRole.includes(user.role) ? (
                   <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}

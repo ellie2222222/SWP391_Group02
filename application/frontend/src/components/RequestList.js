@@ -70,7 +70,11 @@ const RequestList = () => {
                     <Box marginBottom='20px' key={index}>
                         <Typography variant="h5" component="p" marginBottom='20px'>Request #{index + 1}</Typography>
                         <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
+                        <Typography variant="h5"> Status: {request.request_status} </Typography>
                         <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
+                        { request.request_status === 'completed' && (
+                            <CustomButton1>Payment</CustomButton1>
+                        )}
                     </Box>
                 ))}
                 {error && (

@@ -158,17 +158,6 @@ export default function MiniDrawer() {
                             </CustomListItemButton>
                         </Link>
                     </ListItem>
-                    <ListItem key="Orders" disablePadding sx={{ display: 'block' }}>
-                        <Link>
-                            <CustomListItemButton>
-                                <CustomListItemIcon
-                                >
-                                    <ShoppingCartIcon />
-                                </CustomListItemIcon>
-                                <ListItemText primary="Orders" sx={{ opacity: open ? 1 : 0 }} />
-                            </CustomListItemButton>
-                        </Link>
-                    </ListItem>
                     {user.role !== 'admin' && user.role !== 'user' && (
                         <ListItem key="My Requests" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/requests'>
