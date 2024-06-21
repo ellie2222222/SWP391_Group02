@@ -19,7 +19,7 @@ const requestSchema = new Schema( {
     request_status: {
         type: String,
         required: true,
-        enum: ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'payment', 'cancelled'],
+        enum: ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'warranty', 'payment', 'cancelled'],
         default: 'pending'
     },
     quote_content: {
@@ -27,14 +27,6 @@ const requestSchema = new Schema( {
     },
     quote_amount: {
         type: Number
-    },
-    quote_status: {
-        type: String,
-        enum: ['pending', 'approved', 'rejected']
-    },
-    design_status: {
-        type: String,
-        enum: ['ongoing', 'completed']
     },
     production_start_date: {
         type: Date
@@ -44,10 +36,6 @@ const requestSchema = new Schema( {
     },
     production_cost: {
         type: Number
-    },
-    production_status: {
-        type: String,
-        enum: ['ongoing', 'completed']
     },
     total_amount: {
         type: Number
