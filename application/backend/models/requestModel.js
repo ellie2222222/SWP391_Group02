@@ -54,7 +54,26 @@ const requestSchema = new Schema( {
     },
     endedAt: {
         type: Date
-    }
+    },
+    design_images: [{
+        type: String,
+    }],
+    warranty_content: {
+        type: String,
+        required: true,
+    },
+    warranty_start_date: {
+        type: Date,
+        required: true
+    },
+    warranty_end_date: {
+        type: Date,
+        required: true
+    },
+    images_public_ids: [{
+        type: String
+    }],
+    //waranty, design,
 }, {timestamps: true})
 
 module.exports = mongoose.model('Request', requestSchema)

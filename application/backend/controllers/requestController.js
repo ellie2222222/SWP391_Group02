@@ -9,10 +9,10 @@ const getRequests = async (req, res) => {
   try {
     let request
     if (req.role === "sale_staff") {
-      request = await Request.find({ request_status: "pending"});
+      request = await Request.find({ request_status: "pending" });
     } else {
       request = await Request.find({});
-    }    
+    }
 
     res.status(200).json(request);
   } catch (error) {
@@ -80,7 +80,7 @@ const getUserRequest = async (req, res) => {
       return res.status(400).json({ error: 'Invalid ID' });
     }
 
-    const requests = await Request.findOne({ user_id: _id, _id: id }); 
+    const requests = await Request.findOne({ user_id: _id, _id: id });
 
     // Check if requests exist
     if (requests.length === 0) {
@@ -100,11 +100,11 @@ const getStaffRequests = async (req, res) => {
     const { authorization } = req.headers
     const token = authorization.split(' ')[1]
     const { _id } = jwt.verify(token, process.env.SECRET)
-  
+
     const worksOn = await WorksOn.find({ staff_ids: _id });
-    
+
     const requestIds = worksOn.map(w => w.request_id);
-    
+
     const requests = await Request.find({ _id: { $in: requestIds } })
       .populate({
         path: 'user_id',
@@ -136,8 +136,8 @@ const getStaffRequest = async (req, res) => {
     }
 
     // Find request
-    const requests = await Request.findOne({ _id: id }); 
-    
+    const requests = await Request.findOne({ _id: id });
+
     // Check if requests exist
     if (!requests) {
       return res.status(404).json({ error: "No request found" });
@@ -147,7 +147,7 @@ const getStaffRequest = async (req, res) => {
     const worksOn = await WorksOn.findOne({ request_id: requests._id, staff_ids: _id });
 
     if (!worksOn) {
-        return res.status(403).json({ error: "You do not have permission to perform this action" });
+      return res.status(403).json({ error: "You do not have permission to perform this action" });
     }
 
     res.status(200).json(requests);
@@ -184,7 +184,11 @@ const createRequest = async (req, res) => {
     production_cost: null,
     production_status: null,
     total_amount: null,
-    endedAt: null
+    endedAt: null,
+    design_images: null,
+    warranty_content: null,
+    warranty_start_date: null,
+    warranty_end_date: null,
   };
 
   // Add to the database
@@ -214,7 +218,10 @@ const updateRequest = async (req, res) => {
       production_cost,
       production_status,
       total_amount,
-      endedAt
+      endedAt,
+      warranty_content,
+      warranty_start_date,
+      warranty_end_date,
     } = req.body;
 
     // Validate request ID
@@ -277,7 +284,7 @@ const updateRequest = async (req, res) => {
 
     // Validate and parse dates if provided
     let parsedStartDate = production_start_date ? new Date(production_start_date) : existingRequest.production_start_date;
-    
+
     if (production_start_date && isNaN(parsedStartDate)) {
       return res.status(400).json({ error: "Invalid production start date" });
     }
@@ -292,34 +299,61 @@ const updateRequest = async (req, res) => {
       return res.status(400).json({ error: "End date must be valid and after creation date" });
     }
 
+    // Handle design_images upload
+    const images = [];
+
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(file => {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ folder: 'design' }, (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              images.push(result.secure_url);
+              resolve();
+            }
+          });
+          streamifier.createReadStream(file.buffer).pipe(uploadStream);
+        });
+      });
+
+      await Promise.all(uploadPromises);
+    } else {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+
     // Only update fields that are provided
     const updateFields = {
       ...(jewelry_id !== undefined && { jewelry_id }),
       ...(request_description !== undefined && { request_description }),
       ...(request_status !== undefined && { request_status }),
-      ...(quote_content !== undefined && { quote_content }),
-      ...(quote_amount !== undefined && { quote_amount }),
-      ...(quote_status !== undefined && { quote_status }),
-      ...(design_status !== undefined && { design_status }),
-      ...(production_start_date !== undefined && { production_start_date: parsedStartDate }),
-      ...(production_end_date !== undefined && { production_end_date: parsedEndDate }),
-      ...(production_cost !== undefined && { production_cost }),
-      ...(production_status !== undefined && { production_status }),
-      ...(total_amount !== undefined && { total_amount }),
+      ...(quote_content !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { quote_content }),
+      ...(quote_amount !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { quote_amount }),
+      ...(quote_status !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { quote_status }),
+      ...(design_status !== undefined && (req.role === 'design_staff' || req.role === 'manager') && { design_status }),
+      ...(production_start_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_start_date: parsedStartDate }),
+      ...(production_end_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_end_date: parsedEndDate }),
+      ...(production_cost !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_cost }),
+      ...(production_status !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_status }),
+      ...(total_amount !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { total_amount }),
       ...(endedAt !== undefined && { endedAt: parsedEndAt }),
+      ...(images.length > 0 && { design_images: images }), // Update design_images with uploaded images
+      ...(warranty_content !== undefined && { warranty_content }),
+      ...(warranty_start_date !== undefined && { warranty_start_date }),
+      ...(warranty_end_date !== undefined && { warranty_end_date }),
     };
-    
+
     if (
-      (existingRequest.quote_amount == null || existingRequest.quote_content == null )
+      (existingRequest.quote_amount == null || existingRequest.quote_content == null)
       &&
-      quote_amount != null && quote_content != null 
+      quote_amount != null && quote_content != null
     ) {
       updateFields.quote_status = 'pending';
       updateFields.request_status = 'quote';
     }
 
     if (
-      (existingRequest.production_start_date == null || existingRequest.production_end_date == null || existingRequest.production_cost == null )
+      (existingRequest.production_start_date == null || existingRequest.production_end_date == null || existingRequest.production_cost == null)
       &&
       production_start_date != null && production_start_date != null && production_cost != null
     ) {
@@ -327,7 +361,7 @@ const updateRequest = async (req, res) => {
       updateFields.request_status = 'production';
     }
 
-    // Update
+    // Update request
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
       { $set: updateFields },

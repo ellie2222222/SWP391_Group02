@@ -77,17 +77,23 @@ const validateInputData = (data) => {
 
 const createJewelry = async (req, res) => {
     try {
+        // Log the request body and files for debugging
+        console.log('Request Body:', req.body);
+        console.log('Request Files:', req.files);
+
         let { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
 
         // Trim IDs
         if (gemstone_id) gemstone_id = gemstone_id.trim();
         if (material_id) material_id = material_id.trim();
 
+        // Validate Empty Fields
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
         }
 
+        // Validate Input Data
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
@@ -97,45 +103,59 @@ const createJewelry = async (req, res) => {
             sale_percentage = 0;
         }
 
-        const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
-            if (error) {
-                return res.status(500).json({ error: error.message });
-            }
+        const images = [];
+        const image_public_ids = [];
 
-            const newJewelry = new Jewelry({
-                name,
-                description,
-                price,
-                gemstone_id,
-                gemstone_weight,
-                material_id,
-                material_weight,
-                category,
-                type,
-                on_sale,
-                sale_percentage,
-                available,
-                images: [result.secure_url],
-                image_public_ids: [result.public_id]
+        // Handle file uploads
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => {
+                return new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
+                        if (error) {
+                            console.error('Upload Error:', error); // Log upload errors
+                            reject(error);
+                        } else {
+                            images.push(result.secure_url);
+                            image_public_ids.push(result.public_id);
+                            resolve();
+                        }
+                    });
+                    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+                });
             });
 
-            newJewelry.save().then(() => {
-                res.status(201).json(newJewelry);
-            }).catch(error => {
-                res.status(500).json({ error: error.message });
-            });
+            await Promise.all(uploadPromises);
+        } else {
+            return res.status(400).json({ error: 'No files uploaded' });
+        }
+
+        // Create new jewelry item
+        const newJewelry = new Jewelry({
+            name,
+            description,
+            price,
+            gemstone_id,
+            gemstone_weight,
+            material_id,
+            material_weight,
+            category,
+            type,
+            on_sale,
+            sale_percentage,
+            available,
+            images,
+            image_public_ids
         });
 
-        if (req.file && req.file.buffer) {
-            streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
-        } else {
-            res.status(400).json({ error: 'No file uploaded' });
-        }
+        await newJewelry.save();
+        res.status(201).json(newJewelry);
     } catch (error) {
+        console.error('Server Error:', error); // Log server errors
         res.status(500).json({ error: error.message });
     }
 };
 
+//update
 const updateJewelry = async (req, res) => {
     try {
         let { 
@@ -143,13 +163,11 @@ const updateJewelry = async (req, res) => {
             material_id, material_weight, category, type, on_sale, sale_percentage, available
         } = req.body;
 
-        // Validate empty fields if necessary
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
         }
 
-        // Validate input data
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
@@ -159,7 +177,6 @@ const updateJewelry = async (req, res) => {
             sale_percentage = 0;
         }
 
-        // Find the existing jewelry item
         const existingJewelry = await Jewelry.findById(req.params.id);
         if (!existingJewelry) {
             return res.status(404).json({ error: 'Jewelry not found' });
@@ -179,35 +196,35 @@ const updateJewelry = async (req, res) => {
         if (sale_percentage) updateData.sale_percentage = sale_percentage;
         if (available) updateData.available = available;
 
-        if (req.file) {
-            // Delete old image from Cloudinary
+        if (req.files && req.files.length > 0) {
             const deletePromises = existingJewelry.image_public_ids.map(publicId => cloudinary.uploader.destroy(publicId));
             await Promise.all(deletePromises);
 
-            // Upload new image to Cloudinary using the buffer
-            const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, async (error, result) => {
-                if (error) {
-                    return res.status(500).json({ error: error.message });
-                }
-
-                updateData.images = [result.secure_url];
-                updateData.image_public_ids = [result.public_id];
-
-                // Perform the update after uploading the image
-                try {
-                    const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true });
-                    res.status(200).json(updatedJewelry);
-                } catch (error) {
-                    res.status(500).json({ error: error.message });
-                }
+            const images = [];
+            const image_public_ids = [];
+            const uploadPromises = req.files.map(file => {
+                return new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            images.push(result.secure_url);
+                            image_public_ids.push(result.public_id);
+                            resolve();
+                        }
+                    });
+                    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+                });
             });
+            
+            await Promise.all(uploadPromises);
 
-            streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
-        } else {
-            // Perform the update without uploading a new image
-            const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true });
-            res.status(200).json(updatedJewelry);
+            updateData.images = images;
+            updateData.image_public_ids = image_public_ids;
         }
+
+        const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        res.status(200).json(updatedJewelry);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

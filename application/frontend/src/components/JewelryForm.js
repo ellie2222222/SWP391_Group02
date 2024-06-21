@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia } from '@mui/material';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia, Grid } from '@mui/material';
 import * as Yup from 'yup';
 import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
-    const [selectedImage, setSelectedImage] = useState(initialValues.images[0] || []);
-   
+    const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
+
     const formik = useFormik({
         initialValues: {
             ...initialValues,
+            images: initialValues.images || [],
+            available: initialValues.available ?? false,
         },
         onSubmit: async (values) => {
             const formData = new FormData();
             Object.keys(values).forEach((key) => {
-                if (key === 'image') {
-                    if (values.image) {
-                        formData.append('image', values.image);
-                    }
+                if (key === 'images') {
+                    values.images.forEach((image) => {
+                        formData.append('images', image);
+                    });
                 } else {
                     formData.append(key, values[key]);
                 }
             });
-            console.log(formData);
-            return onSubmit(formData);
+            console.log('Submitting:', formData);
+            onSubmit(formData);
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Required."),
@@ -43,15 +45,25 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     });
 
     const handleImageChange = (event) => {
-        const file = event.currentTarget.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                formik.setFieldValue("image", file);
-                setSelectedImage(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
+        const files = event.currentTarget.files;
+        const fileArray = Array.from(files);
+
+        const readers = fileArray.map(file => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    resolve({ file, url: reader.result });
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        });
+
+        Promise.all(readers).then(results => {
+            const newSelectedImages = results.map(result => result.url);
+            setSelectedImages([...selectedImages, ...newSelectedImages]);
+            formik.setFieldValue("images", [...formik.values.images, ...results.map(result => result.file)]);
+        });
     };
 
     return (
@@ -205,28 +217,31 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     }
                     label="Available"
                 />
-                {selectedImage ? (
-                    <Box sx={{ mt: 2 }}>
-                        <CardMedia
-                            component="img"
-                            alt="Selected"
-                            image={selectedImage}
-                            sx={{ width: '100%', maxHeight: '300px' }}
-                        />
-                    </Box>
-                ) : 
-                <></>
-                }
-                {formik.errors.image && (
-                    <Typography variant="caption" color="red">{formik.errors.image}</Typography>
+                {selectedImages.length > 0 && (
+                    <Grid container spacing={2} sx={{ mt: 2 }}>
+                        {selectedImages.map((image, index) => (
+                            <Grid item xs={6} key={index}>
+                                <CardMedia
+                                    component="img"
+                                    alt={`Selected ${index}`}
+                                    image={image}
+                                    sx={{ width: '100%', maxHeight: '150px' }}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
                 )}
-                <Button variant="contained" component="label">
+                {formik.errors.images && (
+                    <Typography variant="caption" color="red">{formik.errors.images}</Typography>
+                )}
+                <Button variant="contained" component="label" sx={{ mt: 2 }}>
                     <AddPhotoAlternateIcon />
-                    Upload Image
+                    Upload Images
                     <input
                         type="file"
                         hidden
                         onChange={handleImageChange}
+                        multiple
                     />
                 </Button>
 
