@@ -27,6 +27,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             });
             console.log('Submitting:', formData);
             onSubmit(formData);
+            return onSubmit(formData);
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Required."),
