@@ -40,7 +40,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/warranties/create" element={<Warranty />} /> {/* Add the new route */}
+        <Route path="/warranties/create" element={<Warranty />} />
         <Route path="/warranties" element={<WarrantyList />} />
 
         <Route element={<AdminRoute />}>
@@ -52,11 +52,6 @@ function App() {
         <Route element={<UserRoute />}>
           <Route path="/requests" element={<Requests />} />
           <Route path="/request" element={<CustomRequest />} />
-        </Route>
-
-        <Route element={<ManagerOrSaleRoute />}>
-          <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
-          <Route path="/requests/customer-requests-view/:id" element={<CustomerRequest />} />
         </Route>
 
       </Routes>

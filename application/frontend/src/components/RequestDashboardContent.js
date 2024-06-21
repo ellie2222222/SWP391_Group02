@@ -264,8 +264,8 @@ const RequestDashboardContent = () => {
                 </Dialog>
             </Container>
             )}
-            {user.role == 'sale_staff' && (
-                <SaleStaffDashboard></SaleStaffDashboard>
+            {user.role === 'sale_staff' && (
+                <SaleStaffDashboard />
             )}
         </Box>
     );
