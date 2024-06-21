@@ -6,7 +6,7 @@ import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
-    const [selectedImage, setSelectedImage] = useState(initialValues.images[0] || []);
+    const [selectedImage, setSelectedImage] = useState(initialValues.images[0] || '');
    
     const formik = useFormik({
         initialValues: {
@@ -23,7 +23,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     formData.append(key, values[key]);
                 }
             });
-            console.log(formData);
             return onSubmit(formData);
         },
         validationSchema: Yup.object({
