@@ -44,7 +44,7 @@ const RequestDashboardContent = () => {
 
     const fetchRequests = async () => {
         try {
-            const response = await axiosInstance.get('/requests/staff-requests'); 
+            const response = await axiosInstance.get('/requests/'); 
             setError('')
             setRequests(response.data);
         } catch (error) {
