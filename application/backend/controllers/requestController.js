@@ -109,6 +109,13 @@ const getStaffRequests = async (req, res) => {
       .populate({
         path: 'user_id',
         select: 'email'
+      })
+      .populate({
+        path: 'jewelry_id',
+        populate: [
+          { path: 'material_id' },
+          { path: 'gemstone_id' }
+        ]
       });
 
     // Check if requests exist
