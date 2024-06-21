@@ -109,6 +109,13 @@ const getStaffRequests = async (req, res) => {
       .populate({
         path: 'user_id',
         select: 'email'
+      })
+      .populate({
+        path: 'jewelry_id',
+        populate: [
+          { path: 'material_id' },
+          { path: 'gemstone_id' }
+        ]
       });
 
     // Check if requests exist
@@ -241,6 +248,13 @@ const updateRequest = async (req, res) => {
       if (!jewelry) {
         return res.status(404).json({ error: 'No such jewelry' });
       }
+
+      if (existingRequest.jewelry_id && !existingRequest.jewelry_id.equals(jewelry._id)) {
+        const existingJewelry = await Request.findOne({jewelry_id: jewelry._id})
+        if (existingJewelry) {
+          return res.status(400).json({ error: "This jewelry already exist in another request" })
+        }
+      }
     }
 
     // Validate request status
@@ -318,8 +332,6 @@ const updateRequest = async (req, res) => {
       });
 
       await Promise.all(uploadPromises);
-    } else {
-      return res.status(400).json({ error: 'No files uploaded' });
     }
 
     // Only update fields that are provided
@@ -352,6 +364,20 @@ const updateRequest = async (req, res) => {
       updateFields.request_status = 'quote';
     }
 
+    if (existingRequest.design_status === 'ongoing' && design_status === 'completed') {
+      updateFields.request_status = 'design'
+    }
+    if (existingRequest.design_status === 'completed' && design_status === 'ongoing' && req.role !== 'manager') {
+      updateFields.design_status = 'completed'
+    }
+
+    if (existingRequest.production_status === 'ongoing' && production_status === 'completed') {
+      updateFields.request_status = 'production'
+    }
+    if (existingRequest.production_status === 'completed' && production_status === 'ongoing' && req.role !== 'manager') {
+      updateFields.production_status = 'completed'
+    }
+
     if (
       (existingRequest.production_start_date == null || existingRequest.production_end_date == null || existingRequest.production_cost == null)
       &&
@@ -372,10 +398,10 @@ const updateRequest = async (req, res) => {
       return res.status(404).json({ error: "No such request" });
     }
 
-    res.status(200).json(updatedRequest);
+    res.status(200).json({ message: "Update successfully", updatedRequest});
   } catch (error) {
     console.error('Error updating request:', error);
-    res.status(500).json({ error: "Error while updating request" });
+    res.status(500).json({ error: error.message });
   }
 };
 

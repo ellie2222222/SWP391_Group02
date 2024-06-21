@@ -11,7 +11,7 @@ const convertToInputDateFormat = (dateStr) => {
     return `${year}-${month}-${day}`;
 };
 
-const RequestForm = ({ initialValues, onSubmit, role }) => {
+const RequestForm = ({ initialValues, onSubmit, role, error, message }) => {
     const filterBlankValues = (values) => {
         const filteredValues = {};
         Object.keys(values).forEach((key) => {
@@ -156,7 +156,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                         onBlur={formik.handleBlur}
                         label="Design Status"
                         error={formik.touched.design_status && Boolean(formik.errors.design_status)}
-                        readOnly={role !== 'manager' && role !== 'design_staff' && formik.values.quote_status === 'approved' }
+                        readOnly={role !== 'manager' && role !== 'design_staff' }
                     >
                         <MenuItem value="ongoing">Ongoing</MenuItem>
                         <MenuItem value="completed">Completed</MenuItem>
@@ -176,7 +176,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_start_date && Boolean(formik.errors.production_start_date)}
                     helperText={formik.touched.production_start_date && formik.errors.production_start_date}
-                    InputProps={{ readOnly: (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' }}
                 />
                 <TextField
                     name="production_end_date"
@@ -189,7 +189,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_end_date && Boolean(formik.errors.production_end_date)}
                     helperText={formik.touched.production_end_date && formik.errors.production_end_date}
-                    InputProps={{ readOnly: (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' }}
                 />
                 <TextField
                     name="production_cost"
@@ -201,7 +201,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_cost && Boolean(formik.errors.production_cost)}
                     helperText={formik.touched.production_cost && formik.errors.production_cost}
-                    InputProps={{ readOnly: (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }}
+                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' }}
                 />
                 <FormControl variant="outlined" fullWidth>
                     <InputLabel id="production-status-label">Production Status</InputLabel>
@@ -213,7 +213,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                         onBlur={formik.handleBlur}
                         label="Production Status"
                         error={formik.touched.production_status && Boolean(formik.errors.production_status)}
-                        readOnly={ (role !== 'manager' && role !== 'production_staff') || formik.values.design_status !== 'completed' }
+                        readOnly={ role !== 'manager' && role !== 'production_staff' }
                     >
                         <MenuItem value="ongoing">Ongoing</MenuItem>
                         <MenuItem value="completed">Completed</MenuItem>
@@ -237,6 +237,12 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                 <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                     Submit
                 </Button>
+                {error && (
+                    <Typography>{error}</Typography>
+                )}
+                {message && (
+                    <Typography>{message}</Typography>
+                )}
             </Box>
         </Container>
     );
