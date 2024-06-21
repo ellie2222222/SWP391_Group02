@@ -156,11 +156,6 @@ const Navbar = () => {
                   <ListItemText primary="Sales" />
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
-                  <CustomLink to="/warranties">
-                    <ListItemText primary="Warranty" />
-                  </CustomLink>
-                </CustomListItem>
-                <CustomListItem button onClick={handleDrawerClose}>
                   <ListItemIcon>
                     <SearchIcon style={{ fontSize: "1.6rem" }} />
                   </ListItemIcon>
@@ -205,27 +200,10 @@ const Navbar = () => {
                 </Link>
               </Grid>
               <Grid item xs>
-                <Link to="/warranties/create">
-                  <CustomButton>Warranty</CustomButton>
+                <Link to="/request">
+                  <CustomButton>Custom</CustomButton>
                 </Link>
               </Grid>
-              <Grid item xs>
-                <Link to="/warranties">
-                  <CustomButton>Warranty List</CustomButton>
-                </Link>
-              </Grid>
-                <Grid item xs>
-                  <Link to="/request">
-                    <CustomButton>Custom</CustomButton>
-                  </Link>
-                </Grid>              {user &&
-                (user.role === "manager" || user.role === "sale_staff") && (
-                  <Grid item xs>
-                    <Link to="/requests/customer-requests-view">
-                      <CustomButton>Customer Requests</CustomButton>
-                    </Link>
-                  </Grid>
-                )}
             </Grid>
             {/* Thêm icon login và thanh search */}
             <Box sx={{ display: "flex", alignItems: "center" }}>

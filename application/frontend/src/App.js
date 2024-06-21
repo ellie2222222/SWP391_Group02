@@ -11,14 +11,10 @@ import UsersDashboard from "./pages/UsersDashboard";
 import BlogContents from "./pages/BlogContents";
 import Warranty from './pages/Warranty'; // Import the new page
 import WarrantyList from "./pages/WarrantyList";
-import WarrantyLists from "./components/WarrantyLists";
-
 import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
-import CustomerRequests from "./pages/CustomerRequests";
 import Requests from "./pages/Requests";
-import CustomerRequest from "./pages/CustomerRequest";
 import RequestDashboard from "./pages/RequestDashboard";
 import CustomRequest from "./pages/CustomRequest";
 function App() {
@@ -40,7 +36,7 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/warranties/create" element={<Warranty />} /> {/* Add the new route */}
+        <Route path="/warranties/create" element={<Warranty />} />
         <Route path="/warranties" element={<WarrantyList />} />
 
         <Route element={<AdminRoute />}>
@@ -52,11 +48,6 @@ function App() {
         <Route element={<UserRoute />}>
           <Route path="/requests" element={<Requests />} />
           <Route path="/request" element={<CustomRequest />} />
-        </Route>
-
-        <Route element={<ManagerOrSaleRoute />}>
-          <Route path="/requests/customer-requests-view" element={<CustomerRequests />} />
-          <Route path="/requests/customer-requests-view/:id" element={<CustomerRequest />} />
         </Route>
 
       </Routes>

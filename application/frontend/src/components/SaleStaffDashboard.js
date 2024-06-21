@@ -22,7 +22,7 @@ export default function SaleStaffDashboard() {
 
     const fetchRequests = async () => {
         try {
-            const response = await axiosInstance.get('/requests/staff-requests');
+            const response = await axiosInstance.get('/requests');
             setRequests(response.data);
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
@@ -55,7 +55,6 @@ export default function SaleStaffDashboard() {
                             <TableCell>Sender</TableCell>
                             <TableCell>Description</TableCell>
                             <TableCell>Request Status</TableCell>
-                            <TableCell>Jewelry_ID</TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -68,7 +67,6 @@ export default function SaleStaffDashboard() {
                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
                                     <TableCell>{request.request_description}</TableCell>
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
-                                    <TableCell>{request.jewelry_id ? request.jewelry_id : 'Custom' }</TableCell>
                                     <TableCell>
                                         <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
                                     </TableCell>
@@ -76,7 +74,6 @@ export default function SaleStaffDashboard() {
                             )
                         ))}
                     </TableBody>
-
                 </Table>
             </TableContainer>
         </Container>
