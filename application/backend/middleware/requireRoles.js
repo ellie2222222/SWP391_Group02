@@ -47,7 +47,7 @@ const requireProductions = (req, res, next) => {
 }
 
 const requireManagerOrSale = (req, res, next) => {
-  if (req.role !== 'sale_staff' && req.role !== 'manager') {
+  if (req.role !== 'sale_staff' && req.role !== 'manager' ) {
     return res.status(403).json({ error: 'Sale Staff or Manager access required' });
   }
 
@@ -55,7 +55,7 @@ const requireManagerOrSale = (req, res, next) => {
 }
 
 const requireManagerOrStaff = (req, res, next) => {
-  if (req.role !== 'sale_staff' && req.role !== 'design_staff' && req.role !== 'production_staff' && req.role !== 'manager') {
+  if (req.role !== 'sale_staff' && req.role !== 'design_staff' && req.role !== 'production_staff' && req.role !== 'manager' && req.role !== 'user') {
     return res.status(403).json({ error: 'Staff or Manager access required' });
   }
 
