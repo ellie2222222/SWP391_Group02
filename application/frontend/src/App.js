@@ -14,13 +14,13 @@ import WarrantyList from "./pages/WarrantyList";
 import WarrantyLists from "./components/WarrantyLists";
 
 import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
-import Request from "./pages/Request";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
 import CustomerRequests from "./pages/CustomerRequests";
 import Requests from "./pages/Requests";
-import RequestInfo from "./pages/RequestInfo";
 import CustomerRequest from "./pages/CustomerRequest";
+import RequestDashboard from "./pages/RequestDashboard";
+import CustomRequest from "./pages/CustomRequest";
 function App() {
   const { user } = useAuth()
 
@@ -46,12 +46,12 @@ function App() {
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<JewelryDashboard/>} />
           <Route path="/admin/users" element={<UsersDashboard/>} />
+          <Route path="/admin/requests" element={<RequestDashboard />} />
         </Route>
 
-        <Route element={<AuthRoute />}>
+        <Route element={<UserRoute />}>
           <Route path="/requests" element={<Requests />} />
-          <Route path="/requests/:id" element={<RequestInfo />} />
-          <Route path="/request" element={<Request />} />
+          <Route path="/request" element={<CustomRequest />} />
         </Route>
 
         <Route element={<ManagerOrSaleRoute />}>

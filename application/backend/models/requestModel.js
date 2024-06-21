@@ -19,7 +19,7 @@ const requestSchema = new Schema( {
     request_status: {
         type: String,
         required: true,
-        enum: ['pending', 'assigned','completed'],
+        enum: ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'payment', 'cancelled'],
         default: 'pending'
     },
     quote_content: {
@@ -31,6 +31,10 @@ const requestSchema = new Schema( {
     quote_status: {
         type: String,
         enum: ['pending', 'approved', 'rejected']
+    },
+    design_status: {
+        type: String,
+        enum: ['ongoing', 'completed']
     },
     production_start_date: {
         type: Date
@@ -50,7 +54,26 @@ const requestSchema = new Schema( {
     },
     endedAt: {
         type: Date
-    }
+    },
+    design_images: [{
+        type: String,
+    }],
+    warranty_content: {
+        type: String,
+        required: true,
+    },
+    warranty_start_date: {
+        type: Date,
+        required: true
+    },
+    warranty_end_date: {
+        type: Date,
+        required: true
+    },
+    images_public_ids: [{
+        type: String
+    }],
+    //waranty, design,
 }, {timestamps: true})
 
 module.exports = mongoose.model('Request', requestSchema)

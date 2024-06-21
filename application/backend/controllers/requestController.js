@@ -9,10 +9,10 @@ const getRequests = async (req, res) => {
   try {
     let request
     if (req.role === "sale_staff") {
-      request = await Request.find({ request_status: "pending"});
+      request = await Request.find({ request_status: "pending" });
     } else {
       request = await Request.find({});
-    }    
+    }
 
     res.status(200).json(request);
   } catch (error) {
@@ -80,7 +80,7 @@ const getUserRequest = async (req, res) => {
       return res.status(400).json({ error: 'Invalid ID' });
     }
 
-    const requests = await Request.findOne({ user_id: _id, _id: id }); 
+    const requests = await Request.findOne({ user_id: _id, _id: id });
 
     // Check if requests exist
     if (requests.length === 0) {
@@ -100,13 +100,17 @@ const getStaffRequests = async (req, res) => {
     const { authorization } = req.headers
     const token = authorization.split(' ')[1]
     const { _id } = jwt.verify(token, process.env.SECRET)
-  
+
     const worksOn = await WorksOn.find({ staff_ids: _id });
-    
+
     const requestIds = worksOn.map(w => w.request_id);
-    
-    const requests = await Request.find({ _id: { $in: requestIds } });
-    
+
+    const requests = await Request.find({ _id: { $in: requestIds } })
+      .populate({
+        path: 'user_id',
+        select: 'email'
+      });
+
     // Check if requests exist
     if (requests.length === 0) {
       return res.status(404).json({ error: "No requests found for this staff" });
@@ -132,8 +136,8 @@ const getStaffRequest = async (req, res) => {
     }
 
     // Find request
-    const requests = await Request.findOne({ _id: id }); 
-    
+    const requests = await Request.findOne({ _id: id });
+
     // Check if requests exist
     if (!requests) {
       return res.status(404).json({ error: "No request found" });
@@ -143,7 +147,7 @@ const getStaffRequest = async (req, res) => {
     const worksOn = await WorksOn.findOne({ request_id: requests._id, staff_ids: _id });
 
     if (!worksOn) {
-        return res.status(403).json({ error: "You do not have permission to perform this action" });
+      return res.status(403).json({ error: "You do not have permission to perform this action" });
     }
 
     res.status(200).json(requests);
@@ -173,13 +177,18 @@ const createRequest = async (req, res) => {
     request_status: 'pending',
     quote_content: null,
     quote_amount: null,
-    quote_status: 'pending',
+    quote_status: null,
+    design_status: null,
     production_start_date: null,
     production_end_date: null,
     production_cost: null,
     production_status: null,
     total_amount: null,
-    endedAt: null
+    endedAt: null,
+    design_images: null,
+    warranty_content: null,
+    warranty_start_date: null,
+    warranty_end_date: null,
   };
 
   // Add to the database
@@ -203,12 +212,16 @@ const updateRequest = async (req, res) => {
       quote_content,
       quote_amount,
       quote_status,
+      design_status,
       production_start_date,
       production_end_date,
       production_cost,
       production_status,
       total_amount,
-      endedAt
+      endedAt,
+      warranty_content,
+      warranty_start_date,
+      warranty_end_date,
     } = req.body;
 
     // Validate request ID
@@ -231,7 +244,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'assigned', 'completed'];
+    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'payment', 'cancelled'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }
@@ -240,6 +253,12 @@ const updateRequest = async (req, res) => {
     const allowedQuoteStatuses = ["pending", "approved", "rejected"];
     if (quote_status && !allowedQuoteStatuses.includes(quote_status)) {
       return res.status(400).json({ error: "Invalid quote status" });
+    }
+
+    // Validate design status
+    const allowedDesignStatuses = ["ongoing", "completed"];
+    if (design_status && !allowedDesignStatuses.includes(design_status)) {
+      return res.status(400).json({ error: "Invalid design status" });
     }
 
     // Validate production status
@@ -264,56 +283,85 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate and parse dates if provided
-    let parsedStartDate, parsedEndDate, parsedEndAt;
+    let parsedStartDate = production_start_date ? new Date(production_start_date) : existingRequest.production_start_date;
 
-    if (production_start_date) {
-      parsedStartDate = new Date(production_start_date);
-      if (isNaN(parsedStartDate)) {
-        return res.status(400).json({ error: "Invalid production start date" });
-      }
-    } else {
-      parsedStartDate = existingRequest.production_start_date;
+    if (production_start_date && isNaN(parsedStartDate)) {
+      return res.status(400).json({ error: "Invalid production start date" });
     }
 
-    if (production_end_date) {
-      parsedEndDate = new Date(production_end_date);
-      if (isNaN(parsedEndDate)) {
-        return res.status(400).json({ error: "Invalid production end date" });
-      }
-    } else {
-      parsedEndDate = existingRequest.production_end_date;
+    let parsedEndDate = production_end_date ? new Date(production_end_date) : existingRequest.production_end_date;
+    if (production_end_date && isNaN(parsedEndDate)) {
+      return res.status(400).json({ error: "Invalid production end date" });
     }
 
-    if (endedAt) {
-      parsedEndAt = new Date(endedAt);
-      if (isNaN(parsedEndAt)) {
-        return res.status(400).json({ error: "Invalid end date" });
-      }
-      
-      if (parsedEndAt <= existingRequest.createdAt) {
-        return res.status(400).json({ error: "End date must be after creation date" });
-      }
+    let parsedEndAt = endedAt ? new Date(endedAt) : existingRequest.endedAt;
+    if (endedAt && (isNaN(parsedEndAt) || parsedEndAt <= existingRequest.createdAt)) {
+      return res.status(400).json({ error: "End date must be valid and after creation date" });
+    }
+
+    // Handle design_images upload
+    const images = [];
+
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(file => {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ folder: 'design' }, (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              images.push(result.secure_url);
+              resolve();
+            }
+          });
+          streamifier.createReadStream(file.buffer).pipe(uploadStream);
+        });
+      });
+
+      await Promise.all(uploadPromises);
     } else {
-      parsedEndAt = existingRequest.endedAt;
+      return res.status(400).json({ error: 'No files uploaded' });
     }
 
     // Only update fields that are provided
-    const updateFields = {};
+    const updateFields = {
+      ...(jewelry_id !== undefined && { jewelry_id }),
+      ...(request_description !== undefined && { request_description }),
+      ...(request_status !== undefined && { request_status }),
+      ...(quote_content !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { quote_content }),
+      ...(quote_amount !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { quote_amount }),
+      ...(quote_status !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { quote_status }),
+      ...(design_status !== undefined && (req.role === 'design_staff' || req.role === 'manager') && { design_status }),
+      ...(production_start_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_start_date: parsedStartDate }),
+      ...(production_end_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_end_date: parsedEndDate }),
+      ...(production_cost !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_cost }),
+      ...(production_status !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_status }),
+      ...(total_amount !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { total_amount }),
+      ...(endedAt !== undefined && { endedAt: parsedEndAt }),
+      ...(images.length > 0 && { design_images: images }), // Update design_images with uploaded images
+      ...(warranty_content !== undefined && { warranty_content }),
+      ...(warranty_start_date !== undefined && { warranty_start_date }),
+      ...(warranty_end_date !== undefined && { warranty_end_date }),
+    };
 
-    if (jewelry_id !== undefined) updateFields.jewelry_id = jewelry_id;
-    if (request_description !== undefined) updateFields.request_description = request_description;
-    if (request_status !== undefined) updateFields.request_status = request_status;
-    if (quote_content !== undefined) updateFields.quote_content = quote_content;
-    if (quote_amount !== undefined) updateFields.quote_amount = quote_amount;
-    if (quote_status !== undefined) updateFields.quote_status = quote_status;
-    if (production_start_date !== undefined) updateFields.production_start_date = parsedStartDate;
-    if (production_end_date !== undefined) updateFields.production_end_date = parsedEndDate;
-    if (production_cost !== undefined) updateFields.production_cost = production_cost;
-    if (production_status !== undefined) updateFields.production_status = production_status;
-    if (production_status !== undefined) updateFields.production_status = production_status;
-    if (total_amount !== undefined) updateFields.total_amount = total_amount;
-    if (endedAt !== undefined) updateFields.endedAt = parsedEndAt;
+    if (
+      (existingRequest.quote_amount == null || existingRequest.quote_content == null)
+      &&
+      quote_amount != null && quote_content != null
+    ) {
+      updateFields.quote_status = 'pending';
+      updateFields.request_status = 'quote';
+    }
 
+    if (
+      (existingRequest.production_start_date == null || existingRequest.production_end_date == null || existingRequest.production_cost == null)
+      &&
+      production_start_date != null && production_start_date != null && production_cost != null
+    ) {
+      updateFields.production_status = 'ongoing';
+      updateFields.request_status = 'production';
+    }
+
+    // Update request
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
       { $set: updateFields },

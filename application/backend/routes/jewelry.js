@@ -14,10 +14,12 @@ jewelryRoutes.get('/', getJewelries);
 
 jewelryRoutes.get('/:id', getJewelry);
 
-jewelryRoutes.post('/', requireAuth, requireAdmin, upload.single('image'), createJewelry); // Handle single file upload with field name 'image'
+jewelryRoutes.post('/', requireAuth, requireAdmin, upload.array('images', 5), createJewelry); // Handle multiple file uploads with field name 'images' and max 5 files
 
 jewelryRoutes.delete('/:id', requireAuth, requireAdmin, deleteJewelry);
 
-jewelryRoutes.patch('/:id', requireAuth, requireAdmin, upload.single('image'), updateJewelry); // Handle single file upload with field name 'image'
+jewelryRoutes.patch('/:id', requireAuth, requireAdmin, upload.array('images', 5), updateJewelry); // Handle multiple file uploads with field name 'images' and max 5 files
 
+// GET /api/jewelries?sortByName=asc
+// GET /api/jewelries?sortByName=desc
 module.exports = jewelryRoutes;

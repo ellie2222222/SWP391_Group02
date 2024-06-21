@@ -40,7 +40,12 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (userData) => {
         try {
-            await axios.post('http://localhost:4000/api/user/signup', userData);
+            const response = await axios.post('http://localhost:4000/api/user/signup', userData);
+            const { token } = response.data;
+            const decoded = jwtDecode(token);
+            localStorage.setItem('token', token);
+            setUser({ ...decoded, token });
+            return decoded.role;
         } catch (error) {
             if (error.response && error.response.data && error.response.data.error) {
                 throw new Error(error.response.data.error);
