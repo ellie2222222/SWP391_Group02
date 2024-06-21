@@ -284,7 +284,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate quote amount
-    if (quote_amount != null && (typeof quote_amount !== 'number' || quote_amount <= 0)) {
+    if (quote_amount != null && (typeof Number(quote_amount) !== 'number' || quote_amount <= 0)) {
       return res.status(400).json('Quote amount must be a positive number');
     }
 
@@ -380,13 +380,13 @@ const updateRequest = async (req, res) => {
 
       // Transition from 'accepted' to 'quote'
       if (updatedRequest.request_status === 'accepted') {
-        updatedRequest.request_status = 'quote';
+        updatedRequest.request_status = 'design';
         statusChanged = true;
       }
 
       // Transition from 'quote' to 'design'
       if (updatedRequest.request_status === 'quote' && updatedRequest.quote_amount !== null && updatedRequest.quote_content !== null && updatedRequest.design_images.length === 0) {
-        updatedRequest.request_status = 'design';
+        updatedRequest.request_status = 'accepted';
         statusChanged = true;
       }
 
