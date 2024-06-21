@@ -72,7 +72,7 @@ const RequestList = () => {
                         <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
                         <Typography variant="h5"> Status: {request.request_status} </Typography>
                         <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
-                        { request.request_status === 'completed' && (
+                        { request.request_status === 'payment' && (
                             <CustomButton1>Payment</CustomButton1>
                         )}
                     </Box>
