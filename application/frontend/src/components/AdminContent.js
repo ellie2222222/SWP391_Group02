@@ -13,10 +13,10 @@ const CustomButton1 = styled(Button)({
     fontSize: '1rem',
     marginTop: '20px',
     '&:hover': {
-      color: '#b48c72', // Thay đổi màu chữ khi hover
-      backgroundColor: 'transparent',
+        color: '#b48c72', // Thay đổi màu chữ khi hover
+        backgroundColor: 'transparent',
     },
-  });
+});
 
 const AdminContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
@@ -82,7 +82,7 @@ const AdminContent = () => {
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             <Container>
-                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick} sx={{backgroundColor:'#b48c72'}}>
+                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick} sx={{ backgroundColor: '#b48c72' }}>
                     Add Jewelry
                 </CustomButton1>
                 <TableContainer component={Paper}>
@@ -103,6 +103,16 @@ const AdminContent = () => {
                                     <TableCell>{jewelry.description}</TableCell>
                                     <TableCell>{jewelry.price}</TableCell>
                                     <TableCell>
+                                        {jewelry.images[0] && (
+                                            <CardMedia
+                                                component="img"
+                                                alt="Jewelry"
+                                                image={jewelry.images[0]}
+                                                sx={{ width: '50%', maxHeight: '200px', margin: '0px' }}
+                                            />
+                                        )}
+                                    </TableCell>
+                                    {/* <TableCell>
                                         {jewelry.images.map((image, index) => (
                                             <CardMedia
                                                 key={index}
@@ -112,7 +122,7 @@ const AdminContent = () => {
                                                 sx={{ width: '50%', maxHeight: '200px', margin: '0px' }}
                                             />
                                         ))}
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell>
                                         <IconButton color="primary" onClick={() => handleEditClick(jewelry)}>
                                             <Edit />

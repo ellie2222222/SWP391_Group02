@@ -60,15 +60,12 @@ const requestSchema = new Schema( {
     }],
     warranty_content: {
         type: String,
-        required: true,
     },
     warranty_start_date: {
         type: Date,
-        required: true
     },
     warranty_end_date: {
         type: Date,
-        required: true
     },
     images_public_ids: [{
         type: String

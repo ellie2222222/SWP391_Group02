@@ -109,13 +109,6 @@ const getStaffRequests = async (req, res) => {
       .populate({
         path: 'user_id',
         select: 'email'
-      })
-      .populate({
-        path: 'jewelry_id',
-        populate: [
-          { path: 'material_id' },
-          { path: 'gemstone_id' }
-        ]
       });
 
     // Check if requests exist
@@ -192,7 +185,6 @@ const createRequest = async (req, res) => {
     production_status: null,
     total_amount: null,
     endedAt: null,
-    design_images: null,
     warranty_content: null,
     warranty_start_date: null,
     warranty_end_date: null,
@@ -250,9 +242,9 @@ const updateRequest = async (req, res) => {
       }
 
       if (existingRequest.jewelry_id && !existingRequest.jewelry_id.equals(jewelry._id)) {
-        const existingJewelry = await Request.findOne({jewelry_id: jewelry._id})
+        const existingJewelry = await Request.findOne({ jewelry_id: jewelry._id });
         if (existingJewelry) {
-          return res.status(400).json({ error: "This jewelry already exist in another request" })
+          return res.status(400).json({ error: "This jewelry already exists in another request" });
         }
       }
     }
@@ -315,7 +307,6 @@ const updateRequest = async (req, res) => {
 
     // Handle design_images upload
     const images = [];
-
     if (req.files && req.files.length > 0) {
       const uploadPromises = req.files.map(file => {
         return new Promise((resolve, reject) => {
@@ -349,7 +340,7 @@ const updateRequest = async (req, res) => {
       ...(production_status !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_status }),
       ...(total_amount !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { total_amount }),
       ...(endedAt !== undefined && { endedAt: parsedEndAt }),
-      ...(images.length > 0 && { design_images: images }), // Update design_images with uploaded images
+      ...(images.length > 0 && { design_images: images }),
       ...(warranty_content !== undefined && { warranty_content }),
       ...(warranty_start_date !== undefined && { warranty_start_date }),
       ...(warranty_end_date !== undefined && { warranty_end_date }),
@@ -365,17 +356,17 @@ const updateRequest = async (req, res) => {
     }
 
     if (existingRequest.design_status === 'ongoing' && design_status === 'completed') {
-      updateFields.request_status = 'design'
+      updateFields.request_status = 'design';
     }
     if (existingRequest.design_status === 'completed' && design_status === 'ongoing' && req.role !== 'manager') {
-      updateFields.design_status = 'completed'
+      updateFields.design_status = 'completed';
     }
 
     if (existingRequest.production_status === 'ongoing' && production_status === 'completed') {
-      updateFields.request_status = 'production'
+      updateFields.request_status = 'production';
     }
     if (existingRequest.production_status === 'completed' && production_status === 'ongoing' && req.role !== 'manager') {
-      updateFields.production_status = 'completed'
+      updateFields.production_status = 'completed';
     }
 
     if (
@@ -398,7 +389,7 @@ const updateRequest = async (req, res) => {
       return res.status(404).json({ error: "No such request" });
     }
 
-    res.status(200).json({ message: "Update successfully", updatedRequest});
+    res.status(200).json({ message: "Update successfully", updatedRequest });
   } catch (error) {
     console.error('Error updating request:', error);
     res.status(500).json({ error: error.message });
