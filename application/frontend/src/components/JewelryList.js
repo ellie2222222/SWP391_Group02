@@ -23,19 +23,17 @@ const JewelryList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const fetchJewelries = async () => {
+    try {
+        const response = await axiosInstance.get('/jewelries');
+        setProducts(response.data);
+        setLoading(false);
+    } catch (error) {
+        console.error('There was an error fetching the products!', error);
+        setLoading(false);
+    }
+};
   useEffect(() => {
-      const fetchJewelries = async () => {
-          try {
-              const response = await axiosInstance.get('/jewelries');
-              setProducts(response.data);
-              setLoading(false);
-          } catch (error) {
-              console.error('There was an error fetching the products!', error);
-              setLoading(false);
-          }
-      };
-
       fetchJewelries()
   }, []);
 
