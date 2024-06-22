@@ -75,7 +75,6 @@ mongoose.connect(process.env.MONGO_URI)
 const axios = require('axios').default; // npm install axios
 const CryptoJS = require('crypto-js'); // npm install crypto-js
 const moment = require('moment'); // npm install moment
-const jwt = require('jsonwebtoken')
 
 // APP INFO
 let config = {
@@ -86,19 +85,19 @@ let config = {
 };
 
 const requireAuth = require('./middleware/requireAuth');
-app.post('/payment', async (req, res) => {
-  const { email } = req.body;
-  // const { id } = req.id
+app.post('/payment', requireAuth, async (req, res) => {
+  const { email, product } = req.body;
+  const { _id } = req.id
   const embed_data = {
     // redirecturl: "https://localhost:3000"
   };
 
-  const items = [{}];
+  const items = [{ product }];
   const transID = Math.floor(Math.random() * 1000000);
   const order = {
     app_id: config.app_id,
     app_trans_id: `${moment().format('YYMMDD')}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
-    app_user: 'id',
+    app_user: _id,
     app_time: Date.now(), // miliseconds
     item: JSON.stringify(items),
     embed_data: JSON.stringify(embed_data),
@@ -110,7 +109,7 @@ app.post('/payment', async (req, res) => {
 
   // appid|app_trans_id|appuser|amount|apptime|embeddata|item
   const data = config.app_id + "|" + order.app_trans_id + "|" + order.app_user + "|" + order.amount + "|" + order.app_time + "|" + order.embed_data + "|" + order.item;
-  order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+  order.mac = CryptoJS.HmacSHA256(data, "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL").toString();
 
   try {
     const result = await axios.post(config.endpoint, null, { params: order })

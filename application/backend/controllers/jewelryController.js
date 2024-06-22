@@ -234,7 +234,7 @@ const getJewelries = async (req, res) => {
     const { name, category, on_sale, sortByPrice, sortBySalePercentage, sortByName } = req.query;
 
     try {
-        let query = {};
+        let query = { available: true };
         if (name) {
             query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
         }

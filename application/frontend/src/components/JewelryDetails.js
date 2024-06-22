@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, styled } from '@mui/material';
 import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance';
+import useAuth from '../hooks/useAuthContext';
+import { jwtDecode } from 'jwt-decode';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -22,14 +24,18 @@ const JewelryDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [payment, setPayment] = useState(null);
+  const [error, setError] = useState('')
+  const { user } = useAuth()
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchJewelry = async () => {
       try {
         const response = await axiosInstance.get(`/jewelries/${id}`);
+        
         setProduct(response.data);
-        console.log(response.data.gemstone_id)
+        
         setLoading(false);
       } catch (error) {
         console.error('There was an error fetching the product!', error);
@@ -39,6 +45,30 @@ const JewelryDetails = () => {
 
     fetchJewelry()
   }, [id]);
+
+  const handleOrder = async () => {
+    try {
+      const decoded = jwtDecode(user.token);
+      const userResponse = await axiosInstance.get(`/users/` + decoded._id)
+      
+      const paymentResponse = await axios.post('http://localhost:4000/payment', {
+        email: userResponse.data.email,
+        product
+      }, {
+        headers: {
+          "Authorization": `Bearer ${user.token}`
+        }
+      })
+
+      setPayment(paymentResponse.data)
+      console.log(paymentResponse.data)
+      setError('')
+    } catch (error) {
+      console.error('Cannot proceed to payment!', error);
+      if (error.response === undefined) setError(error.message);
+      else setError(error.response.data.error)
+    }
+  }
 
   if (loading) {
     return (
@@ -84,7 +114,7 @@ const JewelryDetails = () => {
           
           <Typography variant="h6">Material Weight: {product.material_weight} kg</Typography>
           <Typography variant="h6">Category: {product.category}</Typography>
-          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate('')}>
+          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={handleOrder}>
             ORDER NOW
           </CustomButton1>
         </Box>
