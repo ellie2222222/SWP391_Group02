@@ -15,7 +15,7 @@ requestRoutes.use(requireAuth)
 
 requestRoutes.post('/', requireUser, createRequest)
 
-requestRoutes.get('/', requireManagerOrSale, getRequests)
+requestRoutes.get('/', requireManagerOrStaff, getRequests)
 
 // Get all requests from one user
 requestRoutes.get('/user-requests', requireUser, getUserRequests)
