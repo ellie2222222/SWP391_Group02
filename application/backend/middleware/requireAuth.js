@@ -19,8 +19,6 @@ const requireAuth = async (req, res, next) => {
 
         req.role = role;
         req.id = _id; // Fixing the variable name from `id` to `_id`
-
-        console.log(`Authenticated request from user: ${_id} with role: ${role}`);
         next();
     } catch (error) {
         console.error('Error verifying token:', error);

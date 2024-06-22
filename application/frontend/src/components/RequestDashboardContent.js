@@ -177,7 +177,7 @@ const RequestDashboardContent = () => {
                         </Button>
                     </DialogActions>
                 </Dialog>
-                <Dialog open={isJewelryDetailDialogOpen} onClose={handleCloseAllDialogs} fullWidth={'300px'}>
+                <Dialog open={isJewelryDetailDialogOpen} onClose={handleCloseAllDialogs} >
                     <DialogTitle>Jewelry Detail</DialogTitle>
                     <DialogContent>
                     {selectedRequest && selectedRequest.jewelry_id && (

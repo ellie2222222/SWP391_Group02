@@ -25,32 +25,30 @@ const RequestList = () => {
     const [requests, setRequests] = useState([])
     const [error, setError] = useState('')
     const navigate = useNavigate();
-
-    useEffect(() => {
-        let fetchApi = '';
-        switch (user.role) {
-            case 'user':
-                fetchApi = 'user-requests'
-                break
-            default:
-                fetchApi = 'staff-requests'
-                break
+    const fetchRequests = async () => {
+        try {
+            const response = await axiosInstance.get(`/requests/user-requests/`);
+            setRequests(response.data)
+            setError('')
+            setLoading(false);
+        } catch (error) {
+            console.error('There was an error fetching requests!', error);
+            setLoading(false);
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error)
         }
-
-        const fetchRequests = async () => {
-            try {
-                const response = await axiosInstance.get(`/requests/${fetchApi}`);
-                setRequests(response.data)
-                setError('')
-                setLoading(false);
-            } catch (error) {
-                console.error('There was an error fetching requests!', error);
-                setLoading(false);
-                if (error.response === undefined) setError(error.message);
-                else setError(error.response.data.error)
-            }
-        };
-
+    };
+    const handleAcceptRequest = async (requestId) => {
+        try {
+            await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'user_accepted' })
+            setError('');
+            fetchRequests();
+        } catch (error) {
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error);
+        }
+    };
+    useEffect(() => {
         fetchRequests()
     }, [user.token]);
 
@@ -72,6 +70,12 @@ const RequestList = () => {
                         <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
                         <Typography variant="h5"> Status: {request.request_status} </Typography>
                         <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
+                        { request.request_status === 'accepted' && (
+                            <Box>
+                                <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quoted</CustomButton1>
+                                <CustomButton1>Quoted Details</CustomButton1>
+                            </Box>
+                        )}
                         { request.request_status === 'payment' && (
                             <CustomButton1>Payment</CustomButton1>
                         )}

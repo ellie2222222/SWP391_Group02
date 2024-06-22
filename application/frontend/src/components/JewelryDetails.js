@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, styled } from '@mui/material';
-import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
 import { jwtDecode } from 'jwt-decode';

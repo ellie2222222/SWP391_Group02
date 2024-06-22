@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
-import { Add } from '@mui/icons-material';
-import QuoteForm from './QuoteForm'
+import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -18,11 +16,18 @@ const CustomButton1 = styled(Button)({
 });
 
 
-export default function SaleStaffDashboard() {
+export default function QuotedRequestDashBoard() {
+    const DrawerHeader = styled('div')(({ theme }) => ({
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        padding: theme.spacing(0, 1),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+    }));
+
     const [requests, setRequests] = useState([]);
-    const [selectedRequest, setSelectedRequest] = useState(null);
     const [error, setError] = useState('');
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const fetchRequests = async () => {
         try {
@@ -32,51 +37,47 @@ export default function SaleStaffDashboard() {
             console.error("There was an error fetching the requests!", error);
         }
     };
-    const handleSubmit = async (values) => {
+    const handleAcceptRequest = async (requestId) => {
         try {
-            await axiosInstance.patch(`/requests/${selectedRequest._id}`, values)
-            setIsDialogOpen(false);
+            await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'accepted' })
+            setError('');
             fetchRequests();
         } catch (error) {
             if (error.response === undefined) setError(error.message);
             else setError(error.response.data.error);
         }
     }
-    const handleEditClick = (request) => {
-        setIsDialogOpen(true);
-        setSelectedRequest(request)
-    };
-    
     useEffect(() => {
         fetchRequests();
     }, []);
 
     return (
         <Container>
+             <DrawerHeader/>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
                             <TableCell>Request ID</TableCell>
-                            <TableCell>Sender</TableCell>
-                            <TableCell>Description</TableCell>
+                            <TableCell>Quoted Conten</TableCell>
+                            <TableCell>Quoted Amount</TableCell>
                             <TableCell>Request Status</TableCell>
-                            <TableCell>Create Quote</TableCell>
+                            <TableCell>Jewelry_ID</TableCell>
+                            <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
                         {requests.map((request, index) => (
-                            (request.request_status === 'pending' || request.request_status === 'rejected_quote') && (
+                            request.request_status === 'quote' && (
                                 <TableRow key={index}>
                                     <TableCell>{request._id}</TableCell>
-                                    <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
-                                    <TableCell>{request.request_description}</TableCell>
+                                    <TableCell>{request.quote_content}</TableCell>
+                                    <TableCell>{request.quote_amount}</TableCell>
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
+                                    <TableCell>{request.jewelry_id ? request.jewelry_id._id : 'Custom'}</TableCell>
                                     <TableCell>
-                                        <IconButton color="primary" onClick={() => handleEditClick(request)}>
-                                            <Add/>
-                                        </IconButton>
+                                        <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
                                     </TableCell>
                                 </TableRow>
                             )
@@ -85,17 +86,6 @@ export default function SaleStaffDashboard() {
 
                 </Table>
             </TableContainer>
-            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <DialogTitle>Quote</DialogTitle>
-                <DialogContent>
-                        <QuoteForm initialValues={selectedRequest} onSubmit={handleSubmit}/>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setIsDialogOpen(false)} color="primary">
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Container>
 
     )

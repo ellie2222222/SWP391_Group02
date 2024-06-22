@@ -8,8 +8,8 @@ export default function UserForm(initialValues, onSubmit) {
       ...initialValues.initialValues,
     },
     onSubmit: async (values) => {
-    
-     
+
+
       return initialValues.onSubmit(values);
     },
     validationSchema: Yup.object({
@@ -17,7 +17,7 @@ export default function UserForm(initialValues, onSubmit) {
       email: Yup.string().email('Invalid email format').required('Email is required'),
       password: Yup.string().required('Password is required'), // Assuming the hashed password is validated elsewhere
       phone_number: Yup.string().matches(/^(\d{8,})$/, 'Phone number is not valid').required('Phone number is required'),
-      role: Yup.string().oneOf(['user', 'admin','sale_staff','manager','design_staff'], 'Role must be either "user" or "admin"').required('Role is required'),
+      role: Yup.string().oneOf(['user', 'admin', 'sale_staff', 'manager', 'design_staff'], 'Role must be either "user" or "admin"').required('Role is required'),
       username: Yup.string().required('Username is required')
     }),
   })
@@ -47,7 +47,7 @@ export default function UserForm(initialValues, onSubmit) {
           error={formik.touched.phone_number && Boolean(formik.errors.phone_number)}
           helperText={formik.touched.phone_number && formik.errors.phone_number}
         />
-         <TextField
+        <TextField
           name="address"
           label="Address"
           variant="outlined"
@@ -68,25 +68,25 @@ export default function UserForm(initialValues, onSubmit) {
           helperText={formik.touched.email && formik.errors.email}
         />
         <FormControl variant="outlined" fullWidth>
-                    <InputLabel id="role">Role</InputLabel>
-                    <Select
-                        name="role"
-                        value={formik.values.role}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        label="role"
-                        error={formik.touched.role && Boolean(formik.errors.role)}
-                    >
-                        <MenuItem value="user">User</MenuItem>
-                        <MenuItem value="admin">Admin</MenuItem>
-                        <MenuItem value="manager">Manager</MenuItem>
-                        <MenuItem value="sale_staff">Sale Staff</MenuItem>
-                        <MenuItem value="design_staff">Design Staff</MenuItem>
-                    </Select>
-                    {formik.touched.role && formik.errors.role && (
-                        <Typography variant="caption" color="red">{formik.errors.role}</Typography>
-                    )}
-                </FormControl>
+          <InputLabel id="role">Role</InputLabel>
+          <Select
+            name="role"
+            value={formik.values.role}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            label="role"
+            error={formik.touched.role && Boolean(formik.errors.role)}
+          >
+            <MenuItem value="user">User</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="manager">Manager</MenuItem>
+            <MenuItem value="sale_staff">Sale Staff</MenuItem>
+            <MenuItem value="design_staff">Design Staff</MenuItem>
+          </Select>
+          {formik.touched.role && formik.errors.role && (
+            <Typography variant="caption" color="red">{formik.errors.role}</Typography>
+          )}
+        </FormControl>
 
         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
           Submit

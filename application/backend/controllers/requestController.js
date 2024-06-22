@@ -278,13 +278,13 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'warranty', 'payment', 'cancelled'];
+    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'warranty', 'payment', 'cancelled','user_accepted'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }
 
     // Validate quote amount
-    if (quote_amount != null && (typeof quote_amount !== 'number' || quote_amount <= 0)) {
+    if (quote_amount != null && (typeof Number(quote_amount) !== 'number' || quote_amount <= 0)) {
       return res.status(400).json('Quote amount must be a positive number');
     }
 
@@ -374,48 +374,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Continuously check for status transitions
-    let statusChanged;
-    do {
-      statusChanged = false;
-
-      // Transition from 'accepted' to 'quote'
-      if (updatedRequest.request_status === 'accepted') {
-        updatedRequest.request_status = 'quote';
-        statusChanged = true;
-      }
-
-      // Transition from 'quote' to 'design'
-      if (updatedRequest.request_status === 'quote' && updatedRequest.quote_amount !== null && updatedRequest.quote_content !== null && updatedRequest.design_images.length === 0) {
-        updatedRequest.request_status = 'design';
-        statusChanged = true;
-      }
-
-      // Transition from 'design' to 'production'
-      if (updatedRequest.request_status === 'design' && updatedRequest.design_images.length !== 0 && (updatedRequest.production_cost === null || updatedRequest.production_end_date === null || updatedRequest.production_start_date === null)) {
-        updatedRequest.request_status = 'production';
-        statusChanged = true;
-      }
-
-      // Transition from 'production' to 'warranty'
-      if (updatedRequest.request_status === 'production' && updatedRequest.production_cost !== null && updatedRequest.production_end_date !== null && updatedRequest.production_start_date !== null && (updatedRequest.warranty_content === null || updatedRequest.warranty_end_date === null || updatedRequest.warranty_start_date === null)) {
-        updatedRequest.request_status = 'warranty';
-        statusChanged = true;
-      }
-
-      // Transition from 'warranty' to 'payment'
-      if (updatedRequest.request_status === 'warranty' && updatedRequest.warranty_content !== null && updatedRequest.warranty_end_date !== null && updatedRequest.warranty_start_date !== null) {
-        updatedRequest.request_status = 'payment';
-        statusChanged = true;
-      }
-
-      if (statusChanged) {
-        updatedRequest = await Request.findByIdAndUpdate(
-          id,
-          { $set: { request_status: updatedRequest.request_status } },
-          { new: true, runValidators: true }
-        );
-      }
-    } while (statusChanged);
+   
 
     res.status(200).json({ message: "Update successfully", updatedRequest });
   } catch (error) {
