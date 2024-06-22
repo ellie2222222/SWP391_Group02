@@ -25,8 +25,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     formData.append(key, values[key]);
                 }
             });
-            console.log('Submitting:', formData);
-            onSubmit(formData);
+            
             return onSubmit(formData);
         },
         validationSchema: Yup.object({
