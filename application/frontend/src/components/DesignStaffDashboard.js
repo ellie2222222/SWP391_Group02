@@ -74,7 +74,7 @@ export default function DesignStaffDashboard() {
 
                     <TableBody>
                         {requests.map((request, index) => (
-                            request.request_status === 'accepted' && (
+                            request.request_status === 'user_accepted' && (
                                 <TableRow key={index}>
                                     <TableCell>{request._id}</TableCell>
                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
