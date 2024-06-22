@@ -9,6 +9,6 @@ userRoutes.post('/login', loginUser)
 
 userRoutes.post('/signup', signupUser)
 
-userRoutes.post('/changepassword', changePassword)
+userRoutes.patch('/changepassword', changePassword)
 
 module.exports = userRoutes
