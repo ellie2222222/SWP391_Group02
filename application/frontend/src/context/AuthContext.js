@@ -23,10 +23,10 @@ export const AuthProvider = ({ children }) => {
         }
         setLoading(false);
     },[]);
-    
+    const baseUrl = 'https://backend-j9ne.onrender.com/api/user'
     const login = async (email, password) => {
         try {
-            const response = await axios.post('http://localhost:4000/api/user/login', { email, password });
+            const response = await axios.post(baseUrl + '/login', { email, password });
             const { token } = response.data;
             const decoded = jwtDecode(token);
             localStorage.setItem('token', token);
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (userData) => {
         try {
-            const response = await axios.post('http://localhost:4000/api/user/signup', userData);
+            const response = await axios.post(baseUrl + '/signup', userData);
             const { token } = response.data;
             const decoded = jwtDecode(token);
             localStorage.setItem('token', token);
