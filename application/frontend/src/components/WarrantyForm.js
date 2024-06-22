@@ -1,65 +1,67 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Container, TextField, Button, Typography, Box, CircularProgress } from '@mui/material';
-import { styled } from '@mui/system';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import useAuth from '../hooks/useAuthContext';
+import React from 'react';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import axiosInstance from '../utils/axiosInstance';
+import { Container, TextField, Button, Typography, Box, CircularProgress, Grid } from '@mui/material';
+import { styled } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuthContext';
 
-const CustomButton1 = styled(Button)({
-  outlineColor: '#000',
-  border: '1px solid #000',
-  color: '#000',
-  width: '100%',
-  fontSize: '1rem',
+const CustomButton = styled(Button)({
+  backgroundColor: '#b48c72',
+  color: '#fff',
   marginTop: '20px',
   '&:hover': {
-    color: '#b48c72',
-    border: '1px solid #b48c72',
-    backgroundColor: 'transparent',
+    backgroundColor: '#9b7a63',
   },
 });
 
+const initialValues = {
+  userId: '',
+  requestId: '',
+  warrantyContent: '',
+  warrantyStartDate: '',
+  warrantyEndDate: '',
+};
+
+const validationSchema = Yup.object().shape({
+  userId: Yup.string().required('Required'),
+  requestId: Yup.string().required('Required'),
+  warrantyContent: Yup.string().required('Required'),
+  warrantyStartDate: Yup.date().required('Required'),
+  warrantyEndDate: Yup.date().required('Required'),
+});
+
+const CustomTextField = ({ field, form, ...props }) => (
+  <TextField
+    fullWidth
+    variant="outlined"
+    margin="normal"
+    {...field}
+    {...props}
+    helperText={<ErrorMessage name={field.name} />}
+    error={form.touched[field.name] && Boolean(form.errors[field.name])}
+  />
+);
+
 const WarrantyForm = () => {
-  const [userId, setUserId] = useState('');
-  const [requestId, setRequestId] = useState('');
-  const [warrantyContent, setWarrantyContent] = useState('');
-  const [warrantyStartDate, setWarrantyStartDate] = useState('');
-  const [warrantyEndDate, setWarrantyEndDate] = useState('');
-  const [warranty, setWarranty] = useState(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    if (!userId || !requestId) {
-      setError('Please fill out all required fields.');
-      setLoading(false);
-      return;
-    }
-
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axiosInstance.post(
-        '/warranties', 
-        { 
-          user_id: userId, 
-          request_id: requestId, 
-          warranty_content: warrantyContent, 
-          warranty_start_date: warrantyStartDate, 
-          warranty_end_date: warrantyEndDate 
-        }
-      );
-      setWarranty(response.data.warranty);
-      setLoading(false);
+      const response = await axiosInstance.post('/warranties', {
+        user_id: values.userId,
+        request_id: values.requestId,
+        warranty_content: values.warrantyContent,
+        warranty_start_date: values.warrantyStartDate,
+        warranty_end_date: values.warrantyEndDate,
+      });
+      setSubmitting(false);
       navigate('/warranties'); // Redirect to warranty list page
     } catch (error) {
-      setError(error.message);
-      setLoading(false);
+      console.error(error);
+      setSubmitting(false);
     }
   };
 
@@ -69,66 +71,60 @@ const WarrantyForm = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Complete Transaction
         </Typography>
-        <form noValidate autoComplete="off" onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="User ID"
-            margin="normal"
-            variant="outlined"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Request ID"
-            margin="normal"
-            variant="outlined"
-            value={requestId}
-            onChange={(e) => setRequestId(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Warranty Content"
-            margin="normal"
-            variant="outlined"
-            value={warrantyContent}
-            onChange={(e) => setWarrantyContent(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Warranty Start Date"
-            margin="normal"
-            variant="outlined"
-            value={warrantyStartDate}
-            onChange={(e) => setWarrantyStartDate(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Warranty End Date"
-            margin="normal"
-            variant="outlined"
-            value={warrantyEndDate}
-            onChange={(e) => setWarrantyEndDate(e.target.value)}
-          />
-          <CustomButton1 type="submit">
-            {loading ? <CircularProgress size={24} /> : 'Submit'}
-          </CustomButton1>
-        </form>
-        {warranty && (
-          <Box mt={4}>
-            <Typography variant="h6" component="p" gutterBottom>
-              Warranty Information
-            </Typography>
-            <Typography component="p">Warranty Content: {warranty.warranty_content}</Typography>
-            <Typography component="p">Start Date: {new Date(warranty.warranty_start_date).toLocaleDateString()}</Typography>
-            <Typography component="p">End Date: {new Date(warranty.warranty_end_date).toLocaleDateString()}</Typography>
-          </Box>
-        )}
-        {error && (
-          <Typography variant="body1" color="error" mt={2}>
-            {error}
-          </Typography>
-        )}
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form noValidate>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Field
+                    name="userId"
+                    label="User ID"
+                    component={CustomTextField}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Field
+                    name="requestId"
+                    label="Request ID"
+                    component={CustomTextField}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    name="warrantyContent"
+                    label="Warranty Content"
+                    component={CustomTextField}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Field
+                    name="warrantyStartDate"
+                    label="Warranty Start Date"
+                    component={CustomTextField}
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Field
+                    name="warrantyEndDate"
+                    label="Warranty End Date"
+                    component={CustomTextField}
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+              </Grid>
+              <CustomButton type="submit" disabled={isSubmitting} fullWidth>
+                {isSubmitting ? <CircularProgress size={24} /> : 'Submit'}
+              </CustomButton>
+            </Form>
+          )}
+        </Formik>
       </Box>
     </Container>
   );
