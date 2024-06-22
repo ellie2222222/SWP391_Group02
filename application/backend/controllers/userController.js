@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const validator = require("validator");
 
 const createToken = (_id, role) => {
   return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
@@ -153,5 +154,43 @@ const getUser = async (req, res) => {
   }
 }
 
+const changePassword = async (req, res) => {
+  const { email, password, newpassword, confirmpassword } = req.body;
 
-module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser };
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if the current password is correct
+    const isPasswordCorrect = await user.checkPassword(password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Check if new password and confirm password match
+    if (newpassword !== confirmpassword) {
+      return res.status(400).json({ error: "New password and confirm password do not match" });
+    }
+    
+    // Validate the new password
+    if (!validator.isStrongPassword(newpassword)) {
+      return res.status(400).json({ error: "New password is not strong enough" });
+    }
+    
+    // Hash the new password and update it
+    user.password = newpassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    return res.status(500).json({ error: "An error occurred while changing the password" });
+  }
+};
+
+
+module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, changePassword };
