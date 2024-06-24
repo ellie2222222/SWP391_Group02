@@ -90,7 +90,7 @@ const Login = () => {
   return (
     <CustomContainer maxWidth={false}>
       <Grid container style={{ height: '100vh', margin: 0, padding: 0 }}>
-        <Grid item xs={12} md={5} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 0, margin: 0 }}>
+        <Grid item xs={12} md={5} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingLeft: 150, margin: 0 }}>
           <FormContainer elevation={3} style={{ height: '100%' }}>
             <CustomTypography variant="h6" align="center">
               WELCOME TO OUR JEWELRY SHOP
@@ -130,7 +130,7 @@ const Login = () => {
         </CustomTypography>
           </FormContainer>
         </Grid>
-        <Grid item xs={12} md={7} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 0, margin: 0 }}>
+        <Grid item xs={12} md={7} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingRight: 150, margin: 0 }}>
           <Box
             component="img"
             src="https://hips.hearstapps.com/hmg-prod/images/treasure-royalty-free-image-1689115852.jpg?crop=0.66667xw:1xh;center,top&resize=1200:*"
