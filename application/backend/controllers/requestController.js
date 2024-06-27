@@ -78,7 +78,8 @@ const getUserRequests = async (req, res) => {
     const token = authorization.split(' ')[1]
     const { _id } = jwt.verify(token, process.env.SECRET)
 
-    const requests = await Request.find({ user_id: _id });
+    const requests = await Request.find({ user_id: _id })
+      .populate('jewelry_id');
 
     // Check if requests exist
     if (requests.length === 0) {
@@ -214,7 +215,6 @@ const createRequest = async (req, res) => {
     production_end_date: null,
     production_cost: null,
     production_status: null,
-    total_amount: null,
     endedAt: null,
     warranty_content: null,
     warranty_start_date: null,
@@ -244,7 +244,6 @@ const updateRequest = async (req, res) => {
       production_start_date,
       production_end_date,
       production_cost,
-      total_amount,
       endedAt,
       warranty_content,
       warranty_start_date,
@@ -278,7 +277,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'warranty', 'payment', 'cancelled','user_accepted'];
+    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'warranty', 'payment', 'cancelled', 'user_accepted'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }
@@ -286,11 +285,6 @@ const updateRequest = async (req, res) => {
     // Validate quote amount
     if (quote_amount != null && (typeof Number(quote_amount) !== 'number' || quote_amount <= 0)) {
       return res.status(400).json('Quote amount must be a positive number');
-    }
-
-    // Validate total amount
-    if (total_amount != null && (typeof total_amount !== 'number' || total_amount <= 0)) {
-      return res.status(400).json('Total amount must be a positive number');
     }
 
     // Validate production cost
@@ -354,11 +348,10 @@ const updateRequest = async (req, res) => {
       ...(production_start_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_start_date: parsedStartDate }),
       ...(production_end_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_end_date: parsedEndDate }),
       ...(production_cost !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_cost }),
-      ...(total_amount !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { total_amount }),
       ...(endedAt !== undefined && { endedAt: parsedEndAt }),
       ...(images.length > 0 && (req.role === 'design_staff' || req.role === 'manager') && { design_images: images }),
       ...(warranty_content !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_content }),
-      ...(warranty_start_date !== undefined && (req.role === 'sale_staff' || req.role === 'manager') &&  {warranty_start_date: parsedWarrantyStartDate }),
+      ...(warranty_start_date !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_start_date: parsedWarrantyStartDate }),
       ...(warranty_end_date !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_end_date: parsedWarrantyEndDate }),
     };
 
@@ -374,11 +367,57 @@ const updateRequest = async (req, res) => {
     }
 
     // Continuously check for status transitions
-   
+
 
     res.status(200).json({ message: "Update successfully", updatedRequest });
   } catch (error) {
     console.error('Error updating request:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const createOrderRequest = async (req, res) => {
+  const { authorization } = req.headers;
+  const token = authorization.split(" ")[1];
+  const { _id } = jwt.verify(token, process.env.SECRET);
+  const { jewelry_id } = req.body;
+
+  // Validate jewelry ID
+  if (!mongoose.Types.ObjectId.isValid(jewelry_id)) {
+    return res.status(400).json({ error: "Invalid jewelry ID" });
+  }
+
+  try {
+    const jewelry = await Jewelry.findById(jewelry_id);
+    if (!jewelry) {
+      return res.status(404).json({ error: 'No such jewelry' });
+    }
+
+    // Initialize all fields with default or null values
+    const newRequest = {
+      user_id: _id,
+      request_description: 'order request',
+      jewelry_id,
+      request_status: 'payment',
+      quote_content: null,
+      quote_amount: null,
+      quote_status: null,
+      design_status: null,
+      production_start_date: null,
+      production_end_date: null,
+      production_cost: null,
+      production_status: null,
+      endedAt: null,
+      warranty_content: null,
+      warranty_start_date: null,
+      warranty_end_date: null,
+    };
+
+    // Add to the database
+    const request = await Request.create(newRequest);
+    res.status(201).json(request);
+  } catch (error) {
+    console.error('Error creating order request:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -391,5 +430,6 @@ module.exports = {
   getStaffRequest,
   getUserRequests,
   getUserRequest,
-  updateRequest
+  updateRequest,
+  createOrderRequest
 };

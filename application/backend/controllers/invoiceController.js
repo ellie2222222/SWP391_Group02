@@ -2,39 +2,54 @@ const mongoose = require('mongoose');
 const Invoice = require('../models/invoiceModel');
 const User = require('../models/userModel');
 const Request = require('../models/requestModel');
+const Transaction = require('../models/transactionModel');
 
 // Helper function to validate ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-// Create a new Invoice
+// Create invoice
 const createInvoice = async (req, res) => {
-    const { request_id, payment_method } = req.body;
-
-    if (!isValidObjectId(request_id)) {
-        return res.status(400).json({ message: 'Invalid request_id format' });
-    }
+    const { transaction_id, payment_method, payment_gateway, total_amount } = req.body;
 
     try {
-        // Find the request by ID
-        const request = await Request.findById(request_id);
-        if (!request) {
-            return res.status(404).json({ message: 'Request not found' });
+        // Find the transaction by ID
+        const transaction = await Transaction.findById(transaction_id);
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found' });
         }
+        const requestId = transaction.request_id
 
-        // Extract the necessary information from the request
-        const total_amount = request.total_amount;
+        // Find all invoices and populate the transaction_id to get the request_id
+        const invoices = await Invoice.find().populate({
+            path: 'transaction_id',
+            select: 'request_id'
+        });
+
+        // Check if any invoice's populated request_id matches the request_id from req.body
+        const exists = invoices.some(invoice => invoice.transaction_id.request_id.toString() === requestId.toString());
+        if (exists) {
+            return res.status(200).json({ message: 'exist' });
+        }
 
         // Check if total_amount is valid
-        if (total_amount < 0) {
-            return res.status(400).json({ message: 'Total amount cannot be negative.' });
+        if (total_amount <= 0) {
+            return res.status(400).json({ error: 'Total amount must be a positive number.' });
         }
 
+        let updatedRequest = await Request.findByIdAndUpdate(
+            requestId,
+            { $set: {request_status: 'warranty'} },
+            { new: true, runValidators: true }
+        );
+
         // Create the invoice
-        const invoice = new Invoice({ request_id, payment_method, total_amount });
+        const invoice = new Invoice({ transaction_id, payment_method, payment_gateway, total_amount });
         await invoice.save();
+        
         res.status(201).json(invoice);
     } catch (error) {
-        res.status(400).json({ message: 'Unable to create invoice. Please try again later.' });
+        console.error('Error creating invoice:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 
@@ -125,5 +140,5 @@ module.exports = {
     getInvoiceById,
     getAllInvoices,
     updateInvoiceById,
-    deleteInvoiceById
+    deleteInvoiceById,
 };

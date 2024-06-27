@@ -6,19 +6,21 @@ const { requireManagerOrSale } = require('../middleware/requireRoles');
 
 const invoiceRoutes = express.Router();
 
+invoiceRoutes.use(requireAuth)
+
 // Route to create a new Invoice
-invoiceRoutes.post('/', requireAuth, requireManagerOrSale, createInvoice);
+invoiceRoutes.post('/', createInvoice);
 
 // Route to get all Invoices
-invoiceRoutes.get('/', requireAuth, requireManager, getAllInvoices);
+invoiceRoutes.get('/', requireManager, getAllInvoices);
 
 // Route to get an Invoice by ID
-invoiceRoutes.get('/:id', requireAuth, getInvoiceById);
+invoiceRoutes.get('/:id', getInvoiceById);
 
 // Route to update an Invoice by ID
-invoiceRoutes.patch('/:id', requireAuth, requireManager, updateInvoiceById);
+invoiceRoutes.patch('/:id', requireManager, updateInvoiceById);
 
 // Route to delete an Invoice by ID
-invoiceRoutes.delete('/:id', requireAuth, requireManager, deleteInvoiceById);
+invoiceRoutes.delete('/:id', requireManager, deleteInvoiceById);
 
 module.exports = invoiceRoutes;

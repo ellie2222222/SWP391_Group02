@@ -1,7 +1,7 @@
 const express = require('express')
 const multer = require('multer');
 const requireAuth = require('../middleware/requireAuth')
-const { getRequests, createRequest, getStaffRequests, getUserRequests, updateRequest, getRequest, getUserRequest, getStaffRequest } = require('../controllers/requestController')
+const { getRequests, createRequest, getStaffRequests, getUserRequests, updateRequest, getRequest, getUserRequest, getStaffRequest, createOrderRequest } = require('../controllers/requestController')
 const { requireUser, requireManagerOrStaff, requireManagerOrSale } = require('../middleware/requireRoles')
 
 
@@ -14,6 +14,8 @@ const requestRoutes = express.Router()
 requestRoutes.use(requireAuth)
 
 requestRoutes.post('/', requireUser, createRequest)
+
+requestRoutes.post('/order-requests', requireUser, createOrderRequest)
 
 requestRoutes.get('/', requireManagerOrStaff, getRequests)
 

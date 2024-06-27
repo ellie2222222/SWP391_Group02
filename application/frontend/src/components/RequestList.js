@@ -5,6 +5,7 @@ import { Container, Box, Typography, Button, CircularProgress, styled, TextField
 import useAuth from '../hooks/useAuthContext';
 import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance';
+import { jwtDecode } from 'jwt-decode';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -25,10 +26,12 @@ const RequestList = () => {
     const [requests, setRequests] = useState([])
     const [error, setError] = useState('')
     const navigate = useNavigate();
+
     const fetchRequests = async () => {
         try {
             const response = await axiosInstance.get(`/requests/user-requests/`);
             setRequests(response.data)
+
             setError('')
             setLoading(false);
         } catch (error) {
@@ -38,6 +41,7 @@ const RequestList = () => {
             else setError(error.response.data.error)
         }
     };
+
     const handleAcceptRequest = async (requestId) => {
         try {
             await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'user_accepted' })
@@ -48,6 +52,34 @@ const RequestList = () => {
             else setError(error.response.data.error);
         }
     };
+
+    const handlePayment = async (request) => {
+        try {
+            const decoded = jwtDecode(user.token);
+            const userResponse = await axiosInstance.get(`/users/` + decoded._id);
+
+            const payment = await axiosInstance.post('/payment', {
+                user_info: userResponse.data,
+                product: request.jewelry_id,
+            });
+
+            console.log(payment.data.result);
+
+            const transaction = await axiosInstance.post('transactions', {
+                trans_id: payment.data.trans_id,
+                request_id: request._id,
+            })
+
+            console.log(transaction)
+
+            window.open(payment.data.result.order_url, '_blank');
+
+
+        } catch (error) {
+            console.error('Error, cannot proceed to payment', error)
+        }
+    }
+
     useEffect(() => {
         fetchRequests()
     }, [user.token]);
@@ -70,14 +102,14 @@ const RequestList = () => {
                         <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
                         <Typography variant="h5"> Status: {request.request_status} </Typography>
                         <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
-                        { request.request_status === 'accepted' && (
+                        {request.request_status === 'accepted' && (
                             <Box>
                                 <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quoted</CustomButton1>
                                 <CustomButton1>Quoted Details</CustomButton1>
                             </Box>
                         )}
-                        { request.request_status === 'payment' && (
-                            <CustomButton1>Payment</CustomButton1>
+                        {request.request_status === 'payment' && (
+                            <CustomButton1 onClick={() => handlePayment(request)}>Payment</CustomButton1>
                         )}
                     </Box>
                 ))}

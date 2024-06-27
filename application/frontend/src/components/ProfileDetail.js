@@ -55,10 +55,10 @@ const ProfileDetail = () => {
     return (
         <Container>
             <Box padding="40px 0">
-                <Typography variant="h5" component="p" marginBottom='20px'>Username: {profile.user.username}</Typography>
-                <Typography variant="h5" component="p" marginBottom='20px'>Email: {profile.user.email}</Typography>
-                <Typography variant="h5" component="p" marginBottom='20px'>Phone number: {profile.user.phone_number}</Typography>
-                <Typography variant="h5" component="p" marginBottom='20px'>Address: {profile.user.address}</Typography>
+                <Typography variant="h5" component="p" marginBottom='20px'>Username: {profile ? profile.user.username : 'N/A'}</Typography>
+                <Typography variant="h5" component="p" marginBottom='20px'>Email: {profile ? profile.user.email : 'N/A'}</Typography>
+                <Typography variant="h5" component="p" marginBottom='20px'>Phone number: {profile ? profile.user.phone_number : 'N/A'}</Typography>
+                <Typography variant="h5" component="p" marginBottom='20px'>Address: {profile ? profile.user.address : 'N/A'}</Typography>
             </Box>
             <Box padding="40px 0">
                 <Typography variant="h5" component="p" marginBottom='20px'>View My Request</Typography>

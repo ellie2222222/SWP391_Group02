@@ -15,7 +15,7 @@ const blogRoutes = require('./routes/blog')
 const worksOnRoutes = require('./routes/worksOn');
 const designRoutes = require('./routes/design');
 const invoiceRoutes = require('./routes/invoice');
-const paymentRoutes = require('./routes/payment');
+const transactionRoutes = require('./routes/transaction');
 
 //application
 const app = express()
@@ -57,8 +57,8 @@ app.use('/api/warranties', warrantyRoutes)
 app.use('/api/blogs', blogRoutes)
 app.use('/api/works-on', worksOnRoutes)
 app.use('/api/designs', designRoutes)
-app.use('/api/invoice', invoiceRoutes);
-// app.use('/api/payment', paymentRoutes)
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
@@ -85,26 +85,31 @@ let config = {
 };
 
 const requireAuth = require('./middleware/requireAuth');
-app.post('/payment', requireAuth, async (req, res) => {
-  const { email, product } = req.body;
-  const { _id } = req.id
-  const embed_data = {
-    // redirecturl: "https://localhost:3000"
-  };
+app.post('/api/payment', requireAuth, async (req, res) => {
+  const { user_info, product } = req.body;
 
+  const embed_data = {
+    // redirecturl: "https://frontend-chk2.onrender.com/",
+    redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
+    preferred_payment_method: ["domestic_card",  "account"]
+  };
+  
   const items = [{ product }];
   const transID = Math.floor(Math.random() * 1000000);
   const order = {
     app_id: config.app_id,
     app_trans_id: `${moment().format('YYMMDD')}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
-    app_user: _id,
+    app_user: req.id,
     app_time: Date.now(), // miliseconds
     item: JSON.stringify(items),
     embed_data: JSON.stringify(embed_data),
-    amount: 5000,
+    amount: product.price,
     description: `Payment for the order #${transID}`,
     bank_code: "",
-    email: email
+    email: user_info.email,
+    phone: user_info.phone,
+    address: user_info.address,
+    // callback_url: "https://ee14-2001-ee0-4f83-e990-e855-8bf6-1042-f79f.ngrok-free.app/callback",
   };
 
   // appid|app_trans_id|appuser|amount|apptime|embeddata|item
@@ -114,7 +119,7 @@ app.post('/payment', requireAuth, async (req, res) => {
   try {
     const result = await axios.post(config.endpoint, null, { params: order })
 
-    return res.status(200).json(result.data)
+    return res.status(200).json({ result: result.data, trans_id: order.app_trans_id })
   } catch (error) {
     console.log(error.message)
   }
@@ -161,9 +166,9 @@ app.post('/callback', (req, res) => {
 
 const qs = require('qs');
 
-app.post('/order-status/:app_trans_id', async (req, res) => {
+app.post('/api/order-status/:app_trans_id', requireAuth, async (req, res) => {
   const { app_trans_id } = req.params
-  console.log(app_trans_id)
+  
   let postData = {
     app_id: config.app_id,
     app_trans_id: app_trans_id, // Input your app_trans_id

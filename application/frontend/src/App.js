@@ -18,6 +18,7 @@ import Requests from "./pages/Requests";
 import RequestDashboard from "./pages/RequestDashboard";
 import CustomRequest from "./pages/CustomRequest";
 import QuotedRequest from "./pages/QuotedRequest";
+import Payment from "./pages/Payment";
 function App() {
   const { user } = useAuth()
 
@@ -26,8 +27,8 @@ function App() {
       <Routes>
         <Route path='/' element={<Home />}></Route>
 
-        <Route path='/products' element={<Products />}></Route>
-        <Route path='/products/:id' element={<Details />}></Route>
+        <Route path='/products' element={<Products />} />
+        <Route path='/products/:id' element={<Details />} />
 
         <Route path='/blogs' element={<Blogs />}></Route>
         <Route path='/blog/:id' element={<BlogContents />}></Route>
@@ -50,6 +51,7 @@ function App() {
         <Route element={<UserRoute />}>
           <Route path="/requests" element={<Requests />} />
           <Route path="/request" element={<CustomRequest />} />
+          <Route path='/products/:id/payment-status' element={<Payment />} />
         </Route>
 
       </Routes>

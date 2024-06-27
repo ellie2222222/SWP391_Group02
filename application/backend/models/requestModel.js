@@ -37,9 +37,6 @@ const requestSchema = new Schema( {
     production_cost: {
         type: Number
     },
-    total_amount: {
-        type: Number
-    },
     endedAt: {
         type: Date
     },

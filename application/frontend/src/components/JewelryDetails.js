@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, Typography, Button, CircularProgress, styled } from '@mui/material';
+import { Container, Box, Typography, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
-import { jwtDecode } from 'jwt-decode';
-import axios from 'axios';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -20,13 +18,24 @@ const CustomButton1 = styled(Button)({
   },
 });
 
+const StyledDialogTitle = styled(DialogTitle)({
+  textAlign: 'center',
+});
+
+const StyledDialogContentText = styled(DialogContentText)({
+  color: '#000',
+  fontSize: '1.1rem',
+  textAlign: 'center',
+});
+
 const JewelryDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [payment, setPayment] = useState(null);
-  const [error, setError] = useState('')
-  const { user } = useAuth()
+  const [error, setError] = useState('');
+  const [open, setOpen] = useState(false);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,32 +52,35 @@ const JewelryDetails = () => {
       }
     };
 
-    fetchJewelry()
+    fetchJewelry();
   }, [id]);
 
-  const handleOrder = async () => {
-    try {
-      const decoded = jwtDecode(user.token);
-      const userResponse = await axiosInstance.get(`/users/` + decoded._id)
-      
-      const paymentResponse = await axios.post('http://localhost:4000/payment', {
-        email: userResponse.data.email,
-        product
-      }, {
-        headers: {
-          "Authorization": `Bearer ${user.token}`
-        }
-      })
-
-      setPayment(paymentResponse.data)
-      console.log(paymentResponse.data)
-      setError('')
-    } catch (error) {
-      console.error('Cannot proceed to payment!', error);
-      if (error.response === undefined) setError(error.message);
-      else setError(error.response.data.error)
+  const handleCreateOrder = async () => {
+    if (!user) {
+      navigate('/login');
     }
-  }
+
+    try {
+      const request = await axiosInstance.post('/requests/order-requests', {
+        jewelry_id: id,
+      });
+      
+      setError('');
+      setOpen(false); // Close the dialog
+    } catch (error) {
+      console.error('Error while creating order information!', error);
+      if (error.response === undefined) setError(error.message);
+      else setError(error.response.data.error);
+    }
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   if (loading) {
     return (
@@ -114,11 +126,33 @@ const JewelryDetails = () => {
           
           <Typography variant="h6">Material Weight: {product.material_weight} kg</Typography>
           <Typography variant="h6">Category: {product.category}</Typography>
-          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={handleOrder}>
+          <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={handleClickOpen}>
             ORDER NOW
           </CustomButton1>
         </Box>
       </Box>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <StyledDialogTitle id="alert-dialog-title">{"Confirm Order"}</StyledDialogTitle>
+        <DialogContent>
+          <StyledDialogContentText id="alert-dialog-description">
+            Are you sure you want to place this order?
+          </StyledDialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <CustomButton1 onClick={handleClose} color="primary">
+            Cancel
+          </CustomButton1>
+          <CustomButton1 onClick={handleCreateOrder} color="primary" autoFocus>
+            Confirm
+          </CustomButton1>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
