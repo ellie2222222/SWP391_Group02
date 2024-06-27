@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia, Grid } from '@mui/material';
 import * as Yup from 'yup';
-import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
     const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
@@ -25,7 +25,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     formData.append(key, values[key]);
                 }
             });
-            
             return onSubmit(formData);
         },
         validationSchema: Yup.object({
@@ -64,6 +63,13 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             setSelectedImages([...selectedImages, ...newSelectedImages]);
             formik.setFieldValue("images", [...formik.values.images, ...results.map(result => result.file)]);
         });
+    };
+
+    const handleRemoveImage = (index) => {
+        const newSelectedImages = selectedImages.filter((_, i) => i !== index);
+        const newImages = formik.values.images.filter((_, i) => i !== index);
+        setSelectedImages(newSelectedImages);
+        formik.setFieldValue("images", newImages);
     };
 
     return (
@@ -221,12 +227,27 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     <Grid container spacing={2} sx={{ mt: 2 }}>
                         {selectedImages.map((image, index) => (
                             <Grid item xs={6} key={index}>
-                                <CardMedia
-                                    component="img"
-                                    alt={`Selected ${index}`}
-                                    image={image}
-                                    sx={{ width: '100%', maxHeight: '150px' }}
-                                />
+                                <Box position="relative">
+                                    <CardMedia
+                                        component="img"
+                                        alt={`Selected ${index}`}
+                                        image={image}
+                                        sx={{right: 4, left: 4, width: '100%', maxHeight: '150px' }}
+                                    />
+                                    <IconButton
+                                        aria-label="delete"
+                                        size="small"
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                        }}
+                                        onClick={() => handleRemoveImage(index)}
+                                    >
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
                             </Grid>
                         ))}
                     </Grid>
