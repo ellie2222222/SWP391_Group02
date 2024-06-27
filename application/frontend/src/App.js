@@ -18,6 +18,8 @@ import Requests from "./pages/Requests";
 import RequestDashboard from "./pages/RequestDashboard";
 import CustomRequest from "./pages/CustomRequest";
 import QuotedRequest from "./pages/QuotedRequest";
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 function App() {
   const { user } = useAuth()
 
@@ -36,6 +38,8 @@ function App() {
         <Route path='/profile/:id' element={<Profile />} />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset/:id/:token" element={<ResetPassword />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/warranties/create" element={<Warranty />} />
         <Route path="/warranties" element={<WarrantyList />} />

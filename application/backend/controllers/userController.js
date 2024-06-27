@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 
 const createToken = (_id, role) => {
   return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
@@ -154,43 +156,71 @@ const getUser = async (req, res) => {
   }
 }
 
-const changePassword = async (req, res) => {
-  const { email, password, newpassword, confirmpassword } = req.body;
+const forgotPassword = async (req, res) => {
+  console.log("Forgot password request received");
+  const { email } = req.body;
 
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if the current password is correct
-    const isPasswordCorrect = await user.checkPassword(password);
-    if (!isPasswordCorrect) {
-      return res.status(400).json({ error: "Current password is incorrect" });
-    }
+    const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: '1h' });
 
-    // Check if new password and confirm password match
-    if (newpassword !== confirmpassword) {
-      return res.status(400).json({ error: "New password and confirm password do not match" });
-    }
-    
-    // Validate the new password
-    if (!validator.isStrongPassword(newpassword)) {
-      return res.status(400).json({ error: "New password is not strong enough" });
-    }
-    
-    // Hash the new password and update it
-    user.password = newpassword;
-    await user.save();
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail', // or your preferred email service provider
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
 
-    return res.status(200).json({ message: "Password changed successfully" });
-  } catch (error) {
-    console.error('Error changing password:', error);
-    return res.status(500).json({ error: "An error occurred while changing the password" });
+    const mailOptions = {
+      to: user.email,
+      from: process.env.EMAIL,
+      subject: 'Password Reset',
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+             Please click on the following link, or paste this into your browser to complete the process:\n\n
+             http://localhost:3000/reset/${user._id}/${token}\n\n
+             If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    };
+
+    transporter.sendMail(mailOptions, (error, response) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).json({ message: 'Error sending email' });
+      }
+      console.log('Password reset email sent:', response);
+      res.status(200).json({ message: 'Email sent successfully' });
+    });
+  } catch (err) {
+    console.error('Server error:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
+// Reset password
+const resetPassword = async (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
 
-module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, changePassword };
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
+    if(err) {
+      return res.json({Status: "Token error"})
+    } else {
+      bcrypt.hash(password, 10)
+      .then(hash => {
+        User.findByIdAndUpdate({_id: id}, {password: hash})
+        .then(u => res.send({Status: "Success"}))
+        .catch(err => res.send({Status: err}))
+      })
+      .catch(err => res.send({Status: err}))
+    }
+  })
+};
+
+
+
+module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword };

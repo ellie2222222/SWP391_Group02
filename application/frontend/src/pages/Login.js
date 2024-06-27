@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Navigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Grid, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import useAuth from '../hooks/useAuthContext';
@@ -9,7 +9,7 @@ const CustomContainer = styled(Container)({
   justifyContent: 'center',
   alignItems: 'center',
   minHeight: '100vh',
-  backgroundColor: '#f3f0e4', // beige background color
+  backgroundColor: '#f3f0e4',
   padding: 0,
   margin: 0,
 });
@@ -29,26 +29,26 @@ const FormContainer = styled(Paper)({
 });
 
 const CustomButton = styled(Button)({
-  backgroundColor: '#b48c72', // brown button background color
+  backgroundColor: '#b48c72',
   color: '#fff',
   marginTop: '1rem',
   width: '100%',
   '&:hover': {
-    backgroundColor: '#8e735c', // darker brown on hover
+    backgroundColor: '#8e735c',
   },
-  fontSize: '1rem', // Increase button font size
+  fontSize: '1rem',
 });
 
 const CustomTypography = styled(Typography)({
-  color: '#6e552f', // dark brown text color
+  color: '#6e552f',
   marginBottom: '1rem',
-  fontSize: '1.5rem', // Increase main title font size
+  fontSize: '1.5rem',
 });
 
 const SubtitleTypography = styled(Typography)({
-  color: '#6e552f', // dark brown text color
+  color: '#6e552f',
   marginBottom: '1rem',
-  fontSize: '1rem', // Increase subtitle font size
+  fontSize: '1rem',
 });
 
 const CustomLink = styled(Link)({
@@ -58,7 +58,7 @@ const CustomLink = styled(Link)({
   display: 'block',
   textAlign: 'center',
   marginTop: '1rem',
-  fontSize: '1rem', // Increase link font size
+  fontSize: '1rem',
 });
 
 const Login = () => {
@@ -125,9 +125,10 @@ const Login = () => {
                 </Typography>
               )}
             </form>
-            <CustomTypography variant="body2" align="center" style={{ marginTop: '1rem' }}>
-          Don't have an account? <Link to="/signup" style={{ color: '#b48c72' }}>Sign up</Link>
-        </CustomTypography>
+            <CustomLink to="/forgot-password">Forgot Password?</CustomLink>
+            <Typography variant="body2" align="center" style={{ marginTop: '1rem' }}>
+              Don't have an account? <Link to="/signup" style={{ color: '#b48c72' }}>Sign up</Link>
+            </Typography>
           </FormContainer>
         </Grid>
         <Grid item xs={12} md={7} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingRight: 150, margin: 0 }}>
