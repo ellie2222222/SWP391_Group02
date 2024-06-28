@@ -75,7 +75,7 @@ export default function SaleStaffDashboard() {
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
                                     <TableCell>
                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>
-                                            <Add/>
+                                            <Add sx={{color: '#b48c72'}}/>
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>

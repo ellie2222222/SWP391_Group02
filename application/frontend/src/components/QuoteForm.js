@@ -2,6 +2,20 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia } from '@mui/material';
 import * as Yup from 'yup';
+import { styled } from '@mui/system';
+
+const CustomButton1 = styled(Button)({
+    outlineColor: '#000',
+    backgroundColor: '#b48c72',
+    color: '#fff',
+    width: '100%',
+    fontSize: '1rem',
+    '&:hover': {
+        color: '#b48c72', // Thay đổi màu chữ khi hover
+        backgroundColor: 'transparent',
+    },
+});
+
 export default function QuoteForm(initialValues,onSubmit) {
     const formik = useFormik({
         initialValues: {
@@ -27,7 +41,7 @@ export default function QuoteForm(initialValues,onSubmit) {
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
                 <TextField
                     name="quote_content"
-                    label="quote_content"
+                    label="Quote Content"
                     variant="outlined"
                     value={formik.values.quote_content || ''}
                     onChange={formik.handleChange}
@@ -37,7 +51,7 @@ export default function QuoteForm(initialValues,onSubmit) {
                 />
                 <TextField
                     name="quote_amount"
-                    label="quote_amount"
+                    label="Quote Amount"
                     variant="outlined"
                     value={formik.values.quote_amount || ''}
                     onChange={formik.handleChange}
@@ -64,9 +78,9 @@ export default function QuoteForm(initialValues,onSubmit) {
                         <Typography variant="caption" color="red">{formik.errors.request_status}</Typography>
                     )}
                 </FormControl>
-                <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+                <CustomButton1 type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                     Submit
-                </Button>
+                </CustomButton1>
             </Box>
         </Container>
     )

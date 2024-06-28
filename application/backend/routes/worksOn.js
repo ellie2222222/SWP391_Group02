@@ -1,13 +1,13 @@
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth')
-const { requireManager, requireManagerOrSale } = require('../middleware/requireRoles')
+const { requireManager, requireManagerOrSale, requireManagerOrStaff } = require('../middleware/requireRoles')
 const { createWorksOn, getWorksOnById, getAllWorksOns, updateWorksOnById, deleteWorksOnById, addStaffToWorksOn, removeStaffFromWorksOn} = require('../controllers/worksOnController.js');
 
 const worksOnRoutes = express.Router()
 
 worksOnRoutes.use(requireAuth)
 
-worksOnRoutes.post('/', requireManagerOrSale, createWorksOn)
+worksOnRoutes.post('/', requireManagerOrStaff, createWorksOn)
 
 worksOnRoutes.get('/:id', requireManager, getWorksOnById)
 

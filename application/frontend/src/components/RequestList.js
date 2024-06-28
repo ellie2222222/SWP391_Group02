@@ -104,8 +104,8 @@ const RequestList = () => {
                         <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
                         {request.request_status === 'accepted' && (
                             <Box>
-                                <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quoted</CustomButton1>
-                                <CustomButton1>Quoted Details</CustomButton1>
+                                <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
+                                <CustomButton1>Quote Details</CustomButton1>
                             </Box>
                         )}
                         {request.request_status === 'payment' && (

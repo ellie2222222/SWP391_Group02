@@ -59,11 +59,11 @@ export default function QuotedRequestDashBoard() {
                     <TableHead>
                         <TableRow>
                             <TableCell>Request ID</TableCell>
-                            <TableCell>Quoted Conten</TableCell>
-                            <TableCell>Quoted Amount</TableCell>
+                            <TableCell>Quote Content</TableCell>
+                            <TableCell>Quote Amount</TableCell>
                             <TableCell>Request Status</TableCell>
-                            <TableCell>Jewelry_ID</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>Product Type</TableCell>
+                            <TableCell align='center'>Actions</TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -77,13 +77,12 @@ export default function QuotedRequestDashBoard() {
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
                                     <TableCell>{request.jewelry_id ? request.jewelry_id._id : 'Custom'}</TableCell>
                                     <TableCell>
-                                        <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
+                                        <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Approve Quote</CustomButton1>
                                     </TableCell>
                                 </TableRow>
                             )
                         ))}
                     </TableBody>
-
                 </Table>
             </TableContainer>
         </Container>
