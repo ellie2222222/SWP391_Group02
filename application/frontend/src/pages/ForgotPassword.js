@@ -54,7 +54,9 @@ const ForgotPassword = () => {
     <CustomContainer>
       <FormContainer elevation={3}>
         <Typography variant="h6" align="center">
-          Forgot Password
+          Forgotten Password
+        </Typography><Typography color="textSecondary" align="center" style={{ marginTop: '1rem' }}>
+        Please enter your registered email address. We will send you a link to reset your password
         </Typography>
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <TextField

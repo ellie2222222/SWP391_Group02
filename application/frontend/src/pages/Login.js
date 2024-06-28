@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
-import { TextField, Button, Container, Typography, Box, Grid, Paper } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Grid, Paper, IconButton, InputAdornment } from '@mui/material';
 import { styled } from '@mui/system';
 import useAuth from '../hooks/useAuthContext';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const CustomContainer = styled(Container)({
   display: 'flex',
@@ -67,6 +68,11 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login, user } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,9 +118,19 @@ const Login = () => {
                 type="password"
                 fullWidth
                 margin="normal"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 variant="outlined"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={togglePasswordVisibility}>
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <CustomButton variant="contained" type="submit">
                 LOGIN
