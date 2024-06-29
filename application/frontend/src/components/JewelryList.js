@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Container, Box, Button, TextField, InputAdornment, IconButton } from '@mui/material';
+import { Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Container, Box, Button, TextField, InputAdornment, IconButton, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import { styled } from '@mui/system';
 import SearchIcon from "@mui/icons-material/Search";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axiosInstance from '../utils/axiosInstance';
-import { TextFields } from '@mui/icons-material';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -22,21 +23,49 @@ const CustomButton1 = styled(Button)({
 
 const CustomTextField = styled(TextField)({
   width: '100%',
-  borderRadius: "30px", // Add border radius to round the corners
   variant: "outlined",
   padding: "0",
   "& fieldset": {
     borderRadius: "30px",
+  },
+  "& .MuiOutlinedInput-root": {
+    "&:hover fieldset": {
+      borderColor: "#b48c72",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#b48c72",
+    },
+  },
+  "& .MuiInputLabel-root": {
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
   },
 });
 
 const CustomIconButton = styled(IconButton)({
   color: "#000",
   fontSize: "2.6rem",
-
   "&:hover": {
     backgroundColor: "transparent",
     color: "#b48c72",
+  },
+});
+
+const CustomFormControl = styled(FormControl)({
+  minWidth: 120,
+  "& .MuiInputLabel-root": {
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
+  },
+  "& .MuiOutlinedInput-root": {
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#b48c72",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#b48c72",
+    },
   },
 });
 
@@ -44,14 +73,21 @@ const JewelryList = () => {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [onSale, setOnSale] = useState("");
+  const [category, setCategory] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const fetchJewelries = async () => {
+    setLoading(true);
     try {
-      const response = await axiosInstance.get('/jewelries');
+      const response = await axiosInstance.get(`/jewelries?${searchParams.toString()}`);
+      console.log(searchParams.toString());
       setProducts(response.data);
     } catch (error) {
       console.error('There was an error fetching the products!', error);
+      toast.error(error.response?.data?.error || error.message);
     } finally {
       setLoading(false);
     }
@@ -59,18 +95,31 @@ const JewelryList = () => {
 
   useEffect(() => {
     fetchJewelries();
-  }, []);
+  }, [searchParams]);
 
-  const handleSearchClick = async () => {
-    
-    const jewelry = await axiosInstance.get(`/jewelries?name=${search}`)
-
-    setProducts(jewelry.data);
-    try {
-
-    } catch (error) {
-      console.error(error)
+  const updateQueryParams = (key, value) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (value) {
+      newSearchParams.set(key, value);
+    } else {
+      newSearchParams.delete(key);
     }
+    setSearchParams(newSearchParams);
+  };
+
+  useEffect(() => {
+    setSearch(searchParams.get('name') || "");
+    setOnSale(searchParams.get('on_sale') || "");
+    setCategory(searchParams.get('category') || "");
+    setSortOrder(searchParams.get('sortByPrice') || "");
+  }, [searchParams]);
+
+  const handleSearchClick = () => {
+    updateQueryParams('name', search);
+  };
+
+  const handleFilterChange = (key, value) => {
+    updateQueryParams(key, value);
   };
 
   if (loading) {
@@ -83,25 +132,66 @@ const JewelryList = () => {
 
   return (
     <Container>
+      <ToastContainer />
       <Box padding='40px 0' minHeight="100vh">
-        <Box display="flex" marginBottom="20px">
-          <CustomTextField
-            size="normal"
-            label="Search..."
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <CustomIconButton color="inherit" onClick={handleSearchClick}>
-                    <SearchIcon fontSize="large" />
-                  </CustomIconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
+        <Box display="flex" marginBottom="20px" flexDirection="column">
+          <Box display="flex" marginBottom="20px">
+            <CustomTextField
+              size="normal"
+              label="Search..."
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <CustomIconButton color="inherit" onClick={handleSearchClick}>
+                      <SearchIcon fontSize="large" />
+                    </CustomIconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+          <Box display="flex" marginBottom="20px">
+            <CustomFormControl>
+              <InputLabel>On Sale</InputLabel>
+              <Select
+                value={onSale}
+                onChange={(event) => handleFilterChange('on_sale', event.target.value)}
+              >
+                <MenuItem value=""><em>None</em></MenuItem>
+                <MenuItem value="false">Not On Sale</MenuItem>
+                <MenuItem value="true">On Sale</MenuItem>
+              </Select>
+            </CustomFormControl>
+            <CustomFormControl style={{ marginLeft: 20 }}>
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={category}
+                onChange={(event) => handleFilterChange('category', event.target.value)}
+              >
+                <MenuItem value=""><em>None</em></MenuItem>
+                <MenuItem value="Ring">Ring</MenuItem>
+                <MenuItem value="Necklace">Necklace</MenuItem>
+                <MenuItem value="Bracelet">Bracelet</MenuItem>
+                <MenuItem value="Earring">Earring</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </CustomFormControl>
+            <CustomFormControl style={{ marginLeft: 20 }}>
+              <InputLabel>Sort By Price</InputLabel>
+              <Select
+                value={sortOrder}
+                onChange={(event) => handleFilterChange('sortByPrice', event.target.value)}
+              >
+                <MenuItem value=""><em>None</em></MenuItem>
+                <MenuItem value="asc">Ascending</MenuItem>
+                <MenuItem value="desc">Descending</MenuItem>
+              </Select>
+            </CustomFormControl>
+          </Box>
         </Box>
         <Grid container spacing={2}>
           {products.map((product, index) => (

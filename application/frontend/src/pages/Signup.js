@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Grid, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuthContext';
 import { styled } from '@mui/system';
 
@@ -19,6 +19,43 @@ const FormContainer = styled(Grid)({
   boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
   maxWidth: '400px',
   width: '100%',
+});
+
+const CustomTextField = styled(TextField)({
+  width: '100%',
+  marginBottom: '1rem',
+  "& .MuiOutlinedInput-root": {
+    "&:hover fieldset": {
+      borderColor: "#b48c72",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#b48c72",
+    },
+  },
+  "& .MuiInputLabel-root": {
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
+  },
+});
+
+const CustomButton = styled(Button)({
+  backgroundColor: '#b48c72',
+  color: '#fff',
+  marginTop: '1rem',
+  width: '100%',
+  '&:hover': {
+    backgroundColor: '#8e735c',
+  },
+  fontSize: '1rem',
+});
+
+const CustomLink = styled(Link)({
+  color: '#b48c72',
+  textDecoration: 'none',
+  fontWeight: 'bold',
+  textAlign: 'center',
+  fontSize: '1rem',
 });
 
 const Signup = () => {
@@ -56,7 +93,7 @@ const Signup = () => {
           Sign Up
         </Typography>
         <form onSubmit={handleSubmit}>
-          <TextField
+          <CustomTextField
             label="Username"
             name="username"
             fullWidth
@@ -64,7 +101,7 @@ const Signup = () => {
             value={userData.username}
             onChange={handleChange}
           />
-          <TextField
+          <CustomTextField
             label="Email"
             name="email"
             fullWidth
@@ -72,7 +109,7 @@ const Signup = () => {
             value={userData.email}
             onChange={handleChange}
           />
-          <TextField
+          <CustomTextField
             label="Password"
             name="password"
             type="password"
@@ -81,7 +118,7 @@ const Signup = () => {
             value={userData.password}
             onChange={handleChange}
           />
-          <TextField
+          <CustomTextField
             label="Phone Number"
             name="phone_number"
             fullWidth
@@ -89,7 +126,7 @@ const Signup = () => {
             value={userData.phone_number}
             onChange={handleChange}
           />
-          <TextField
+          <CustomTextField
             label="Address"
             name="address"
             fullWidth
@@ -97,11 +134,14 @@ const Signup = () => {
             value={userData.address}
             onChange={handleChange}
           />
-          <Button variant="contained" color="primary" type="submit" fullWidth style={{ marginTop: '1rem' }}>
+          <CustomButton variant="contained" type="submit">
             Sign Up
-          </Button>
+          </CustomButton>
           {error && <Typography color="error" style={{ marginTop: '16px' }}>{error}</Typography>}
         </form>
+        <Typography variant="body2" align="center" style={{ marginTop: '1rem' }}>
+          Already have an account? <CustomLink to="/login">Sign in</CustomLink>
+        </Typography>
       </FormContainer>
     </CustomContainer>
   );

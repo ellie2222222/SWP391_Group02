@@ -241,7 +241,7 @@ const getJewelries = async (req, res) => {
         if (category) {
             query.category = new RegExp(category, 'i');
         }
-        if (on_sale !== undefined) {
+        if (on_sale !== undefined && on_sale !== '') {
             query.on_sale = on_sale === 'true'; // Convert string to boolean
         }
         let sort = {};

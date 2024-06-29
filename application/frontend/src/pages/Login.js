@@ -62,6 +62,24 @@ const CustomLink = styled(Link)({
   fontSize: '1rem',
 });
 
+const CustomTextField = styled(TextField)({
+  width: '100%',
+  marginBottom: '1rem',
+  "& .MuiOutlinedInput-root": {
+    "&:hover fieldset": {
+      borderColor: "#b48c72",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#b48c72",
+    },
+  },
+  "& .MuiInputLabel-root": {
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
+  },
+});
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -105,19 +123,16 @@ const Login = () => {
               Let's get started with our jewelry shop
             </SubtitleTypography>
             <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-              <TextField
+              <CustomTextField
                 label="Email"
                 fullWidth
-                margin="normal"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 variant="outlined"
               />
-              <TextField
+              <CustomTextField
                 label="Password"
-                type="password"
                 fullWidth
-                margin="normal"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -143,7 +158,7 @@ const Login = () => {
             </form>
             <CustomLink to="/forgot-password">Forgot Password?</CustomLink>
             <Typography variant="body2" align="center" style={{ marginTop: '1rem' }}>
-              Don't have an account? <Link to="/signup" style={{ color: '#b48c72' }}>Sign up</Link>
+              Don't have an account? <Link to="/signup" style={{ color: '#b48c72', fontWeight: 'bold' }}>Sign up</Link>
             </Typography>
           </FormContainer>
         </Grid>

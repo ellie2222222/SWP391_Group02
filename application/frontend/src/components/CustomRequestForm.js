@@ -3,7 +3,6 @@ import { Container, Box, Typography, Button, TextField, Dialog, DialogActions, D
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
@@ -30,13 +29,9 @@ const StyledDialogContentText = styled(DialogContentText)({
 
 const CustomRequestForm = () => {
     const [description, setDescription] = useState('');
-    const { user } = useAuth();
-    const [error, setError] = useState('');
-    const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
-    const navigate = useNavigate();
-
+    
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -46,6 +41,7 @@ const CustomRequestForm = () => {
     };
 
     const handleRequest = async () => {
+        setOpen(false);
         setLoading(true);
         try {
             await axiosInstance.post(`/requests`, { request_description: description }, {
@@ -53,18 +49,11 @@ const CustomRequestForm = () => {
                     'Content-Type': 'application/json'
                 }
             });
-            setError('');
-            setMessage('Request sent successfully');
             toast.success('Request sent successfully');
-            setLoading(false);
-            setOpen(false); // Close the dialog after sending the request
+            setLoading(false);  
         } catch (error) {
-            setMessage('');
-            if (error.response === undefined) setError(error.message);
-            else setError(error.response.data.error);
             toast.error(error.response?.data?.error || error.message);
             setLoading(false);
-            toast.error(error);
         }
     };
 
@@ -84,17 +73,12 @@ const CustomRequestForm = () => {
                     fullWidth
                     required
                 />
-                {message && (
-                    <Typography marginBottom="20px" color="green">{message}</Typography>
-                )}
-                {error && (
-                    <Typography marginBottom="20px" color="red">{error}</Typography>
-                )}
-                <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={handleClickOpen}>
-                    SEND REQUEST
-                </CustomButton1>
+                <Box display="flex" justifyContent="center" alignItems="center" marginTop="20px">
+                    <CustomButton1 variant="contained" color="primary" onClick={handleClickOpen} disabled={loading}>
+                        {loading ? <CircularProgress size={24} /> : 'SEND REQUEST'}
+                    </CustomButton1>
+                </Box>
             </Box>
-
             <Dialog
                 open={open}
                 onClose={handleClose}
@@ -116,13 +100,6 @@ const CustomRequestForm = () => {
                     </CustomButton1>
                 </DialogActions>
             </Dialog>
-
-            {loading && (
-                <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                    <CircularProgress />
-                </Box>
-            )}
-
             <ToastContainer />
         </Container>
     );
