@@ -46,18 +46,20 @@ function App() {
         <Route path="/warranties" element={<WarrantyList />} />
 
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<JewelryDashboard/>} />
-          <Route path="/admin/users" element={<UsersDashboard/>} />
+          <Route path="/admin" element={<JewelryDashboard />} />
+          <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
-          <Route path="/admin/quotedRequest" element={<QuotedRequest/>}></Route>
+          <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
         </Route>
 
         <Route element={<UserRoute />}>
           <Route path="/requests" element={<Requests />} />
-          <Route path="/request" element={<CustomRequest />} />
           <Route path='/products/:id/payment-status' element={<Payment />} />
         </Route>
 
+        <Route element={<AuthRoute />}>
+          <Route path="/request" element={<CustomRequest />} />
+        </Route>
       </Routes>
     </div>
   );
