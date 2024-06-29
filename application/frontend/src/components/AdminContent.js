@@ -4,6 +4,8 @@ import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, Tabl
 import { Add, Edit, Delete } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import JewelryForm from './JewelryForm';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -13,7 +15,7 @@ const CustomButton1 = styled(Button)({
     fontSize: '1rem',
     marginTop: '20px',
     '&:hover': {
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
@@ -55,8 +57,10 @@ const AdminContent = () => {
         try {
             await axiosInstance.delete(`/jewelries/${id}`);
             fetchJewelries();
+            toast.success('Jewelry item deleted successfully');
         } catch (error) {
             console.error("There was an error deleting the jewelry!", error);
+            toast.error('Failed to delete jewelry item');
         }
     };
 
@@ -64,13 +68,16 @@ const AdminContent = () => {
         try {
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
+                toast.success('Jewelry item updated successfully');
             } else {
                 await axiosInstance.post('/jewelries', values);
+                toast.success('Jewelry item added successfully');
             }
             fetchJewelries();
             setIsDialogOpen(false);
         } catch (error) {
             console.error("There was an error saving the jewelry!", error);
+            toast.error(error.response?.data?.error || error.message);
         }
     };
 
@@ -112,17 +119,6 @@ const AdminContent = () => {
                                             />
                                         )}
                                     </TableCell>
-                                    {/* <TableCell>
-                                        {jewelry.images.map((image, index) => (
-                                            <CardMedia
-                                                key={index}
-                                                component="img"
-                                                alt="Jewelry"
-                                                image={image}
-                                                sx={{ width: '50%', maxHeight: '200px', margin: '0px' }}
-                                            />
-                                        ))}
-                                    </TableCell> */}
                                     <TableCell>
                                         <IconButton color="primary" onClick={() => handleEditClick(jewelry)}>
                                             <Edit />
@@ -148,6 +144,7 @@ const AdminContent = () => {
                     </DialogActions>
                 </Dialog>
             </Container>
+            <ToastContainer />
         </Box>
     );
 };
