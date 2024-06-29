@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Container, Box, Typography, Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress, styled } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 
@@ -53,13 +55,16 @@ const CustomRequestForm = () => {
             });
             setError('');
             setMessage('Request sent successfully');
+            toast.success('Request sent successfully');
             setLoading(false);
             setOpen(false); // Close the dialog after sending the request
         } catch (error) {
             setMessage('');
             if (error.response === undefined) setError(error.message);
             else setError(error.response.data.error);
+            toast.error(error.response?.data?.error || error.message);
             setLoading(false);
+            toast.error(error);
         }
     };
 
@@ -117,6 +122,8 @@ const CustomRequestForm = () => {
                     <CircularProgress />
                 </Box>
             )}
+
+            <ToastContainer />
         </Container>
     );
 };
