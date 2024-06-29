@@ -4,6 +4,53 @@ import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, S
 import * as Yup from 'yup';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { styled } from '@mui/system';
+
+const CustomTextField = styled(TextField)({
+    '& label.Mui-focused': {
+        color: '#b48c72',
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#b48c72',
+    },
+    '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&:hover fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: '#b48c72',
+        },
+    },
+});
+
+const CustomButton = styled(Button)({
+    backgroundColor: '#b48c72',
+    '&:hover': {
+        backgroundColor: '#a57d65',
+    },
+});
+
+const CustomIconButton = styled(IconButton)({
+    color: '#b48c72',
+    '&:hover': {
+        color: '#a57d65',
+    },
+});
+
+const CustomSwitch = styled(Switch)({
+    '& .MuiSwitch-switchBase.Mui-checked': {
+        color: '#b48c72',
+        '&:hover': {
+            backgroundColor: 'rgba(180, 140, 114, 0.08)',
+        },
+    },
+    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+        backgroundColor: '#b48c72',
+    },
+});
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
     const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
@@ -78,7 +125,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 {initialValues._id ? 'Edit Jewelry' : 'Add Jewelry'}
             </Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-                <TextField
+                <CustomTextField
                     name="name"
                     label="Name"
                     variant="outlined"
@@ -88,7 +135,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     helperText={formik.touched.name && formik.errors.name}
                 />
-                <TextField
+                <CustomTextField
                     name="description"
                     label="Description"
                     variant="outlined"
@@ -98,7 +145,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.description && Boolean(formik.errors.description)}
                     helperText={formik.touched.description && formik.errors.description}
                 />
-                <TextField
+                <CustomTextField
                     name="price"
                     label="Price"
                     type="number"
@@ -109,7 +156,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.price && Boolean(formik.errors.price)}
                     helperText={formik.touched.price && formik.errors.price}
                 />
-                <TextField
+                <CustomTextField
                     name="gemstone_id"
                     label="Gemstone ID"
                     variant="outlined"
@@ -119,7 +166,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.gemstone_id && Boolean(formik.errors.gemstone_id)}
                     helperText={formik.touched.gemstone_id && formik.errors.gemstone_id}
                 />
-                <TextField
+                <CustomTextField
                     name="gemstone_weight"
                     label="Gemstone Weight"
                     type="number"
@@ -130,7 +177,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.gemstone_weight && Boolean(formik.errors.gemstone_weight)}
                     helperText={formik.touched.gemstone_weight && formik.errors.gemstone_weight}
                 />
-                <TextField
+                <CustomTextField
                     name="material_id"
                     label="Material ID"
                     variant="outlined"
@@ -140,7 +187,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.material_id && Boolean(formik.errors.material_id)}
                     helperText={formik.touched.material_id && formik.errors.material_id}
                 />
-                <TextField
+                <CustomTextField
                     name="material_weight"
                     label="Material Weight"
                     type="number"
@@ -161,6 +208,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                         onBlur={formik.handleBlur}
                         label="Category"
                         error={formik.touched.category && Boolean(formik.errors.category)}
+                        sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.category && formik.errors.category ? 'red' : '#b48c72' } }}
                     >
                         <MenuItem value="Ring">Ring</MenuItem>
                         <MenuItem value="Necklace">Necklace</MenuItem>
@@ -182,6 +230,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                         onBlur={formik.handleBlur}
                         label="Type"
                         error={formik.touched.type && Boolean(formik.errors.type)}
+                        sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.type && formik.errors.type ? 'red' : '#b48c72' } }}
                     >
                         <MenuItem value="Sample">Sample</MenuItem>
                         <MenuItem value="Custom">Custom</MenuItem>
@@ -192,16 +241,15 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 </FormControl>
                 <FormControlLabel
                     control={
-                        <Switch
+                        <CustomSwitch
                             checked={formik.values.on_sale}
                             onChange={formik.handleChange}
                             name="on_sale"
-                            color="primary"
                         />
                     }
                     label="On Sale"
                 />
-                <TextField
+                <CustomTextField
                     name="sale_percentage"
                     label="Sale Percentage"
                     type="number"
@@ -214,11 +262,10 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 />
                 <FormControlLabel
                     control={
-                        <Switch
+                        <CustomSwitch
                             checked={formik.values.available}
                             onChange={formik.handleChange}
                             name="available"
-                            color="primary"
                         />
                     }
                     label="Available"
@@ -232,9 +279,9 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                                         component="img"
                                         alt={`Selected ${index}`}
                                         image={image}
-                                        sx={{right: 4, left: 4, width: '100%', maxHeight: '150px' }}
+                                        sx={{ right: 4, left: 4, width: '100%', maxHeight: '150px' }}
                                     />
-                                    <IconButton
+                                    <CustomIconButton
                                         aria-label="delete"
                                         size="small"
                                         sx={{
@@ -246,7 +293,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                                         onClick={() => handleRemoveImage(index)}
                                     >
                                         <DeleteIcon fontSize="small" />
-                                    </IconButton>
+                                    </CustomIconButton>
                                 </Box>
                             </Grid>
                         ))}
@@ -255,7 +302,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 {formik.errors.images && (
                     <Typography variant="caption" color="red">{formik.errors.images}</Typography>
                 )}
-                <Button variant="contained" component="label" sx={{ mt: 2 }}>
+                <CustomButton variant="contained" component="label" sx={{ mt: 2 }}>
                     <AddPhotoAlternateIcon />
                     Upload Images
                     <input
@@ -264,11 +311,11 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                         onChange={handleImageChange}
                         multiple
                     />
-                </Button>
+                </CustomButton>
 
-                <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+                <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
                     Submit
-                </Button>
+                </CustomButton>
             </Box>
         </Container>
     );

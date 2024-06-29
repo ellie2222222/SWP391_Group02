@@ -16,20 +16,32 @@ const UserDashboardContent = () => {
         ...theme.mixins.toolbar,
     }));
 
+    const CustomEditIcon = styled(Edit)({
+        color: '#b48c72',
+        '&:hover': {
+            color: '#a57d65',
+        },
+    });
+
+    const CustomDeleteIcon = styled(Delete)({
+        color: '#b48c72',
+        '&:hover': {
+            color: '#a57d65',
+        },
+    });
+
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    const fetchJewelries = async () => {
+    const fetchUsers = async () => {
         try {
             const response = await axiosInstance.get('/users');
             setUsers(response.data.users);
-
         } catch (error) {
-            console.error("There was an error fetching the jewelries!", error);
+            console.error("There was an error fetching the users!", error);
         }
     };
-
 
     const handleEditClick = (user) => {
         setSelectedUser(user);
@@ -39,24 +51,24 @@ const UserDashboardContent = () => {
     const handleDeleteClick = async (id) => {
         try {
             await axiosInstance.delete(`/users/${id}`);
-            fetchJewelries();
+            fetchUsers();
         } catch (error) {
-            console.error("There was an error deleting the jewelry!", error);
+            console.error("There was an error deleting the user!", error);
         }
     };
 
     const handleSubmit = async (values) => {
         try {
             await axiosInstance.patch(`/users/role-assignment/${selectedUser._id}`, values);
-            fetchJewelries();
+            fetchUsers();
             setIsDialogOpen(false);
         } catch (error) {
-            console.error("There was an error saving the jewelry!", error);
+            console.error("There was an error saving the user!", error);
         }
     };
 
     useEffect(() => {
-        fetchJewelries();
+        fetchUsers();
     }, []);
 
     return (
@@ -71,29 +83,26 @@ const UserDashboardContent = () => {
                                 <TableCell>Name</TableCell>
                                 <TableCell>Email</TableCell>
                                 <TableCell>Password</TableCell>
-                                <TableCell>address</TableCell>
+                                <TableCell>Address</TableCell>
                                 <TableCell>Role</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell align='center'>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {users.map((user) => (
                                 <TableRow key={user._id}>
-                                     <TableCell>
-                                        {user.phone_number}
-                                    </TableCell>
+                                    <TableCell>{user.phone_number}</TableCell>
                                     <TableCell>{user.username}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>{user.password}</TableCell>
                                     <TableCell>{user.address}</TableCell>
                                     <TableCell>{user.role}</TableCell>
-                                   
-                                    <TableCell>
+                                    <TableCell align='center'>
                                         <IconButton color="primary" onClick={() => handleEditClick(user)}>
-                                            <Edit />
+                                            <CustomEditIcon />
                                         </IconButton>
                                         <IconButton color="secondary" onClick={() => handleDeleteClick(user._id)}>
-                                            <Delete />
+                                            <CustomDeleteIcon />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>

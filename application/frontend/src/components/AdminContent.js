@@ -20,16 +20,23 @@ const CustomButton1 = styled(Button)({
     },
 });
 
-const AdminContent = () => {
-    const DrawerHeader = styled('div')(({ theme }) => ({
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-    }));
+const StyledIconButton = styled(IconButton)({
+    color: '#b48c72',
+    '&:hover': {
+        color: '#8e735c',
+    },
+});
 
+const DrawerHeader = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+}));
+
+const AdminContent = () => {
     const [jewelries, setJewelries] = useState([]);
     const [selectedJewelry, setSelectedJewelry] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -89,7 +96,7 @@ const AdminContent = () => {
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             <Container>
-                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick} sx={{ backgroundColor: '#b48c72' }}>
+                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick}>
                     Add Jewelry
                 </CustomButton1>
                 <TableContainer component={Paper}>
@@ -100,7 +107,7 @@ const AdminContent = () => {
                                 <TableCell>Description</TableCell>
                                 <TableCell>Price</TableCell>
                                 <TableCell>Images</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell align='center'>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -119,13 +126,13 @@ const AdminContent = () => {
                                             />
                                         )}
                                     </TableCell>
-                                    <TableCell>
-                                        <IconButton color="primary" onClick={() => handleEditClick(jewelry)}>
+                                    <TableCell align='center'>
+                                        <StyledIconButton onClick={() => handleEditClick(jewelry)}>
                                             <Edit />
-                                        </IconButton>
-                                        <IconButton color="secondary" onClick={() => handleDeleteClick(jewelry._id)}>
+                                        </StyledIconButton>
+                                        <StyledIconButton onClick={() => handleDeleteClick(jewelry._id)}>
                                             <Delete />
-                                        </IconButton>
+                                        </StyledIconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
