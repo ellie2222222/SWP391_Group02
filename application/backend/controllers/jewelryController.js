@@ -231,7 +231,7 @@ const updateJewelry = async (req, res) => {
 };
 
 const getJewelries = async (req, res) => {
-    const { name, category, on_sale, sortByPrice, sortBySalePercentage, sortByName } = req.query;
+    const { name, category, on_sale, sortByPrice, sortBySalePercentage, sortByName, page = 1, limit = 10 } = req.query;
 
     try {
         let query = { available: true };
@@ -244,6 +244,7 @@ const getJewelries = async (req, res) => {
         if (on_sale !== undefined && on_sale !== '') {
             query.on_sale = on_sale === 'true'; // Convert string to boolean
         }
+
         let sort = {};
         if (sortByPrice) {
             if (sortByPrice === 'asc') {
@@ -267,13 +268,22 @@ const getJewelries = async (req, res) => {
             }
         }
 
-        const jewelries = await Jewelry.find(query).sort(sort);
-        res.status(200).json(jewelries);
+        const skip = (page - 1) * limit;
+        const jewelries = await Jewelry.find(query).sort(sort).skip(skip).limit(parseInt(limit));
+
+        // Count total number of documents
+        const total = await Jewelry.countDocuments(query);
+
+        res.status(200).json({
+            jewelries,
+            totalPages: Math.ceil(total / limit),
+            currentPage: parseInt(page),
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error while getting jewelries' });
     }
 };
-// Get jewelries by category
+
 
 // Get one jewelry
 const getJewelry = async (req, res) => {

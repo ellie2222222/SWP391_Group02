@@ -25,9 +25,6 @@ const CustomTextField = styled(TextField)({
   width: '100%',
   variant: "outlined",
   padding: "0",
-  "& fieldset": {
-    borderRadius: "30px",
-  },
   "& .MuiOutlinedInput-root": {
     "&:hover fieldset": {
       borderColor: "#b48c72",
@@ -76,6 +73,8 @@ const JewelryList = () => {
   const [onSale, setOnSale] = useState("");
   const [category, setCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -83,8 +82,8 @@ const JewelryList = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/jewelries?${searchParams.toString()}`);
-      console.log(searchParams.toString());
-      setProducts(response.data);
+      setProducts(response.data.jewelries);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('There was an error fetching the products!', error);
       toast.error(error.response?.data?.error || error.message);
@@ -112,6 +111,7 @@ const JewelryList = () => {
     setOnSale(searchParams.get('on_sale') || "");
     setCategory(searchParams.get('category') || "");
     setSortOrder(searchParams.get('sortByPrice') || "");
+    setPage(parseInt(searchParams.get('page') || '1', 10));
   }, [searchParams]);
 
   const handleSearchClick = () => {
@@ -120,6 +120,16 @@ const JewelryList = () => {
 
   const handleFilterChange = (key, value) => {
     updateQueryParams(key, value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearchClick();
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    updateQueryParams('page', newPage);
   };
 
   if (loading) {
@@ -143,6 +153,7 @@ const JewelryList = () => {
               onChange={(event) => {
                 setSearch(event.target.value);
               }}
+              onKeyDown={handleKeyDown}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -221,6 +232,23 @@ const JewelryList = () => {
             </Grid>
           ))}
         </Grid>
+        <Box display="flex" justifyContent="center" marginTop="20px">
+          <Button 
+            disabled={page <= 1} 
+            onClick={() => handlePageChange(page - 1)}
+          >
+            Previous
+          </Button>
+          <Typography variant="h6" margin="0 10px">
+            {page} / {totalPages}
+          </Typography>
+          <Button 
+            disabled={page >= totalPages} 
+            onClick={() => handlePageChange(page + 1)}
+          >
+            Next
+          </Button>
+        </Box>
       </Box>
     </Container>
   );
