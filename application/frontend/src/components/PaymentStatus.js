@@ -4,11 +4,13 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
 import { useParams } from 'react-router-dom';
 import { styled } from '@mui/system';
 
 const LargeTypography = styled(Typography)({
-  fontSize: '1.2rem', // Increased font size
+  fontSize: '1.3rem', // Increased font size
 });
 
 const PaymentStatus = () => {
@@ -56,6 +58,13 @@ const PaymentStatus = () => {
         <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: '10px', width: '100%' }}>
           {orderStatus ? (
             <>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
+              {orderStatus === 1 ? (
+                <CheckCircleOutlineIcon sx={{ fontSize: '8em', color: '#63f558' }} />
+              ) : (
+                <HighlightOffRoundedIcon sx={{ fontSize: '8em', color: 'red' }} />
+              )}
+            </Box>
               <Typography variant="h4" align='center' gutterBottom>
                 Order Status
               </Typography>

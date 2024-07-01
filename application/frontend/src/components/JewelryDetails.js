@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
-import { Link, Container, Box, Typography, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, styled } from '@mui/material';
+import {
+  Link, Container, Box, Typography, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, styled,
+  Grid,
+  TableCell,
+  TableRow,
+  TableBody,
+  TableHead,
+  Table,
+  Paper,
+  TableContainer,
+} from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
 import PhoneIcon from '@mui/icons-material/Phone';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -15,7 +27,6 @@ const CustomButton = styled(Button)({
   color: '#fff',
   width: '100%',
   fontSize: '1rem',
-  marginTop: '20px',
   '&:hover': {
     color: '#b48c72',
     backgroundColor: 'transparent',
@@ -29,12 +40,12 @@ const StyledDialogTitle = styled(DialogTitle)({
 
 const StyledDialogContentText = styled(DialogContentText)({
   color: '#000',
-  fontSize: '1.2rem', // Increased font size
+  fontSize: '1.3rem',
   textAlign: 'center',
 });
 
 const LargeTypography = styled(Typography)({
-  fontSize: '1.2rem', // Increased font size
+  fontSize: '1.3rem',
 });
 
 const CenteredBox = styled(Box)({
@@ -80,7 +91,7 @@ const JewelryDetails = () => {
     try {
       await axiosInstance.post('/requests/order-requests', { jewelry_id: id });
       setError('');
-      setOpen(false); // Close the dialog
+      setOpen(false);
       toast.success('Order created successfully!', { autoClose: 3000 });
     } catch (error) {
       console.error('Error while creating order information!', error);
@@ -124,64 +135,153 @@ const JewelryDetails = () => {
           Back to product list
         </LargeTypography>
       </Link>
-      <Box display="flex" flexDirection="row" padding="40px 0" gap='1em'>
-        <Box flex={1}>
-          <img src='https://www.tierra.vn/files/halo-A7tL5Eltco.webp' alt={product.name} style={{ width: '100%', height: '100%' }} />
+      <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} margin='20px 0 50px 0' gap="1em" sx={{ height: { md: 500, xs: 'auto' } }}>
+        <Box flex={1} sx={{ height: '100%' }}>
+          <img src='https://www.tierra.vn/files/halo-A7tL5Eltco.webp' alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </Box>
-        <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between">
+        <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between" gap='1em'>
           <Box>
             <Typography variant="h2" component="h1" gutterBottom>{product.name}</Typography>
-            <LargeTypography variant="body1" gutterBottom>Product ID: <strong>{product._id}</strong></LargeTypography>
+            <LargeTypography variant="body1" gutterBottom sx={{ pb: 1, borderBottom: '1px solid #ccc' }}>Product ID: <strong>{product._id}</strong></LargeTypography>
+            <LargeTypography variant="body1" sx={{ pb: 1, borderBottom: '1px solid #ccc' }}>{product.description}</LargeTypography>
+          </Box>
+          <Box>
             {product.on_sale ? (
               <>
-                <Typography variant="h4" sx={{ color: 'red', fontWeight: '300', display: 'inline-block', mr: 1 }}>
-                  {(product.price - (product.price * (product.sale_percentage / 100))).toLocaleString()}₫
-                </Typography>
-                <Typography variant="h5" sx={{ textDecoration: 'line-through', fontWeight: '300', display: 'inline-block' }}>
+                <Typography variant="h5" sx={{ textDecoration: 'line-through', fontWeight: '300' }}>
                   {product.price.toLocaleString()}₫
+                </Typography>
+                <Typography variant="h2" sx={{ color: 'red', fontWeight: '300', mr: 1 }}>
+                  {(product.price - (product.price * (product.sale_percentage / 100))).toLocaleString()}₫
                 </Typography>
               </>
             ) : (
-              <Typography variant="h4" component='p' sx={{ color: 'red', fontWeight: '300' }}>
+              <Typography variant="h2" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                 {product.price.toLocaleString()}₫
               </Typography>
             )}
           </Box>
-          <Box display="flex" flexDirection="column" gap='1em'>
+          <Box display="flex" flexDirection="column" gap="1em" sx={{ pt: 1, borderTop: '1px solid #ccc' }}>
+            <Box display="flex" gap="1em">
+              <Box display="flex" gap="0.5em" alignItems="center" flex={1}>
+                <ChangeCircleIcon />
+                <LargeTypography variant="body1">Product Exchange</LargeTypography>
+              </Box>
+              <Box display="flex" gap="0.5em" alignItems="center" flex={1}>
+                <VerifiedIcon />
+                <LargeTypography variant="body1">Lifetime Warranty</LargeTypography>
+              </Box>
+            </Box>
             <CustomButton variant="contained" onClick={handleClickOpen}>
               ORDER NOW
             </CustomButton>
-            <LargeTypography variant="p" component='h6' align='center'>Need some help? <PhoneIcon />1900-xxxx</LargeTypography>
+            <LargeTypography variant="body1" component="h6" align="center">
+              Need some help? <PhoneIcon /> 1900-xxxx
+            </LargeTypography>
           </Box>
         </Box>
       </Box>
-      <Box>
-        <Typography variant="h2" component="h1" gutterBottom align='center'>Product Information</Typography>
-        <Box padding='20px 0' display="flex" flexDirection="column">
-          <Typography variant="h4" gutterBottom>Description</Typography>
-          <LargeTypography variant="body1">{product.description}</LargeTypography>
-        </Box>
-        <Box paddingBottom='40px' display="flex" flexDirection="column">
-          <Typography variant="h4" gutterBottom>Information</Typography>
-          {product.gemstone_id && (
-            <Box>
-              <LargeTypography variant="body1">Gemstone: {product.gemstone_id.name}</LargeTypography>
-              <LargeTypography variant="body1">Gemstone Carat: {product.gemstone_id.carat}</LargeTypography>
-              <LargeTypography variant="body1">Gemstone Shape: {product.gemstone_id.cut}</LargeTypography>
-              <LargeTypography variant="body1">Gemstone Color: {product.gemstone_id.color}</LargeTypography>
-              <LargeTypography variant="body1">Gemstone Clarity: {product.gemstone_id.clarity}</LargeTypography>
-            </Box>
-          )}
-          <LargeTypography variant="body1">Gemstone Weight: {product.gemstone_weight} kg</LargeTypography>
-          {product.material_id && (
-            <Box>
-              <LargeTypography variant="body1">Materials: {product.material_id.name}</LargeTypography>
-              <LargeTypography variant="body1">Material Carat: {product.material_id.carat}</LargeTypography>
-            </Box>
-          )}
-          <LargeTypography variant="body1">Material Weight: {product.material_weight} kg</LargeTypography>
-          <LargeTypography variant="body1">Category: {product.category}</LargeTypography>
-        </Box>
+
+      <Box marginBottom='50px'>
+        <Typography variant="h2" component="h1" gutterBottom align="center">
+          Product Information
+        </Typography>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell><Typography variant="h4">Items</Typography></TableCell>
+                <TableCell colSpan={2}><Typography variant="h4" align='center'>Details</Typography></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {/* Material Section */}
+              <TableRow>
+                <TableCell rowSpan={3}>
+                  <Typography variant="h6">Material</Typography>
+                </TableCell>
+                <TableCell colSpan={2}>
+                  <LargeTypography variant="body1" align='center'>{product.material_id ? product.material_id.name : '-'}</LargeTypography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Material Carat</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.material_id ? product.material_id.carat : '-'}</LargeTypography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Material Weight</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.material_weight} kg</LargeTypography>
+                </TableCell>
+              </TableRow>
+
+              {/* Gemstone Section */}
+              <TableRow>
+                <TableCell rowSpan={6}>
+                  <Typography variant="h6">Gemstone</Typography>
+                </TableCell>
+                <TableCell colSpan={2}>
+                  <LargeTypography variant="body1" align='center'>{product.gemstone_id ? product.gemstone_id.name : '-'}</LargeTypography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Gemstone Carat</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.carat : '-'}</LargeTypography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Gemstone Shape</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.cut : '-'}</LargeTypography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Gemstone Color</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.color : '-'}</LargeTypography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Gemstone Clarity</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.clarity : '-'}</LargeTypography>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Gemstone Weight</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.gemstone_weight} kg</LargeTypography>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Category</Typography>
+                </TableCell>
+                <TableCell>
+                  <LargeTypography variant="body1">{product.category}</LargeTypography>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
 
       <Dialog
