@@ -302,9 +302,9 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 {formik.errors.images && (
                     <Typography variant="caption" color="red">{formik.errors.images}</Typography>
                 )}
-                <CustomButton variant="contained" component="label" sx={{ mt: 2 }}>
+                <CustomButton variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '1em', alignItems: 'center' }}>
                     <AddPhotoAlternateIcon />
-                    Upload Images
+                    <Typography variant='body1'>Upload Images</Typography>
                     <input
                         type="file"
                         hidden

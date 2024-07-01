@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Container, Box, Button, TextField, InputAdornment, IconButton, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import {
+  Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Container, Box, Button,
+  TextField, InputAdornment, IconButton, MenuItem, Select, FormControl, InputLabel, Pagination, Stack
+} from '@mui/material';
 import { styled } from '@mui/system';
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -78,10 +81,17 @@ const JewelryList = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Fetch products function
   const fetchJewelries = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(`/jewelries?${searchParams.toString()}`);
+      const response = await axiosInstance.get(`/jewelries`, {
+        params: {
+          ...Object.fromEntries(searchParams),
+          available: true,
+        },
+      });
+
       setProducts(response.data.jewelries);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -92,20 +102,26 @@ const JewelryList = () => {
     }
   };
 
+  // Fetch products on initial load and whenever searchParams change
   useEffect(() => {
     fetchJewelries();
-  }, [searchParams]);
+  }, [searchParams, page]);
 
-  const updateQueryParams = (key, value) => {
+  // Update query params function
+  const updateQueryParams = (key, value, resetPage = false) => {
     const newSearchParams = new URLSearchParams(searchParams);
     if (value) {
       newSearchParams.set(key, value);
     } else {
       newSearchParams.delete(key);
     }
+    if (resetPage) {
+      newSearchParams.set('page', '1');
+    }
     setSearchParams(newSearchParams);
   };
 
+  // Update state with query params on component mount
   useEffect(() => {
     setSearch(searchParams.get('name') || "");
     setOnSale(searchParams.get('on_sale') || "");
@@ -114,24 +130,30 @@ const JewelryList = () => {
     setPage(parseInt(searchParams.get('page') || '1', 10));
   }, [searchParams]);
 
+  // Handle search click event
   const handleSearchClick = () => {
-    updateQueryParams('name', search);
+    updateQueryParams('name', search, true);
   };
 
+  // Handle filter change event
   const handleFilterChange = (key, value) => {
-    updateQueryParams(key, value);
+    updateQueryParams(key, value, true);
   };
 
+  // Handle Enter key press in search input
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       handleSearchClick();
     }
   };
 
-  const handlePageChange = (newPage) => {
-    updateQueryParams('page', newPage);
+  // Handle page change
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+    updateQueryParams('page', newPage.toString());
   };
 
+  // Display loading spinner while fetching data
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
@@ -144,7 +166,9 @@ const JewelryList = () => {
     <Container>
       <ToastContainer />
       <Box padding='40px 0' minHeight="100vh">
+        {/* Search and Filter Controls */}
         <Box display="flex" marginBottom="20px" flexDirection="column">
+          {/* Search Input */}
           <Box display="flex" marginBottom="20px">
             <CustomTextField
               size="normal"
@@ -165,7 +189,9 @@ const JewelryList = () => {
               }}
             />
           </Box>
+          {/* Filters */}
           <Box display="flex" marginBottom="20px">
+            {/* On Sale Filter */}
             <CustomFormControl>
               <InputLabel>On Sale</InputLabel>
               <Select
@@ -177,6 +203,7 @@ const JewelryList = () => {
                 <MenuItem value="true">On Sale</MenuItem>
               </Select>
             </CustomFormControl>
+            {/* Category Filter */}
             <CustomFormControl style={{ marginLeft: 20 }}>
               <InputLabel>Category</InputLabel>
               <Select
@@ -191,6 +218,7 @@ const JewelryList = () => {
                 <MenuItem value="Other">Other</MenuItem>
               </Select>
             </CustomFormControl>
+            {/* Sort By Price Filter */}
             <CustomFormControl style={{ marginLeft: 20 }}>
               <InputLabel>Sort By Price</InputLabel>
               <Select
@@ -204,50 +232,54 @@ const JewelryList = () => {
             </CustomFormControl>
           </Box>
         </Box>
+
+        {/* Jewelry Cards Grid */}
         <Grid container spacing={2}>
-          {products.map((product, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-              <Card>
-                <CardMedia
-                  component="img"
-                  height="250"
-                  image={product.images[0] || 'placeholder.jpg'} // Fallback to placeholder if no image
-                  alt={product.name}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {product._id}
-                  </Typography>
-                  <Typography variant="h6" color="text.primary">
-                    {product.price} VND
-                  </Typography>
-                  <CustomButton1 onClick={() => navigate(`/products/${product._id}`)}>
-                    Details
-                  </CustomButton1>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+          {products.length > 0 ? (
+            products.map((product, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <Card>
+                  <CardMedia
+                    component="img"
+                    height="250"
+                    image={product.images[0] || 'placeholder.jpg'}
+                    alt={product.name}
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {product.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {product._id}
+                    </Typography>
+                    <Typography variant="h6" color="text.primary">
+                      {product.price} VND
+                    </Typography>
+                    <CustomButton1 onClick={() => navigate(`/products/${product._id}`)}>
+                      Details
+                    </CustomButton1>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          ) : (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="40vh" width="100%">
+              <Typography variant="h6">No products found</Typography>
+            </Box>
+          )}
         </Grid>
+
+        {/* Pagination */}
         <Box display="flex" justifyContent="center" marginTop="20px">
-          <Button 
-            disabled={page <= 1} 
-            onClick={() => handlePageChange(page - 1)}
-          >
-            Previous
-          </Button>
-          <Typography variant="h6" margin="0 10px">
-            {page} / {totalPages}
-          </Typography>
-          <Button 
-            disabled={page >= totalPages} 
-            onClick={() => handlePageChange(page + 1)}
-          >
-            Next
-          </Button>
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              showFirstButton
+              showLastButton
+            />
+          </Stack>
         </Box>
       </Box>
     </Container>

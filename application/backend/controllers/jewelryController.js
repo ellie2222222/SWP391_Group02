@@ -231,18 +231,24 @@ const updateJewelry = async (req, res) => {
 };
 
 const getJewelries = async (req, res) => {
-    const { name, category, on_sale, sortByPrice, sortBySalePercentage, sortByName, page = 1, limit = 10 } = req.query;
+    const { name, available, category, type, on_sale, sortByPrice, sortBySalePercentage, sortByName, page = 1, limit = 10 } = req.query;
 
     try {
-        let query = { available: true };
+        let query = {};
         if (name) {
             query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
         }
         if (category) {
             query.category = new RegExp(category, 'i');
         }
+        if (type) {
+            query.type = new RegExp(type, 'i');
+        }
         if (on_sale !== undefined && on_sale !== '') {
             query.on_sale = on_sale === 'true'; // Convert string to boolean
+        }
+        if (available !== undefined && available !== '') {
+            query.available = available === 'true';
         }
 
         let sort = {};
