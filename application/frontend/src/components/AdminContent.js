@@ -44,7 +44,7 @@ const AdminContent = () => {
     const fetchJewelries = async () => {
         try {
             const response = await axiosInstance.get('/jewelries');
-            setJewelries(response.data);
+            setJewelries(response.data.jewelries);
         } catch (error) {
             console.error("There was an error fetching the jewelries!", error);
         }
@@ -122,7 +122,7 @@ const AdminContent = () => {
                                                 component="img"
                                                 alt="Jewelry"
                                                 image={jewelry.images[0]}
-                                                sx={{ width: '50%', maxHeight: '200px', margin: '0px' }}
+                                                sx={{ width: '100%', maxHeight: '400px', margin: '0px' }}
                                             />
                                         )}
                                     </TableCell>
