@@ -7,7 +7,7 @@ const requireUser = (req, res, next) => {
 }
 
 const requireAdmin = (req, res, next) => {
-  if (req.role !== 'admin') {
+  if (req.role !== 'admin' && req.role !== 'manager') {
     return res.status(403).json({ error: 'Admin access required' });
   }
 

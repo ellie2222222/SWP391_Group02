@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, Typography, Button, CircularProgress, styled, TextField } from '@mui/material';
+import { Container, Box, Typography, Button, CircularProgress, styled, TextField,Card, CardActions,CardContent } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance';
@@ -94,30 +94,34 @@ const RequestList = () => {
 
     return (
         <Container>
-            <Box padding="40px 0" minHeight="60vh">
-                <Typography variant="h2" component="p" marginBottom='20px' textAlign='center'>Requests</Typography>
-                {requests.map((request, index) => (
-                    <Box marginBottom='20px' key={index}>
-                        <Typography variant="h5" component="p" marginBottom='20px'>Request #{index + 1}</Typography>
-                        <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
-                        <Typography variant="h5"> Status: {request.request_status} </Typography>
-                        <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
-                        {request.request_status === 'accepted' && (
-                            <Box>
-                                <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
-                                <CustomButton1>Quote Details</CustomButton1>
-                            </Box>
-                        )}
-                        {request.request_status === 'payment' && (
-                            <CustomButton1 onClick={() => handlePayment(request)}>Payment</CustomButton1>
-                        )}
-                    </Box>
-                ))}
-                {error && (
-                    <Typography variant="h5" component="p" marginBottom="20px" color="red">{error}</Typography>
-                )}
-            </Box>
-        </Container>
+      <Box padding="40px 0" minHeight="60vh">
+        <Typography variant="h2" component="p" marginBottom="20px" textAlign="center">Requests</Typography>
+        {requests.map((request, index) => (
+          <Card key={index} variant="outlined" style={{ marginBottom: '20px' }}>
+            <CardContent>
+              <Typography variant="h5" component="p" marginBottom="20px">Request #{index + 1}</Typography>
+              <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
+              <Typography variant="h5">Status: {request.request_status}</Typography>
+            </CardContent>
+            <CardActions>
+              <CustomButton1 onClick={() => navigate(`/requests/${request._id}`)}>View Detail</CustomButton1>
+              {request.request_status === 'accepted' && (
+                <>
+                  <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
+                  <CustomButton1>Quote Details</CustomButton1>
+                </>
+              )}
+              {request.request_status === 'payment' && (
+                <CustomButton1 onClick={() => handlePayment(request)}>Payment</CustomButton1>
+              )}
+            </CardActions>
+          </Card>
+        ))}
+        {error && (
+          <Typography variant="h5" component="p" marginBottom="20px" color="red">{error}</Typography>
+        )}
+      </Box>
+    </Container>
     );
 };
 

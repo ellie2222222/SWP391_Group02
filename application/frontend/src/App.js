@@ -21,6 +21,7 @@ import QuotedRequest from "./pages/QuotedRequest";
 import Payment from "./pages/Payment";
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Gemstones from "./pages/Gemstones";
 function App() {
   const { user } = useAuth()
 
@@ -50,6 +51,7 @@ function App() {
           <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
           <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
+          <Route path="/admin/Gemstones" element={<Gemstones />}></Route>
         </Route>
 
         <Route element={<UserRoute />}>

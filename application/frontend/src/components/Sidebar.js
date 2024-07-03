@@ -21,6 +21,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import useAuth from '../hooks/useAuthContext';
+import { Diamond } from '@mui/icons-material';
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -57,7 +58,7 @@ const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
     zIndex: theme.zIndex.drawer + 1,
-    backgroundColor:'#b48c72',
+    backgroundColor: '#b48c72',
     transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
@@ -92,12 +93,12 @@ const CustomListItemButton = styled(ListItemButton)({
     minHeight: 48,
     justifyContent: 'initial',
     px: 2.5,
-    padding:'0 20px',
-    color:'#000',
+    padding: '0 20px',
+    color: '#000',
 });
 
 
-export default function MiniDrawer() {
+export default function Sidebar() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const { user } = useAuth()
@@ -113,7 +114,7 @@ export default function MiniDrawer() {
         minWidth: 0,
         mr: open ? 3 : 'auto',
         justifyContent: 'center',
-        marginRight:'24px',
+        marginRight: '24px',
     });
 
     return (
@@ -135,7 +136,7 @@ export default function MiniDrawer() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Dashboard                    
+                        Dashboard
                     </Typography>
                 </Toolbar>
             </AppBar>
@@ -158,32 +159,46 @@ export default function MiniDrawer() {
                             </CustomListItemButton>
                         </Link>
                     </ListItem>
-                    {user.role !== 'admin' && user.role !== 'user' &&  (
+                    {user.role !== 'admin' && user.role !== 'user' && (
                         <ListItem key="My Requests" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/requests'>
                                 <CustomListItemButton>
                                     <CustomListItemIcon
                                     >
-                                    <ShoppingCartIcon />
+                                        <ShoppingCartIcon />
                                     </CustomListItemIcon>
                                     <ListItemText primary="My Requests" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>
-                        
+
                     )}
                     {user.role === 'manager' && (
-                        <ListItem key="Quoted Requests" disablePadding sx={{ display: 'block' }}>
-                        <Link to='/admin/quotedRequest'>
-                            <CustomListItemButton>
-                                <CustomListItemIcon
-                                >
-                                <ShoppingCartIcon />
-                                </CustomListItemIcon>
-                                <ListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
-                            </CustomListItemButton>
-                        </Link>
-                    </ListItem>
+                        <div>
+                            <ListItem key="Quoted Requests" disablePadding sx={{ display: 'block' }}>
+                                <Link to='/admin/quotedRequest'>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon
+                                        >
+                                            <ShoppingCartIcon />
+                                        </CustomListItemIcon>
+                                        <ListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+
+                            </ListItem>
+                            <ListItem key="Gemstones" disablePadding sx={{ display: 'block' }}>
+                                <Link to='/admin/Gemstones'>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                            <Diamond />
+                                        </CustomListItemIcon>
+                                        <ListItemText primary="Gemstones" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+
+                            </ListItem>
+                        </div>
                     )}
                     {user.role === 'admin' && (
                         <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
@@ -192,7 +207,7 @@ export default function MiniDrawer() {
                                     <CustomListItemIcon
                                     >
                                         <PeopleIcon />
-                                    
+
                                     </CustomListItemIcon>
                                     <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
@@ -204,8 +219,8 @@ export default function MiniDrawer() {
                             <CustomListItemButton>
                                 <CustomListItemIcon
                                 >
-                                     <PeopleIcon />
-                                   
+                                    <PeopleIcon />
+
                                 </CustomListItemIcon>
                                 <ListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
                             </CustomListItemButton>

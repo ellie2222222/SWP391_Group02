@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, styled } from '@mui/material';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
-import JewelryForm from './JewelryForm';
 import UserForm from './UserForm';
 
 const UserDashboardContent = () => {
@@ -115,6 +114,7 @@ const UserDashboardContent = () => {
                     <DialogContent>
                         <UserForm initialValues={selectedUser} onSubmit={handleSubmit} />
                     </DialogContent>
+
                     <DialogActions>
                         <Button onClick={() => setIsDialogOpen(false)} color="primary">
                             Cancel
