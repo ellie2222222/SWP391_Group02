@@ -11,10 +11,14 @@ const materialSchema = new Schema({
         type: Number,
         required: true
     },
-    price: {
+    buy_price: {
         type: Number,
         required: true
-    }
+    },
+    sell_price: {
+        type: Number,
+        required: true
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Material', materialSchema);

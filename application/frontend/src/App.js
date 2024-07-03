@@ -21,6 +21,9 @@ import QuotedRequest from "./pages/QuotedRequest";
 import Payment from "./pages/Payment";
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import WarrantyPolicy from "./pages/WarrantyPolicy";
+import ExchangePolicy from "./pages/ExchangePolicy";
+import GoldPrice from "./pages/GoldPrice";
 function App() {
   const { user } = useAuth()
 
@@ -44,12 +47,15 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/warranties/create" element={<Warranty />} />
         <Route path="/warranties" element={<WarrantyList />} />
+        <Route path="/warranty-policy" element={<WarrantyPolicy />} />
+        <Route path="/exchange-policy" element={<ExchangePolicy />} />
+        <Route path="/gold-price" element={<GoldPrice />} />
 
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<JewelryDashboard />} />
           <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
-          <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
+          <Route path="/admin/quotedRequest" element={<QuotedRequest />} />
         </Route>
 
         <Route element={<UserRoute />}>
@@ -66,3 +72,5 @@ function App() {
 }
 
 export default App;
+
+

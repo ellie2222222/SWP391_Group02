@@ -22,7 +22,13 @@ import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
+import Collapse from "@mui/material/Collapse";
 import useAuth from "../../hooks/useAuthContext";
+import { Typography } from "@mui/material";
+import ArticleIcon from '@mui/icons-material/Article';
+import SellIcon from '@mui/icons-material/Sell';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+
 const CustomAppBar = styled(AppBar)({
   backgroundColor: "#fff",
   color: "#000",
@@ -32,17 +38,17 @@ const CustomButton = styled(Button)({
   color: "#000",
   textTransform: "uppercase",
   width: "100%",
-  height: "100%", // Chiếm toàn bộ chiều cao của Grid item
+  height: "100%",
   fontSize: "1.6rem",
   fontWeight: "400",
   "&:hover": {
-    backgroundColor: "transparent", // Xóa hiệu ứng viền mặc định
-    color: "#b48c72", // Thay đổi màu chữ khi hover
+    backgroundColor: "transparent",
+    color: "#b48c72",
     borderRadius: "0",
   },
   "&.active": {
-    backgroundColor: "transparent", // Xóa hiệu ứng viền mặc định
-    color: "#b48c72", // Thay đổi màu chữ khi active
+    backgroundColor: "transparent",
+    color: "#b48c72",
     borderRadius: "0",
   },
 });
@@ -50,42 +56,50 @@ const CustomButton = styled(Button)({
 const CustomListItem = styled(ListItem)({
   textTransform: "uppercase",
   "&:hover": {
-    backgroundColor: "transparent", // Xóa hiệu ứng viền mặc định
-    color: "#b48c72", // Thay đổi màu chữ khi hover
+    backgroundColor: "transparent",
+    color: "#b48c72",
   },
 });
+
 const CustomLink = styled(Link)({
   textDecoration: "none",
   color: "inherit",
-});
-
-const CustomIconButton = styled(IconButton)({
-  color: "#000",
-  fontSize: "2.6rem",
-
   "&:hover": {
     backgroundColor: "transparent",
     color: "#b48c72",
   },
 });
+
+const CustomIconButton = styled(IconButton)({
+  color: "#000",
+  fontSize: "2.6rem",
+  "&:hover": {
+    backgroundColor: "transparent",
+    color: "#b48c72",
+  },
+});
+
 const CustomTextField = styled(TextField)({
-  width: "200px", // Increase the width by 100px
-  borderRadius: "30px", // Add border radius to round the corners
+  width: "200px",
+  borderRadius: "30px",
   variant: "outlined",
   padding: "0",
   "& fieldset": {
     borderRadius: "30px",
   },
 });
+
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
+  const [serviceOpen, setServiceOpen] = useState(false);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const allowRole = ["admin", "sale_staff", "manager", "design_staff", "production_staff"];
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -103,11 +117,14 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  const handleServiceToggle = () => {
+    setServiceOpen(!serviceOpen);
+  };
+
   const handleLogOut = () => {
     logout();
     navigate('/login');
-  }
-  const allowRole = ['admin', 'sale_staff','manager', 'design_staff', 'production_staff' ]
+  };
 
   return (
     <CustomAppBar position="static">
@@ -156,6 +173,16 @@ const Navbar = () => {
                   <ListItemText primary="Sales" />
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
+                  <CustomLink to="">
+                    <ListItemText primary="Service" />
+                  </CustomLink>
+                </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
+                  <CustomLink to="/request">
+                    <ListItemText primary="Custom" />
+                  </CustomLink>
+                </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
                   <ListItemIcon>
                     <SearchIcon style={{ fontSize: "1.6rem" }} />
                   </ListItemIcon>
@@ -177,8 +204,6 @@ const Navbar = () => {
             }}
           >
             <Grid container spacing={0} sx={{ height: "64px" }}>
-              {" "}
-              {/* Chiều cao của AppBar */}
               <Grid item xs>
                 <Link to="/products">
                   <CustomButton>Products</CustomButton>
@@ -200,12 +225,65 @@ const Navbar = () => {
                 </Link>
               </Grid>
               <Grid item xs>
+                <Box
+                  sx={{
+                    position: "relative",
+                    height: "100%",
+                  }}
+                  onMouseEnter={handleServiceToggle}
+                  onMouseLeave={handleServiceToggle}
+                >
+                  <CustomButton>Service</CustomButton>
+                  <Collapse
+                    in={serviceOpen}
+                    timeout="auto"
+                    unmountOnExit
+                    sx={{
+                      position: "absolute",
+                      top: "100%",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      zIndex: 1,
+                      bgcolor: "background.paper",
+                      height: 200,
+                      width: 500,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', boxShadow: 3, p: 2, borderRadius: 2 }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <CustomLink to="/warranty-policy" style={{ textDecoration: 'none' }}>
+                          <ArticleIcon sx={{ fontSize: 100, mb: 1 }} />
+                          <Typography sx={{ fontSize: '1.3rem' }}>
+                            WARRANTY POLICY
+                          </Typography>
+                        </CustomLink>
+                      </Box>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <CustomLink to="/exchange-policy" style={{ textDecoration: 'none' }}>
+                          <ChangeCircleIcon sx={{ fontSize: 100, mb: 1 }} />
+                          <Typography sx={{ fontSize: '1.3rem' }}>
+                            EXCHANGE POLICY
+                          </Typography>
+                        </CustomLink>
+                      </Box>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <CustomLink to="/gold-price" style={{ textDecoration: 'none' }}>
+                          <SellIcon sx={{ fontSize: 100, mb: 1 }} />
+                          <Typography sx={{ fontSize: '1.3rem' }}>
+                            GOLD PRICE TODAY
+                          </Typography>
+                        </CustomLink>
+                      </Box>
+                    </Box>
+                  </Collapse>
+                </Box>
+              </Grid>
+              <Grid item xs>
                 <Link to="/request">
                   <CustomButton>Custom</CustomButton>
                 </Link>
               </Grid>
             </Grid>
-            {/* Thêm icon login và thanh search */}
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <CustomTextField
                 size="normal"
@@ -226,32 +304,33 @@ const Navbar = () => {
               />
               {user ? (
                 <>
-                <CustomIconButton color="inherit" onClick={handleMenuOpen}>
-                  <AccountCircleIcon fontSize='2.6rem' />
-                </CustomIconButton>
-                {allowRole.includes(user.role) ? (
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                  >
-                    <MenuItem onClick={handleLogOut} >Logout</MenuItem>
-                    <MenuItem component={Link} to={`/admin`} onClick={handleMenuClose}>
-                      Dashboard
-                    </MenuItem>
-                  </Menu>
-                ) : (<Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
-                  <MenuItem onClick={handleLogOut} >Logout</MenuItem>
-                  <MenuItem component={Link} to={`/profile/${user._id}`} onClick={handleMenuClose}>
-                    Profile
-                  </MenuItem>
-                </Menu>)}
-
-              </>
+                  <CustomIconButton color="inherit" onClick={handleMenuOpen}>
+                    <AccountCircleIcon fontSize="2.6rem" />
+                  </CustomIconButton>
+                  {allowRole.includes(user.role) ? (
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+                      <MenuItem component={Link} to={`/admin`} onClick={handleMenuClose}>
+                        Dashboard
+                      </MenuItem>
+                    </Menu>
+                  ) : (
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+                      <MenuItem component={Link} to={`/profile/${user._id}`} onClick={handleMenuClose}>
+                        Profile
+                      </MenuItem>
+                    </Menu>
+                  )}
+                </>
               ) : (
                 <Link to="/login">
                   <CustomIconButton color="inherit">
