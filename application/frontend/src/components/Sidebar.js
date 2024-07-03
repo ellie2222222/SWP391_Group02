@@ -188,7 +188,7 @@ export default function Sidebar() {
 
                             </ListItem>
                             <ListItem key="Gemstones" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/Gemstones'>
+                                <Link to='/admin/gemstones'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <Diamond />

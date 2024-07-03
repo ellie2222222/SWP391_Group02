@@ -22,6 +22,7 @@ import Payment from "./pages/Payment";
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Gemstones from "./pages/Gemstones";
+import Material from "./pages/Material";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
 import ExchangePolicy from "./pages/ExchangePolicy";
 import GoldPrice from "./pages/GoldPrice";
@@ -57,7 +58,8 @@ function App() {
           <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
           <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
-          <Route path="/admin/Gemstones" element={<Gemstones />}></Route>
+          <Route path="/admin/gemstones" element={<Gemstones />}></Route>
+          <Route path="/admin/materials" element={<Gemstones />}></Route>
         </Route>
 
         <Route element={<UserRoute />}>
