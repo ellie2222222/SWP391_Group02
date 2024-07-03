@@ -79,6 +79,7 @@ const CustomTableCell = styled(TableCell)({
 
 const AdminContent = () => {
     const [jewelries, setJewelries] = useState([]);
+    const [total, setTotal] = useState(0);
     const [selectedJewelry, setSelectedJewelry] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [search, setSearch] = useState("");
@@ -98,7 +99,9 @@ const AdminContent = () => {
                     ...Object.fromEntries(searchParams),
                 },
             });
+
             setJewelries(response.data.jewelries);
+            setTotal(response.data.total);
             setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error("There was an error fetching the jewelries!", error);
@@ -206,8 +209,8 @@ const AdminContent = () => {
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             <Container>
-                <Box display="flex" marginBottom="20px" flexDirection="column">
-                    <Box display="flex" marginBottom="20px">
+                <Box display="flex" mb={2} flexDirection="column">
+                    <Box display="flex" mb={2}>
                         <CustomTextField
                             size="normal"
                             label="Search..."
@@ -225,7 +228,7 @@ const AdminContent = () => {
                             }}
                         />
                     </Box>
-                    <Box display="flex" marginBottom="20px">
+                    <Box display="flex">
                         <CustomFormControl>
                             <InputLabel>On Sale</InputLabel>
                             <Select
@@ -286,6 +289,11 @@ const AdminContent = () => {
                         </CustomFormControl>
                     </Box>
                 </Box>
+
+                <Box mb={2}>
+                    <Typography variant='h5'>There are a total of {total} result(s)</Typography>
+                </Box>
+
                 <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick}>
                     Add Jewelry
                 </CustomButton1>
@@ -304,7 +312,8 @@ const AdminContent = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {jewelries.map((jewelry) => (
+                            {jewelries.length > 0 ? (
+                                jewelries.map((jewelry) => (
                                 <TableRow key={jewelry._id}>
                                     <CustomTableCell>{jewelry.name}</CustomTableCell>
                                     <CustomTableCell>{jewelry.category}</CustomTableCell>
@@ -331,7 +340,12 @@ const AdminContent = () => {
                                         </StyledIconButton>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ))
+                            ) : (          
+                                <TableCell align='center' colSpan={9}>
+                                    <Typography variant="h6">No products found</Typography>
+                                </TableCell>
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>

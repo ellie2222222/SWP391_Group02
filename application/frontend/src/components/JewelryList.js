@@ -71,6 +71,7 @@ const CustomFormControl = styled(FormControl)({
 
 const JewelryList = () => {
   const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [onSale, setOnSale] = useState("");
@@ -93,6 +94,7 @@ const JewelryList = () => {
       });
 
       setProducts(response.data.jewelries);
+      setTotal(response.data.total)
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('There was an error fetching the products!', error);
@@ -165,11 +167,11 @@ const JewelryList = () => {
   return (
     <Container>
       <ToastContainer />
-      <Box padding='40px 0' minHeight="100vh">
+      <Box padding='40px 0'>
         {/* Search and Filter Controls */}
-        <Box display="flex" marginBottom="20px" flexDirection="column">
+        <Box display="flex" mb={2} flexDirection="column">
           {/* Search Input */}
-          <Box display="flex" marginBottom="20px">
+          <Box display="flex" mb={2}>
             <CustomTextField
               size="normal"
               label="Search..."
@@ -190,7 +192,7 @@ const JewelryList = () => {
             />
           </Box>
           {/* Filters */}
-          <Box display="flex" marginBottom="20px">
+          <Box display="flex">
             {/* On Sale Filter */}
             <CustomFormControl>
               <InputLabel>On Sale</InputLabel>
@@ -233,6 +235,10 @@ const JewelryList = () => {
           </Box>
         </Box>
 
+        <Box mb={2}>
+          <Typography variant='h5'>There are a total of {total} result(s)</Typography>
+        </Box>
+
         {/* Jewelry Cards Grid */}
         <Grid container spacing={2}>
           {products.length > 0 ? (
@@ -263,14 +269,14 @@ const JewelryList = () => {
               </Grid>
             ))
           ) : (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="40vh" width="100%">
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh" width="100%">
               <Typography variant="h6">No products found</Typography>
             </Box>
           )}
         </Grid>
 
         {/* Pagination */}
-        <Box display="flex" justifyContent="center" marginTop="20px">
+        <Box display="flex" justifyContent="center" mt={2}>
           <Stack spacing={2}>
             <Pagination
               count={totalPages}

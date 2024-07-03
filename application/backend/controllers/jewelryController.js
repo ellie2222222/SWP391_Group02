@@ -231,7 +231,7 @@ const updateJewelry = async (req, res) => {
 };
 
 const getJewelries = async (req, res) => {
-    const { name, available, category, type, on_sale, sortByPrice, sortBySalePercentage, sortByName, page = 1, limit = 10 } = req.query;
+    const { name, available, category, type, on_sale, sortByPrice, sortBySalePercentage, sortByName, page = 1, limit = 12 } = req.query;
 
     try {
         let query = {};
@@ -282,6 +282,7 @@ const getJewelries = async (req, res) => {
 
         res.status(200).json({
             jewelries,
+            total: total,
             totalPages: Math.ceil(total / limit),
             currentPage: parseInt(page),
         });
