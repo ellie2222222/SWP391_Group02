@@ -59,7 +59,7 @@ function App() {
           <Route path="/admin/requests" element={<RequestDashboard />} />
           <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
           <Route path="/admin/gemstones" element={<Gemstones />}></Route>
-          <Route path="/admin/materials" element={<Gemstones />}></Route>
+          <Route path="/admin/materials" element={<Material />}></Route>
         </Route>
 
         <Route element={<UserRoute />}>

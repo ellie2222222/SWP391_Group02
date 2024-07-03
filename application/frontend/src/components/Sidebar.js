@@ -21,7 +21,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import useAuth from '../hooks/useAuthContext';
-import { Diamond } from '@mui/icons-material';
+import { Diamond,Done } from '@mui/icons-material';
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -180,7 +180,7 @@ export default function Sidebar() {
                                     <CustomListItemButton>
                                         <CustomListItemIcon
                                         >
-                                            <ShoppingCartIcon />
+                                            <Done />
                                         </CustomListItemIcon>
                                         <ListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
@@ -194,6 +194,17 @@ export default function Sidebar() {
                                             <Diamond />
                                         </CustomListItemIcon>
                                         <ListItemText primary="Gemstones" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+
+                            </ListItem>
+                            <ListItem key="Materials" disablePadding sx={{ display: 'block' }}>
+                                <Link to='/admin/materials'>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                            <Diamond />
+                                        </CustomListItemIcon>
+                                        <ListItemText primary="Materials" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
 
