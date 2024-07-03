@@ -21,13 +21,10 @@ import QuotedRequest from "./pages/QuotedRequest";
 import Payment from "./pages/Payment";
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-<<<<<<< HEAD
 import Gemstones from "./pages/Gemstones";
-=======
 import WarrantyPolicy from "./pages/WarrantyPolicy";
 import ExchangePolicy from "./pages/ExchangePolicy";
 import GoldPrice from "./pages/GoldPrice";
->>>>>>> 22759f3a910143a23414a53fec2eb0a72cfca098
 function App() {
   const { user } = useAuth()
 
