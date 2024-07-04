@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia, Grid } from '@mui/material';
 import * as Yup from 'yup';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/system';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomTextField = styled(TextField)({
     '& label.Mui-focused': {
@@ -54,6 +55,26 @@ const CustomSwitch = styled(Switch)({
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
     const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
+    const [gemstones, setGemstones] = useState([]);
+    const [materials, setMaterials] = useState([]);
+
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                const [gemstonesRes, materialsRes] = await Promise.all([
+                    axiosInstance.get('/gemstones'),
+                    axiosInstance.get('/materials')
+                ]);
+
+                setGemstones(gemstonesRes.data);
+                setMaterials(materialsRes.data);
+            } catch (error) {
+                console.error('Failed to fetch options', error);
+            }
+        };
+
+        fetchOptions();
+    }, []);
 
     const formik = useFormik({
         initialValues: {
@@ -118,6 +139,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
         setSelectedImages(newSelectedImages);
         formik.setFieldValue("images", newImages);
     };
+    
 
     return (
         <Container maxWidth="sm">
@@ -156,16 +178,28 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.price && Boolean(formik.errors.price)}
                     helperText={formik.touched.price && formik.errors.price}
                 />
-                <CustomTextField
-                    name="gemstone_id"
-                    label="Gemstone ID"
-                    variant="outlined"
-                    value={formik.values.gemstone_id}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.gemstone_id && Boolean(formik.errors.gemstone_id)}
-                    helperText={formik.touched.gemstone_id && formik.errors.gemstone_id}
-                />
+                 <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="gemstone_id-label">Gemstone Material</InputLabel>
+                    <Select
+                        labelId="gemstone_id-label"
+                        name="gemstone_id"
+                        value={formik.values.gemstone_id}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        label="Gemstone Material"
+                        error={formik.touched.gemstone_id && Boolean(formik.errors.gemstone_id)}
+                        sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.gemstone_id && formik.errors.gemstone_id ? 'red' : '#b48c72' } }}
+                    >
+                        {gemstones.map((gemstone) => (
+                            <MenuItem key={gemstone._id} value={gemstone._id}>
+                                {gemstone.name} - Carat:{gemstone.carat} - Cut:{gemstone.cut} - Clarity:{gemstone.clarity} - Color:{gemstone.color}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {formik.touched.gemstone_id && formik.errors.gemstone_id && (
+                        <Typography variant="caption" color="red">{formik.errors.gemstone_id}</Typography>
+                    )}
+                </FormControl>
                 <CustomTextField
                     name="gemstone_weight"
                     label="Gemstone Weight"
@@ -177,16 +211,28 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.gemstone_weight && Boolean(formik.errors.gemstone_weight)}
                     helperText={formik.touched.gemstone_weight && formik.errors.gemstone_weight}
                 />
-                <CustomTextField
-                    name="material_id"
-                    label="Material ID"
-                    variant="outlined"
-                    value={formik.values.material_id}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.material_id && Boolean(formik.errors.material_id)}
-                    helperText={formik.touched.material_id && formik.errors.material_id}
-                />
+                 <FormControl variant="outlined" fullWidth>
+                    <InputLabel id="material_id-label">Material</InputLabel>
+                    <Select
+                        labelId="material_id-label"
+                        name="material_id"
+                        value={formik.values.material_id}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        label="Material"
+                        error={formik.touched.material_id && Boolean(formik.errors.material_id)}
+                        sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.material_id && formik.errors.material_id ? 'red' : '#b48c72' } }}
+                    >
+                        {materials.map((material) => (
+                            <MenuItem key={material._id} value={material._id}>
+                                {material.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {formik.touched.material_id && formik.errors.material_id && (
+                        <Typography variant="caption" color="red">{formik.errors.material_id}</Typography>
+                    )}
+                </FormControl>
                 <CustomTextField
                     name="material_weight"
                     label="Material Weight"

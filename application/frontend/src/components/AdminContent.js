@@ -342,9 +342,11 @@ const AdminContent = () => {
                                 </TableRow>
                             ))
                             ) : (          
-                                <TableCell align='center' colSpan={9}>
-                                    <Typography variant="h6">No products found</Typography>
-                                </TableCell>
+                                <TableRow>
+                                    <TableCell align='center' colSpan={9}>
+                                        <Typography variant="h6">No products found</Typography>
+                                    </TableCell>
+                                </TableRow>
                             )}
                         </TableBody>
                     </Table>
@@ -382,5 +384,3 @@ const AdminContent = () => {
 };
 
 export default AdminContent;
-
-
