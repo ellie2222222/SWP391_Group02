@@ -16,6 +16,7 @@ const worksOnRoutes = require('./routes/worksOn');
 const designRoutes = require('./routes/design');
 const invoiceRoutes = require('./routes/invoice');
 const transactionRoutes = require('./routes/transaction');
+const analyticRoutes = require('./routes/analytic');
 
 //application
 const app = express()
@@ -59,6 +60,7 @@ app.use('/api/works-on', worksOnRoutes)
 app.use('/api/designs', designRoutes)
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/analytics', analyticRoutes);
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
@@ -91,7 +93,7 @@ app.post('/api/payment', requireAuth, async (req, res) => {
   const embed_data = {
     // redirecturl: "https://frontend-chk2.onrender.com/",
     redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
-    preferred_payment_method: ["domestic_card",  "account"],
+    preferred_payment_method: ["domestic_card",  "account"]
   };
   
   const items = [{ product }];
@@ -103,7 +105,7 @@ app.post('/api/payment', requireAuth, async (req, res) => {
     app_time: Date.now(), // miliseconds
     item: JSON.stringify(items),
     embed_data: JSON.stringify(embed_data),
-    amount: product.on_sale === true ? (product.price - (product.price * (product.sale_percentage / 100))) : product.price,
+    amount: product.price,
     description: `Payment for the order #${transID}`,
     bank_code: "",
     email: user_info.email,
