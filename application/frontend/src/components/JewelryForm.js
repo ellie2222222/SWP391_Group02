@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia, Grid } from '@mui/material';
 import * as Yup from 'yup';
@@ -57,6 +57,8 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
     const [gemstones, setGemstones] = useState([]);
     const [materials, setMaterials] = useState([]);
+    const [gemstonePrice, setGemstonePrice] = useState(0);
+    const [materialPrice, setMaterialPrice] = useState(0);
 
     useEffect(() => {
         const fetchOptions = async () => {
@@ -110,6 +112,24 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             available: Yup.boolean(),
         }),
     });
+    
+    useEffect(() => {
+        const gemstone = gemstones.find(g => g._id === formik.values.gemstone_id);
+        if (gemstone) {
+            setGemstonePrice(gemstone.price* gemstone.carat);
+        } else {
+            setGemstonePrice(0);
+        }
+
+        const material = materials.find(m => m._id === formik.values.material_id);
+        if (material) {
+            setMaterialPrice(material.sell_price * formik.values.material_weight);
+        } else {
+            setMaterialPrice(0);
+        }
+        formik.setFieldValue('price', gemstonePrice + materialPrice);
+    }, [formik.values.gemstone_id, formik.values.material_id, formik.values.material_weight, gemstones, materials, gemstonePrice, materialPrice]);
+
 
     const handleImageChange = (event) => {
         const files = event.currentTarget.files;
@@ -139,7 +159,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
         setSelectedImages(newSelectedImages);
         formik.setFieldValue("images", newImages);
     };
-    
 
     return (
         <Container maxWidth="sm">
@@ -173,12 +192,14 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     type="number"
                     variant="outlined"
                     value={formik.values.price}
-                    onChange={formik.handleChange}
+                    InputProps={{
+                        readOnly: true,
+                    }}
                     onBlur={formik.handleBlur}
                     error={formik.touched.price && Boolean(formik.errors.price)}
                     helperText={formik.touched.price && formik.errors.price}
                 />
-                 <FormControl variant="outlined" fullWidth>
+                <FormControl variant="outlined" fullWidth>
                     <InputLabel id="gemstone_id-label">Gemstone Material</InputLabel>
                     <Select
                         labelId="gemstone_id-label"
@@ -211,7 +232,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.gemstone_weight && Boolean(formik.errors.gemstone_weight)}
                     helperText={formik.touched.gemstone_weight && formik.errors.gemstone_weight}
                 />
-                 <FormControl variant="outlined" fullWidth>
+                <FormControl variant="outlined" fullWidth>
                     <InputLabel id="material_id-label">Material</InputLabel>
                     <Select
                         labelId="material_id-label"
