@@ -7,10 +7,6 @@ const materialSchema = new Schema({
         type: String,
         required: true
     },
-    carat: {
-        type: Number,
-        required: true
-    },
     buy_price: {
         type: Number,
         required: true

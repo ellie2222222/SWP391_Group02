@@ -29,7 +29,7 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    let { gemstone_id, material_id, price, material_weight, gemstone_weight, sale_percentage, type, on_sale } = data;
+    let { gemstone_id, material_id, price, material_weight, sale_percentage, type, on_sale } = data;
     let validationErrors = [];
 
     if (gemstone_id) gemstone_id = gemstone_id.trim();
@@ -45,7 +45,6 @@ const validateInputData = (data) => {
     // Convert values to numbers before checking
     price = parseFloat(price);
     material_weight = parseFloat(material_weight);
-    gemstone_weight = parseFloat(gemstone_weight);
     sale_percentage = parseFloat(sale_percentage);
 
     if (price != null && (!Number.isFinite(price) || price <= 0)) {
@@ -53,9 +52,6 @@ const validateInputData = (data) => {
     }
     if (material_weight != null && (!Number.isFinite(material_weight) || material_weight <= 0)) {
         validationErrors.push('Material weight must be a positive number');
-    }
-    if (gemstone_weight != null && (!Number.isFinite(gemstone_weight) || gemstone_weight <= 0)) {
-        validationErrors.push('Gemstone weight must be a positive number');
     }
     if (on_sale === 'false') {
         sale_percentage = 0;
@@ -81,7 +77,7 @@ const createJewelry = async (req, res) => {
         console.log('Request Body:', req.body);
         console.log('Request Files:', req.files);
 
-        let { name, description, price, gemstone_id, gemstone_weight, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
+        let { name, description, price, gemstone_id, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
 
         // Trim IDs
         if (gemstone_id) gemstone_id = gemstone_id.trim();
@@ -135,7 +131,6 @@ const createJewelry = async (req, res) => {
             description,
             price,
             gemstone_id,
-            gemstone_weight,
             material_id,
             material_weight,
             category,
@@ -159,7 +154,7 @@ const createJewelry = async (req, res) => {
 const updateJewelry = async (req, res) => {
     try {
         let { 
-            name, description, price, gemstone_id, gemstone_weight, 
+            name, description, price, gemstone_id, 
             material_id, material_weight, category, type, on_sale, sale_percentage, available
         } = req.body;
 
@@ -187,7 +182,6 @@ const updateJewelry = async (req, res) => {
         if (description) updateData.description = description;
         if (price) updateData.price = price;
         if (gemstone_id) updateData.gemstone_id = gemstone_id ? gemstone_id.trim() : null;
-        if (gemstone_weight) updateData.gemstone_weight = gemstone_weight;
         if (material_id) updateData.material_id = material_id ? material_id.trim() : null;
         if (material_weight) updateData.material_weight = material_weight;
         if (category) updateData.category = category;

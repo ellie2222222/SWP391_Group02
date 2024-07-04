@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const express = require('express')
 const mongoose = require('mongoose')
+const cookieParser = require('cookie-parser')
 const cors = require('cors');
 
 const userRoutes = require('./routes/user')
@@ -23,6 +24,7 @@ const app = express()
 
 //middleware
 app.use(express.json())
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
 const allowedOrigins = ['http://localhost:3000', 'https://frontend-chk2.onrender.com'];

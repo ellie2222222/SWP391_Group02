@@ -6,7 +6,11 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
 const createToken = (_id, role) => {
-  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
+  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "30m" });
+};
+
+const createRefreshToken = (_id, role) => {
+  return jwt.sign({ _id, role }, process.env.REFRESH_SECRET, { expiresIn: '7d' });
 };
 
 // login a user
@@ -18,8 +22,11 @@ const loginUser = async (req, res) => {
 
     // create a token
     const token = createToken(user._id, user.role);
+    const refreshToken = createRefreshToken(user._id, user.role);
 
-    res.status(200).json({ token });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+
+    res.status(200).json({ token, refreshToken});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -221,6 +228,33 @@ const resetPassword = async (req, res) => {
   })
 };
 
+const refreshToken = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  console.log("refresh:", refreshToken);
+
+  if (!refreshToken) return res.sendStatus(401);
+
+  jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
+    if (err) return res.sendStatus(403);
+
+    const token = createToken(decoded._id, decoded.role);
+    // const currentTime = new Date().toLocaleString(); // Get current time
+
+    res.json({ token, existToken: true });
+    // console.log("access:", token);
+    // // Log token creation time and expiration
+    // console.log(`Token created at: ${currentTime}`);
+    // console.log(`Token expires at: ${new Date(decoded.exp * 1000).toLocaleString()}`);
+  });
+};
+
+// Logout user
+const logout = (req, res) => {
+  res.clearCookie('refreshToken');
+  res.sendStatus(200);
+};
 
 
-module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword };
+
+module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout };

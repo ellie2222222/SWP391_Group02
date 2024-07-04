@@ -3,11 +3,10 @@ const mongoose = require('mongoose');
 
 // Helper functions for validation
 const validateEmptyFields = (data) => {
-    const { name, carat, buy_price, sell_price } = data;
+    const { name, buy_price, sell_price } = data;
     let emptyFields = [];
 
     if (!name) emptyFields.push('name');
-    if (!carat) emptyFields.push('carat');
     if (!buy_price) emptyFields.push('buy_price');
     if (!sell_price) emptyFields.push('sell_price');
 
@@ -19,12 +18,9 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    const { carat, buy_price, sell_price } = data;
+    const { buy_price, sell_price } = data;
     let validationErrors = [];
 
-    if (carat != null && (typeof carat !== 'number' || carat <= 0)) {
-        validationErrors.push('Carat must be a positive number');
-    }
     if (buy_price != null && (typeof buy_price !== 'number' || buy_price <= 0)) {
         validationErrors.push('Buy price must be a positive number');
     }
