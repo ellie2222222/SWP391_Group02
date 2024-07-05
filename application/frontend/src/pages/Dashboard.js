@@ -1,14 +1,13 @@
 import React from 'react'
-import Navbar from "../components/Navbar/Navbar"
-import Footer from '../components/Footer/Footer'
 import DashboardContent from '../components/DashboardContent'
+import { Box } from '@mui/material'
+import Sidebar from '../components/Sidebar'
 
 export default function Dashboard() {
   return (
-    <div>
-        <Navbar/>
-        <DashboardContent/>
-        <Footer/>
-    </div>
+    <Box sx={{ display: 'flex' }}>
+        <Sidebar />
+        <DashboardContent />
+    </Box>
   )
 }

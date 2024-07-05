@@ -73,10 +73,6 @@ const validateInputData = (data) => {
 
 const createJewelry = async (req, res) => {
     try {
-        // Log the request body and files for debugging
-        console.log('Request Body:', req.body);
-        console.log('Request Files:', req.files);
-
         let { name, description, price, gemstone_id, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
 
         // Trim IDs
@@ -142,8 +138,10 @@ const createJewelry = async (req, res) => {
             image_public_ids
         });
 
-        await newJewelry.save();
-        res.status(201).json(newJewelry);
+        const savedJewelry = await newJewelry.save(); 
+        const populatedJewelry = await Jewelry.findById(savedJewelry._id).populate('gemstone_id').populate('material_id');
+
+        res.status(201).json(populatedJewelry);
     } catch (error) {
         console.error('Server Error:', error); // Log server errors
         res.status(500).json({ error: error.message });
@@ -157,11 +155,6 @@ const updateJewelry = async (req, res) => {
             name, description, price, gemstone_id, 
             material_id, material_weight, category, type, on_sale, sale_percentage, available
         } = req.body;
-
-        const emptyFieldsError = validateEmptyFields(req.body);
-        if (emptyFieldsError) {
-            return res.status(400).json({ error: emptyFieldsError });
-        }
 
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
@@ -217,7 +210,9 @@ const updateJewelry = async (req, res) => {
             updateData.image_public_ids = image_public_ids;
         }
 
-        const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true })
+        .populate('gemstone_id')
+        .populate('material_id');
         res.status(200).json(updatedJewelry);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -269,9 +264,7 @@ const getJewelries = async (req, res) => {
         }
 
         const skip = (page - 1) * limit;
-        const jewelries = await Jewelry.find(query).sort(sort).skip(skip).limit(parseInt(limit))
-        .populate('gemstone_id').
-        populate('material_id');
+        const jewelries = await Jewelry.find(query).sort(sort).skip(skip).limit(parseInt(limit));
 
         // Count total number of documents
         const total = await Jewelry.countDocuments(query);
