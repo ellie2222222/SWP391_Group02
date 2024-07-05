@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, FormControlLabel, Switch, Typography, IconButton, CardMedia } from '@mui/material';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
+import JewelryForm from './JewelryForm'; // Adjust the import path as needed
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -11,29 +13,44 @@ const CustomButton1 = styled(Button)({
     width: '100%',
     fontSize: '1rem',
     '&:hover': {
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        color: '#b48c72', // Change text color on hover
         backgroundColor: 'transparent',
     },
 });
 
-export default function QuoteForm(initialValues,onSubmit) {
+export default function QuoteForm({ initialValues, onSubmit }) {
+    const [isJewelryFormOpen, setIsJewelryFormOpen] = useState(false);
+    const [jewelryId, setJewelryId] = useState(initialValues.jewelry_id ? initialValues.jewelry_id._id : '');
+    
     const formik = useFormik({
         initialValues: {
-            ...initialValues.initialValues,
+            ...initialValues,
         },
         onSubmit: async (values) => {
-
-
-            return initialValues.onSubmit(values);
-          },
+          
+            return onSubmit(values)
+        },
         validationSchema: Yup.object({
             quote_content: Yup.string().required('Quote Content is required'),
             quote_amount: Yup.number().typeError("Must be a number"),
             request_status: Yup.string().required("Required."),
+            jewelry_id: Yup.string().required("Required."),
         }),
-    })
-    return (
+    });
 
+    const handleJewelryFormSubmit = async (values) => {
+        try {
+            const response = await axiosInstance.post('http://localhost:4000/api/jewelries', values); // Adjust the API endpoint as needed
+            console.log(response.data);
+            setJewelryId(response.data._id); // Set the Jewelry ID from the response
+            formik.setFieldValue('jewelry_id', response.data._id); // Update the formik value
+            setIsJewelryFormOpen(false);
+        } catch (error) {
+            console.error('Failed to submit jewelry form', error);
+        }
+    };
+
+    return (
         <Container maxWidth="sm">
             <Typography variant="h4" gutterBottom>
                 Quote
@@ -72,16 +89,50 @@ export default function QuoteForm(initialValues,onSubmit) {
                         <MenuItem value="pending">Pending</MenuItem>
                         <MenuItem value="cancelled">Cancelled</MenuItem>
                         <MenuItem value="quote">Quote</MenuItem>
-
                     </Select>
                     {formik.touched.request_status && formik.errors.request_status && (
                         <Typography variant="caption" color="red">{formik.errors.request_status}</Typography>
                     )}
                 </FormControl>
+                <TextField
+                    name="jewelry_id"
+                    label="Jewelry ID"
+                    variant="outlined"
+                    value={jewelryId}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.jewelry_id && Boolean(formik.errors.jewelry_id)}
+                    helperText={formik.touched.jewelry_id && formik.errors.jewelry_id}
+                    InputProps={{
+                        readOnly: true,
+                    }}
+                    sx={{ mt: 2 }}
+                />
+                <CustomButton1
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 2 }}
+                    onClick={() => setIsJewelryFormOpen(true)}
+                >
+                    Add Jewelry
+                </CustomButton1>
                 <CustomButton1 type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                     Submit
                 </CustomButton1>
+                
             </Box>
+            <Dialog open={isJewelryFormOpen} onClose={() => setIsJewelryFormOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle>Add Jewelry</DialogTitle>
+                <DialogContent>
+                    <JewelryForm initialValues={{ name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false }} onSubmit={handleJewelryFormSubmit} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsJewelryFormOpen(false)} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
-    )
+    );
 }
