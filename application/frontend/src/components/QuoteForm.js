@@ -21,7 +21,8 @@ const CustomButton1 = styled(Button)({
 export default function QuoteForm({ initialValues, onSubmit }) {
     const [isJewelryFormOpen, setIsJewelryFormOpen] = useState(false);
     const [jewelryId, setJewelryId] = useState(initialValues.jewelry_id ? initialValues.jewelry_id._id : '');
-    
+    const [selectedJewelry, setSeclectedJewelry] = useState(initialValues.jewelry_id ? initialValues.jewelry_id : null)
+    console.log(selectedJewelry)
     const formik = useFormik({
         initialValues: {
             ...initialValues,
@@ -40,11 +41,15 @@ export default function QuoteForm({ initialValues, onSubmit }) {
 
     const handleJewelryFormSubmit = async (values) => {
         try {
+            if(selectedJewelry){
             const response = await axiosInstance.post('http://localhost:4000/api/jewelries', values); // Adjust the API endpoint as needed
             console.log(response.data);
             setJewelryId(response.data._id); // Set the Jewelry ID from the response
             formik.setFieldValue('jewelry_id', response.data._id); // Update the formik value
             setIsJewelryFormOpen(false);
+        } else {
+            
+        }
         } catch (error) {
             console.error('Failed to submit jewelry form', error);
         }
@@ -115,7 +120,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     sx={{ mt: 2 }}
                     onClick={() => setIsJewelryFormOpen(true)}
                 >
-                    Add Jewelry
+                   {selectedJewelry ? 'Update Jewelry' : 'Add Jewelry'}
                 </CustomButton1>
                 <CustomButton1 type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                     Submit
@@ -125,7 +130,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
             <Dialog open={isJewelryFormOpen} onClose={() => setIsJewelryFormOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Add Jewelry</DialogTitle>
                 <DialogContent>
-                    <JewelryForm initialValues={{ name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false }} onSubmit={handleJewelryFormSubmit} />
+                    <JewelryForm initialValues={selectedJewelry ? { name: selectedJewelry.name, description: selectedJewelry.description, price: selectedJewelry.price, gemstone_id: selectedJewelry.gemstone_id._id, material_id: selectedJewelry.material_id._id, material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false } : { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false }} onSubmit={handleJewelryFormSubmit} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsJewelryFormOpen(false)} color="primary">
