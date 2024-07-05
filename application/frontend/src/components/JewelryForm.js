@@ -102,7 +102,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             description: Yup.string().required("Required."),
             price: Yup.number().required("Required.").typeError("Must be a number"),
             gemstone_id: Yup.string(),
-            gemstone_weight: Yup.number().typeError("Must be a number"),
             material_id: Yup.string().required("Required."),
             material_weight: Yup.number().required("Required.").typeError("Must be a number"),
             category: Yup.string().required("Required."),
@@ -221,17 +220,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                         <Typography variant="caption" color="red">{formik.errors.gemstone_id}</Typography>
                     )}
                 </FormControl>
-                <CustomTextField
-                    name="gemstone_weight"
-                    label="Gemstone Weight"
-                    type="number"
-                    variant="outlined"
-                    value={formik.values.gemstone_weight}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.gemstone_weight && Boolean(formik.errors.gemstone_weight)}
-                    helperText={formik.touched.gemstone_weight && formik.errors.gemstone_weight}
-                />
                 <FormControl variant="outlined" fullWidth>
                     <InputLabel id="material_id-label">Material</InputLabel>
                     <Select
