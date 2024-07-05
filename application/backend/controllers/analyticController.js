@@ -30,13 +30,14 @@ const getTotalRevenue = async (req, res) => {
     const { period } = req.query;
 
     const { start, end } = getDateRange(period);
+    console.log(start)
+    console.log(end)
 
     try {
         const invoices = await Invoice.find({
             createdAt: { $gte: start, $lt: end },
-            status: 'completed'
         });
-
+        // console.log(invoices)
         const totalRevenue = invoices.reduce((total, invoice) => total + invoice.total_amount, 0);
 
         res.json({ totalRevenue });

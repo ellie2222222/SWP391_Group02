@@ -5,7 +5,10 @@ import axios from 'axios';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const token = localStorage.getItem('token');
+        return token ? { ...jwtDecode(token), token } : null;
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

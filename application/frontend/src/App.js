@@ -26,6 +26,7 @@ import Material from "./pages/Material";
 import WarrantyPolicy from "./pages/WarrantyPolicy";
 import ExchangePolicy from "./pages/ExchangePolicy";
 import GoldPrice from "./pages/GoldPrice";
+import Dashboard from "./pages/Dashboard";
 function App() {
   const { user } = useAuth()
 
@@ -60,6 +61,7 @@ function App() {
           <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
           <Route path="/admin/gemstones" element={<Gemstones />}></Route>
           <Route path="/admin/materials" element={<Material />}></Route>
+          <Route path="/admin/dashboard" element={<Dashboard />} />
         </Route>
 
         <Route element={<UserRoute />}>

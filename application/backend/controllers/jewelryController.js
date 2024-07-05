@@ -269,7 +269,9 @@ const getJewelries = async (req, res) => {
         }
 
         const skip = (page - 1) * limit;
-        const jewelries = await Jewelry.find(query).sort(sort).skip(skip).limit(parseInt(limit));
+        const jewelries = await Jewelry.find(query).sort(sort).skip(skip).limit(parseInt(limit))
+        .populate('gemstone_id').
+        populate('material_id');
 
         // Count total number of documents
         const total = await Jewelry.countDocuments(query);
