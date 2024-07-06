@@ -39,7 +39,7 @@ const BlogDetails = () => {
     const fetchBlogs = async () => {
       try {
         const response = await axiosInstance.get('/blogs');
-        setBlogs(response.data);
+        setBlogs(response.data.blogs);
       } catch (error) {
         console.error('There was an error fetching the blogs!', error);
       }
@@ -48,6 +48,22 @@ const BlogDetails = () => {
     fetchBlog();
     fetchBlogs();
   }, [id]);
+
+  const renderBlogContent = (content, images) => {
+    if (!content || !images) return null;
+
+    const parts = content.split(/(\[image\d+\])/);
+    return parts.map((part, index) => {
+      const match = part.match(/\[image(\d+)\]/);
+      if (match) {
+        const imageIndex = parseInt(match[1], 10);
+        if (images[imageIndex]) {
+          return <img key={index} src={images[imageIndex]} alt={`blog image ${imageIndex}`} style={{ width: '100%', borderRadius: '10px', margin: '20px 0' }} />;
+        }
+      }
+      return <Typography key={index} variant="body1" component="div" style={{ whiteSpace: 'pre-line' }}>{part}</Typography>;
+    });
+  };
 
   if (loading) {
     return (
@@ -70,14 +86,7 @@ const BlogDetails = () => {
       <Box display="flex" flexDirection="row" padding="40px 0" minHeight="100vh">
         <Box flex={1} mr={4}>
           <Typography variant="h4" component="h1" gutterBottom>{blog.blog_title}</Typography>
-          {blog.image_url && (
-            <Box my={4}>
-              <img src={blog.image_url} alt={blog.blog_title} style={{ width: '100%', borderRadius: '10px' }} />
-            </Box>
-          )}
-          <Typography variant="body1" component="div" style={{ whiteSpace: 'pre-line' }}>
-            {blog.blog_content}
-          </Typography>
+          {renderBlogContent(blog.blog_content, blog.blog_images)}
           <CustomButton1 onClick={() => navigate(-1)}>Go Back</CustomButton1>
         </Box>
         <Box width="300px">
@@ -91,7 +100,7 @@ const BlogDetails = () => {
                 >
                   <CardMedia
                     component="img"
-                    image={recommendedBlog.image_url}
+                    image={recommendedBlog.blog_images && recommendedBlog.blog_images[0] ? recommendedBlog.blog_images[0] : ''}
                     alt={recommendedBlog.blog_title}
                     style={{ width: '40%', height: '100px', borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
                   />

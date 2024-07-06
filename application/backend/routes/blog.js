@@ -1,23 +1,26 @@
 const express = require('express');
+const multer = require('multer');
+const { getBlogs, getBlog, createBlog, deleteBlog, updateBlog } = require('../controllers/blogController');
 const requireAuth = require('../middleware/requireAuth');
-const { getBlogs, getBlog, getBlogTitle, createBlog, deleteBlog, updateBlog } = require('../controllers/blogController');
-const { requireUser, requireAdmin } = require('../middleware/requireRoles');
-
+const { requireAdminOrManagerOrSale } = require('../middleware/requireRoles');
 const blogRoutes = express.Router();
 
-// Create a blog
-blogRoutes.post('/', requireAuth, requireAdmin, createBlog);
+// Multer configuration for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// Get all blogs or by title
+// Routes
 blogRoutes.get('/', getBlogs);
 
-// Get a single blog by ID
 blogRoutes.get('/:id', getBlog);
 
-// Update a blog
-blogRoutes.patch('/:id', requireAuth, requireAdmin, updateBlog);
+// POST route for creating a blog with multer handling blog_images
+blogRoutes.post('/', requireAuth, requireAdminOrManagerOrSale, upload.array('blog_images', 5), createBlog);
 
-// Delete a blog
-blogRoutes.delete('/:id', requireAuth, requireAdmin, deleteBlog);
+// DELETE route for deleting a blog
+blogRoutes.delete('/:id', requireAuth, requireAdminOrManagerOrSale, deleteBlog);
+
+// PATCH route for updating a blog with multer handling blog_images
+blogRoutes.patch('/:id', requireAuth, requireAdminOrManagerOrSale, upload.array('blog_images', 5), updateBlog);
 
 module.exports = blogRoutes;
