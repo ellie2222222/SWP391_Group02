@@ -29,7 +29,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
         },
         onSubmit: async (values) => {
 
-            return console.log(values)
+            return onSubmit(values)
         },
         validationSchema: Yup.object({
             quote_content: Yup.string().required('Quote Content is required'),
@@ -133,7 +133,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
             <Dialog open={isJewelryFormOpen} onClose={() => setIsJewelryFormOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Add Jewelry</DialogTitle>
                 <DialogContent>
-                    <JewelryForm initialValues={selectedJewelry ? { name: selectedJewelry.name, description: selectedJewelry.description, price: selectedJewelry.price, gemstone_id: selectedJewelry.gemstone_id._id, material_id: selectedJewelry.material_id._id, material_weight: selectedJewelry.material_weight, category: selectedJewelry.category, type: selectedJewelry.type, on_sale: selectedJewelry.on_sale, sale_percentage: selectedJewelry.sale_percentage, images: selectedJewelry.imgaes, available: selectedJewelry.available } : { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false }} onSubmit={handleJewelryFormSubmit} />
+                    <JewelryForm initialValues={selectedJewelry ? { ...selectedJewelry, gemstone_id: selectedJewelry.gemstone_id._id, material_id: selectedJewelry.material_id._id} : { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false }} onSubmit={handleJewelryFormSubmit} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsJewelryFormOpen(false)} color="primary">
