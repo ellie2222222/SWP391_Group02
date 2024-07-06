@@ -45,7 +45,7 @@ const BlogForm = ({ initialValues = { blog_title: '', blog_content: '', blog_ima
     const [newImages, setNewImages] = useState([]);
 
     useEffect(() => {
-        setSelectedImages(initialValues.blog_images);
+        setSelectedImages(initialValues.blog_images || []);
     }, [initialValues.blog_images]);
 
     const formik = useFormik({
