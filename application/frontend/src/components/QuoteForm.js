@@ -41,7 +41,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
     });
 
     useEffect(() => {
-        if (selectedJewelry) {
+        if (selectedJewelry || formik.values.production_cost) {
             const quoteContent = (
                 `${selectedJewelry.gemstone_id.name} * ${selectedJewelry.gemstone_id.carat} carat + ` +
                 `${selectedJewelry.material_id.name} * ${selectedJewelry.material_weight} + ` +
@@ -57,7 +57,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
     }, [selectedJewelry, formik.values.production_cost ]);
 
     useEffect(() => {
-        if (selectedJewelry && formik.values.production_cost) {
+        if (selectedJewelry || formik.values.production_cost) {
             const quoteAmount = Number(formik.values.production_cost) + selectedJewelry.price;
             formik.setFieldValue('quote_amount', quoteAmount);
         }
