@@ -288,7 +288,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate production cost
-    if (production_cost != null && (typeof production_cost !== 'number' || production_cost <= 0)) {
+    if (production_cost != null && (typeof Number(production_cost) !== 'number' || production_cost <= 0)) {
       return res.status(400).json('Production cost must be a positive number');
     }
 
@@ -347,7 +347,7 @@ const updateRequest = async (req, res) => {
       ...(quote_amount !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { quote_amount }),
       ...(production_start_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_start_date: parsedStartDate }),
       ...(production_end_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_end_date: parsedEndDate }),
-      ...(production_cost !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_cost }),
+      ...(production_cost !== undefined && (req.role === 'sale_staff' || req.role === 'production_staff' || req.role === 'manager') && { production_cost }),
       ...(endedAt !== undefined && { endedAt: parsedEndAt }),
       ...(images.length > 0 && (req.role === 'design_staff' || req.role === 'manager') && { design_images: images }),
       ...(warranty_content !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_content }),
