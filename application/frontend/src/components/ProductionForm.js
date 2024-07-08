@@ -19,12 +19,11 @@ const CustomButton1 = styled(Button)({
 
 const ProductionForm = ({ initialValues, onSubmit }) => {
     const today = new Date().toISOString().split('T')[0];
-
     const formik = useFormik({
         initialValues: {
-            production_start_date: initialValues.production_start_date ? initialValues.production_start_date : '',
-            production_end_date: initialValues.production_end_date ? initialValues.production_end_date : '',
-            request_status: initialValues.request_status,
+            production_start_date: initialValues.production_start_date ? format(parseISO(initialValues.production_start_date), 'yyyy-MM-dd') : '',
+            production_end_date: initialValues.production_end_date ? format(parseISO(initialValues.production_end_date), 'yyyy-MM-dd') : '',
+            request_status: initialValues.request_status || ''
         },
         validationSchema: Yup.object({
             production_start_date: Yup.date()
@@ -42,10 +41,10 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
             // Format dates before submitting
             const formattedValues = {
                 ...values,
-                production_start_date: format(parseISO(values.production_start_date), 'dd/MM/yyyy'), // Định dạng lại thành dd/MM/yy
-                production_end_date: format(parseISO(values.production_end_date), 'dd/MM/yyyy'), // Định dạng lại thành dd/MM/yy
+                production_start_date: format(parseISO(values.production_start_date), 'yyyy-MM-dd'), // Định dạng lại thành dd/MM/yy
+                production_end_date: format(parseISO(values.production_end_date), 'yyyy-MM-dd'), // Định dạng lại thành dd/MM/yy
             };
-            console.log(formattedValues);
+            onSubmit(formattedValues);
         },
     });
 

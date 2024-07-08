@@ -36,6 +36,7 @@ export default function ProductionStaffDashboard() {
         try {
             await axiosInstance.patch(`/requests/${selectedRequest._id}`, values)
             setError('');
+            setIsProductionDialogOpen(false)
             fetchRequests();
         } catch (error) {
             if (error.response === undefined) setError(error.message);
