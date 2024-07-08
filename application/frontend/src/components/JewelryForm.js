@@ -53,6 +53,23 @@ const CustomSwitch = styled(Switch)({
     },
 });
 
+const CustomFormControl = styled(FormControl)({
+    "& .MuiInputLabel-root": {
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiOutlinedInput-root": {
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+    },
+});
+
+
 const JewelryForm = ({ initialValues, onSubmit }) => {
     const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
     const [gemstones, setGemstones] = useState([]);
@@ -198,7 +215,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.price && Boolean(formik.errors.price)}
                     helperText={formik.touched.price && formik.errors.price}
                 />
-                <FormControl variant="outlined" fullWidth>
+                <CustomFormControl variant="outlined" fullWidth>
                     <InputLabel id="gemstone_id-label">Gemstone Material</InputLabel>
                     <Select
                         labelId="gemstone_id-label"
@@ -219,8 +236,8 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     {formik.touched.gemstone_id && formik.errors.gemstone_id && (
                         <Typography variant="caption" color="red">{formik.errors.gemstone_id}</Typography>
                     )}
-                </FormControl>
-                <FormControl variant="outlined" fullWidth>
+                </CustomFormControl>
+                <CustomFormControl variant="outlined" fullWidth>
                     <InputLabel id="material_id-label">Material</InputLabel>
                     <Select
                         labelId="material_id-label"
@@ -241,7 +258,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     {formik.touched.material_id && formik.errors.material_id && (
                         <Typography variant="caption" color="red">{formik.errors.material_id}</Typography>
                     )}
-                </FormControl>
+                </CustomFormControl>
                 <CustomTextField
                     name="material_weight"
                     label="Material Weight"
@@ -253,7 +270,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.material_weight && Boolean(formik.errors.material_weight)}
                     helperText={formik.touched.material_weight && formik.errors.material_weight}
                 />
-                <FormControl variant="outlined" fullWidth>
+                <CustomFormControl variant="outlined" fullWidth>
                     <InputLabel id="category-label">Category</InputLabel>
                     <Select
                         labelId="category-label"
@@ -274,8 +291,8 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     {formik.touched.category && formik.errors.category && (
                         <Typography variant="caption" color="red">{formik.errors.category}</Typography>
                     )}
-                </FormControl>
-                <FormControl variant="outlined" fullWidth>
+                </CustomFormControl>
+                <CustomFormControl variant="outlined" fullWidth>
                     <InputLabel id="type-label">Type</InputLabel>
                     <Select
                         labelId="type-label"
@@ -293,7 +310,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     {formik.touched.type && formik.errors.type && (
                         <Typography variant="caption" color="red">{formik.errors.type}</Typography>
                     )}
-                </FormControl>
+                </CustomFormControl>
                 <FormControlLabel
                     control={
                         <CustomSwitch

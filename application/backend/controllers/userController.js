@@ -133,7 +133,9 @@ const getUsers = async (req, res) => {
       sortField[field] = order === 'asc' ? 1 : -1;
     }
 
-    const users = await User.find(query).sort(sortField);
+    const users = await User.find(query)
+      .select('-password')
+      .sort(sortField);
 
     return res.status(200).json({ users });
   } catch (error) {

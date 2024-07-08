@@ -183,7 +183,7 @@ export default function Sidebar() {
                                             <PeopleIcon />
 
                                         </CustomListItemIcon>
-                                        <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                                        <ListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>

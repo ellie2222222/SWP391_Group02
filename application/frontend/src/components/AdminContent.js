@@ -230,7 +230,7 @@ const AdminContent = () => {
                     </Box>
                     <Box display="flex">
                         <CustomFormControl>
-                            <InputLabel>On Sale</InputLabel>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
                             <Select
                                 value={onSale}
                                 onChange={(event) => handleFilterChange('on_sale', event.target.value)}
@@ -241,7 +241,7 @@ const AdminContent = () => {
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel>Category</InputLabel>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
                             <Select
                                 value={category}
                                 onChange={(event) => handleFilterChange('category', event.target.value)}
@@ -255,7 +255,7 @@ const AdminContent = () => {
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel>Type</InputLabel>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Type</InputLabel>
                             <Select
                                 value={type}
                                 onChange={(event) => handleFilterChange('type', event.target.value)}
@@ -266,7 +266,7 @@ const AdminContent = () => {
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel>Sort By Price</InputLabel>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By Price</InputLabel>
                             <Select
                                 value={sortOrder}
                                 onChange={(event) => handleFilterChange('sortByPrice', event.target.value)}
@@ -277,7 +277,7 @@ const AdminContent = () => {
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel>Available</InputLabel>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Available</InputLabel>
                             <Select
                                 value={available}
                                 onChange={(event) => handleFilterChange('available', event.target.value)}
@@ -356,6 +356,7 @@ const AdminContent = () => {
                 <Box display="flex" justifyContent="center" marginTop="20px">
                     <Stack spacing={2}>
                         <Pagination
+                            size='large'
                             count={totalPages}
                             page={page}
                             onChange={handlePageChange}

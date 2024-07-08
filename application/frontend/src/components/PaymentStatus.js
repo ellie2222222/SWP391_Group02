@@ -23,7 +23,15 @@ const PaymentStatus = () => {
 
   const getPaymentStatus = async () => {
     const transId = urlParams.get('apptransid');
-    const amount = urlParams.get('amount')
+    const amount = urlParams.get('amount');
+    const bankcode = urlParams.get('bankcode');
+    let pm;
+    if (bankcode === "CC") {
+      pm = "credit_card"
+    } 
+    if (bankcode === "SBIS") {
+      pm = "domestic_card"
+    }
     setTransactionId(transId);
 
     try {
@@ -34,7 +42,7 @@ const PaymentStatus = () => {
       if (orderStatus.data.return_code === 1) {
         await axiosInstance.post('/invoices/', {
           transaction_id: transId,
-          payment_method: 'domestic_card',
+          payment_method: pm,
           payment_gateway: 'zalopay',
           total_amount: amount,
         });
@@ -59,7 +67,7 @@ const PaymentStatus = () => {
           {orderStatus ? (
             <>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>
-              {orderStatus === 1 ? (
+              {orderStatus.return_code == 1 ? (
                 <CheckCircleOutlineIcon sx={{ fontSize: '8em', color: '#63f558' }} />
               ) : (
                 <HighlightOffRoundedIcon sx={{ fontSize: '8em', color: 'red' }} />

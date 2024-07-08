@@ -41,6 +41,9 @@ const CustomTextField = styled(TextField)({
       color: "#b48c72",
     },
   },
+  '& .MuiInputBase-input': {
+    fontSize: '1.3rem',
+  },
 });
 
 const CustomIconButton = styled(IconButton)({
@@ -173,7 +176,6 @@ const JewelryList = () => {
           {/* Search Input */}
           <Box display="flex" mb={2}>
             <CustomTextField
-              size="normal"
               label="Search..."
               value={search}
               onChange={(event) => {
@@ -195,7 +197,7 @@ const JewelryList = () => {
           <Box display="flex">
             {/* On Sale Filter */}
             <CustomFormControl>
-              <InputLabel>On Sale</InputLabel>
+              <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
               <Select
                 value={onSale}
                 onChange={(event) => handleFilterChange('on_sale', event.target.value)}
@@ -207,7 +209,7 @@ const JewelryList = () => {
             </CustomFormControl>
             {/* Category Filter */}
             <CustomFormControl style={{ marginLeft: 20 }}>
-              <InputLabel>Category</InputLabel>
+              <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
               <Select
                 value={category}
                 onChange={(event) => handleFilterChange('category', event.target.value)}
@@ -222,7 +224,7 @@ const JewelryList = () => {
             </CustomFormControl>
             {/* Sort By Price Filter */}
             <CustomFormControl style={{ marginLeft: 20 }}>
-              <InputLabel>Sort By Price</InputLabel>
+              <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By Price</InputLabel>
               <Select
                 value={sortOrder}
                 onChange={(event) => handleFilterChange('sortByPrice', event.target.value)}
@@ -252,43 +254,55 @@ const JewelryList = () => {
                     alt={product.name}
                   />
                   <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
+                    <Typography variant="h5" component="div" mb={2}>
                       {product.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="h5" color="text.secondary" mb={2}>
                       {product._id}
                     </Typography>
-                    <Typography variant="h6" color="text.primary">
-                      {product.price} VND
-                    </Typography>
-                    <CustomButton1 onClick={() => navigate(`/products/${product._id}`)}>
-                      Details
-                    </CustomButton1>
-                  </CardContent>
-                </Card>
+                    {product.on_sale ? (
+                      <>
+                        <Typography variant="h4" sx={{ color: 'red', fontWeight: '300', mr: 1, display: 'inline-block' }}>
+                          {(product.price - (product.price * (product.sale_percentage / 100))).toLocaleString()}₫
+                        </Typography>
+                        <Typography variant="h5" sx={{ textDecoration: 'line-through', fontWeight: '300', display: 'inline-block' }}>
+                          {product.price.toLocaleString()}₫
+                        </Typography>
+                      </>
+                    ) : (
+                      <Typography variant="h4" component="p" sx={{ color: 'red', fontWeight: '300' }}>
+                        {product.price.toLocaleString()}₫
+                      </Typography>
+                    )}
+                  <CustomButton1 onClick={() => navigate(`/products/${product._id}`)}>
+                    Details
+                  </CustomButton1>
+                </CardContent>
+              </Card>
               </Grid>
-            ))
-          ) : (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh" width="100%">
-              <Typography variant="h6">No products found</Typography>
-            </Box>
-          )}
-        </Grid>
-
-        {/* Pagination */}
-        <Box display="flex" justifyContent="center" mt={2}>
-          <Stack spacing={2}>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handlePageChange}
-              showFirstButton
-              showLastButton
-            />
-          </Stack>
+        ))
+        ) : (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh" width="100%">
+          <Typography variant="h6">No products found</Typography>
         </Box>
+          )}
+      </Grid>
+
+      {/* Pagination */}
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Stack spacing={2}>
+          <Pagination
+            size="large"
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            showFirstButton
+            showLastButton
+          />
+        </Stack>
       </Box>
-    </Container>
+    </Box>
+    </Container >
   );
 };
 

@@ -27,6 +27,22 @@ const StyledDialogContentText = styled(DialogContentText)({
     textAlign: 'center',
 });
 
+const CustomTextField = styled(TextField)({
+    "& .MuiInputLabel-root": {
+      "&.Mui-focused": {
+        color: "#b48c72",
+      },
+    },
+    "& .MuiOutlinedInput-root": {
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#b48c72",
+      },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#b48c72",
+      },
+    },
+  });
+
 const CustomRequestForm = () => {
     const [description, setDescription] = useState('');
     const [loading, setLoading] = useState(false);
@@ -61,8 +77,8 @@ const CustomRequestForm = () => {
         <Container>
             <Box padding="40px 0" minHeight="60vh">
                 <Typography variant="h2" component="h1" marginBottom="20px">Custom Jewelry Request</Typography>
-                <Typography marginBottom="20px">Please tell us about your design; describe any changes you'd like to make to an existing design on this website or a completely custom item idea.</Typography>
-                <TextField
+                <Typography variant='h4' sx={{ fontWeight: 300 }} marginBottom="20px">Please tell us about your design; describe any changes you'd like to make to an existing design on this website or a completely custom item idea.</Typography>
+                <CustomTextField
                     label="Describe your idea"
                     multiline
                     rows={5}

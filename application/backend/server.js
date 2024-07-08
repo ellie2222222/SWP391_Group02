@@ -95,7 +95,6 @@ app.post('/api/payment', requireAuth, async (req, res) => {
   const embed_data = {
     // redirecturl: "https://frontend-chk2.onrender.com/",
     redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
-    preferred_payment_method: ["domestic_card",  "account"]
   };
   
   const items = [{ product }];
