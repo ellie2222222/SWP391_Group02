@@ -22,7 +22,6 @@ export default function QuoteForm({ initialValues, onSubmit }) {
     const [isJewelryFormOpen, setIsJewelryFormOpen] = useState(false);
     const [jewelryId, setJewelryId] = useState(initialValues.jewelry_id ? initialValues.jewelry_id._id : '');
     const [selectedJewelry, setSelectedJewelry] = useState(initialValues.jewelry_id ? initialValues.jewelry_id : null);
-
     const formik = useFormik({
         initialValues: {
             ...initialValues,

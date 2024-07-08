@@ -175,6 +175,7 @@ const AdminContent = () => {
 
     const handleSubmit = async (values) => {
         try {
+            console.log(values)
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
                 toast.success('Jewelry item updated successfully');

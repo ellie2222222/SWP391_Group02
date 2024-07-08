@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
-import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
-
+import { Grid, Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import DesignForm from './DesignForm';
+import JewelryForm from './JewelryForm';
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
@@ -19,9 +20,9 @@ const CustomButton1 = styled(Button)({
 export default function DesignStaffDashboard() {
     const [requests, setRequests] = useState([]);
     const [isJewelryDetailDialogOpen, setIsJewelryDetailDialogOpen] = useState(false);
-    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [isUpdateDesignDialogOpen, setIsUpdateDesignDialogOpen] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState([]);
     const [error, setError] = useState('');
-
     const fetchRequests = async () => {
         try {
             const response = await axiosInstance.get('/requests');
@@ -30,27 +31,25 @@ export default function DesignStaffDashboard() {
             console.error("There was an error fetching the requests!", error);
         }
     };
-    const handleAcceptRequest = async (requestId) => {
-        try {
-            await axiosInstance.post(`/works-on`, { request_id: requestId })
-
-            await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'accepted' })
-
-            setError('');
-            fetchRequests();
-        } catch (error) {
-            if (error.response === undefined) setError(error.message);
-            else setError(error.response.data.error);
-        }
-    }
+    const handleUpdateDesign = async () => {
+        setIsUpdateDesignDialogOpen(false)
+        fetchRequests();
+    };
 
     const handleJewelryDetailOpen = (request) => {
         setSelectedRequest(request);
         setIsJewelryDetailDialogOpen(true);
-    };  
+    };
+    const handleUpdateDesignOpen = (request) => {
+        setSelectedRequest(request);
+        setIsUpdateDesignDialogOpen(true);
+    };
 
-    const handleCloseAllDialogs = () => {
+    const handleJewelryDialogsClose = () => {
         setIsJewelryDetailDialogOpen(false);
+    };
+    const handleUpdateDesignDialogsClose = () => {
+        setIsUpdateDesignDialogOpen(false);
     };
 
     useEffect(() => {
@@ -73,9 +72,9 @@ export default function DesignStaffDashboard() {
                     </TableHead>
 
                     <TableBody>
-                        {requests.map((request, index) => (
-                            request.request_status === 'user_accepted' && (
-                                <TableRow key={index}>
+                        {requests.map((request) => (
+                            request.request_status === 'design' && (
+                                <TableRow key={request._id}>
                                     <TableCell>{request._id}</TableCell>
                                     <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
                                     <TableCell>{request.request_description}</TableCell>
@@ -86,7 +85,7 @@ export default function DesignStaffDashboard() {
                                         </CustomButton1>
                                     </TableCell>
                                     <TableCell>
-                                        <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Request</CustomButton1>
+                                        <CustomButton1 onClick={() => handleUpdateDesignOpen(request)}>Update Design</CustomButton1>
                                     </TableCell>
                                 </TableRow>
                             )
@@ -95,7 +94,7 @@ export default function DesignStaffDashboard() {
 
                 </Table>
             </TableContainer>
-            <Dialog open={isJewelryDetailDialogOpen} onClose={handleCloseAllDialogs}>
+            <Dialog open={isJewelryDetailDialogOpen} onClose={handleJewelryDialogsClose}>
                 <DialogTitle>Jewelry Detail</DialogTitle>
                 <DialogContent>
                     {selectedRequest && selectedRequest.jewelry_id && (
@@ -120,20 +119,38 @@ export default function DesignStaffDashboard() {
                             )}
                             <Typography marginBottom={'10px'}>Material Weight: {selectedRequest.jewelry_id.material_weight} kg</Typography>
                             <Typography marginBottom={'10px'}>Category: {selectedRequest.jewelry_id.category}</Typography>
+                            <Grid container spacing={2} sx={{ mt: 2 }}>
                             {selectedRequest.jewelry_id.images.map((image, index) => (
-                                <CardMedia
-                                    key={index}
-                                    component="img"
-                                    alt="Jewelry"
-                                    image={image}
-                                    sx={{ width: '100%', margin: '0px' }}
-                                />
+                                <Grid item xs={4} sm={4} md={4} key={index}>
+                                    <CardMedia
+                                        key={index}
+                                        component="img"
+                                        alt="Jewelry"
+                                        image={image}
+                                        sx={{ margin: '5px' }}
+                                    />
+                                </Grid>
                             ))}
+                            </Grid>
                         </>
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} color="primary">
+                    <Button onClick={handleJewelryDialogsClose} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={isUpdateDesignDialogOpen} onClose={handleUpdateDesignDialogsClose}>
+                <DialogTitle>Design Form</DialogTitle>
+                <DialogContent>
+                    <DesignForm
+                        initialValues={selectedRequest}
+                        onSubmit={handleUpdateDesign}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleUpdateDesignDialogsClose} color="primary">
                         Close
                     </Button>
                 </DialogActions>
