@@ -117,13 +117,22 @@ const assignRole = async (req, res) => {
 };
 
 // get all users
+// get all users
 const getUsers = async (req, res) => {
-  const { username, sort } = req.query;
+  const { search, sort, role, page = 1 } = req.query;
 
   try {
     let query = {};
-    if (username) {
-      query.username = new RegExp(username, 'i'); // 'i' for case-insensitive search
+    if (search) {
+      query = {
+        $or: [
+          { username: new RegExp(search, 'i') },
+          { email: new RegExp(search, 'i') }
+        ]
+      };
+    }
+    if (role) {
+      query.role = new RegExp(role, 'i');
     }
 
     // Determine the sort field and order
@@ -133,15 +142,28 @@ const getUsers = async (req, res) => {
       sortField[field] = order === 'asc' ? 1 : -1;
     }
 
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
     const users = await User.find(query)
       .select('-password')
-      .sort(sortField);
+      .sort(sortField)
+      .skip(skip)
+      .limit(limit);
 
-    return res.status(200).json({ users });
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    return res.status(200).json({
+      users,
+      total: totalUsers,
+      totalPages
+    });
   } catch (error) {
     return res.status(500).json({ error: "Error while getting users" });
   }
 }
+
 
 
 const getUser = async (req, res) => {

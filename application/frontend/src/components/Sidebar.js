@@ -137,7 +137,7 @@ export default function Sidebar() {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Dashboard
+                        Management
                     </Typography>
                 </Toolbar>
             </AppBar>
@@ -244,7 +244,7 @@ export default function Sidebar() {
                                         <FeedIcon />
 
                                     </CustomListItemIcon>
-                                    <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                                    <ListItemText primary="Blogs" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>

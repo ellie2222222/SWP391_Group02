@@ -32,7 +32,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
 }));
 
@@ -72,9 +71,8 @@ const CustomFormControl = styled(FormControl)({
     },
 });
 
-
 const CustomTableCell = styled(TableCell)({
-    fontSize: '1.3rem',  // Adjust the font size as needed
+    fontSize: '1.3rem',
 });
 
 const AdminContent = () => {
@@ -87,7 +85,7 @@ const AdminContent = () => {
     const [type, setType] = useState("");
     const [onSale, setOnSale] = useState("");
     const [sortOrder, setSortOrder] = useState("");
-    const [available, setAvailable] = useState("")
+    const [available, setAvailable] = useState("");
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -108,7 +106,6 @@ const AdminContent = () => {
         }
     };
 
-    // Update query params function
     const updateQueryParams = (key, value, resetPage = false) => {
         const newSearchParams = new URLSearchParams(searchParams);
         if (value) {
@@ -122,50 +119,38 @@ const AdminContent = () => {
         setSearchParams(newSearchParams);
     };
 
-    // Update state with query params on component mount
     useEffect(() => {
-        setSearch(searchParams.get('name') || "");
-        setOnSale(searchParams.get('on_sale') || "");
-        setCategory(searchParams.get('category') || "");
-        setSortOrder(searchParams.get('sortByPrice') || "");
-        setAvailable(searchParams.get('available') || "");
-        setType(searchParams.get('type') || "");
+        setSearch(searchParams.get('name') || '');
+        setOnSale(searchParams.get('on_sale') || '');
+        setCategory(searchParams.get('category') || '');
+        setSortOrder(searchParams.get('sortByPrice') || '');
+        setAvailable(searchParams.get('available') || '');
+        setType(searchParams.get('type') || '');
         setPage(parseInt(searchParams.get('page') || '1', 10));
     }, [searchParams]);
 
-    // Handle search click event
     const handleSearchClick = () => {
-        updateQueryParams('search', search, true);
+        updateQueryParams('name', search, true);
     };
 
-    // Handle filter change event
     const handleFilterChange = (key, value) => {
         updateQueryParams(key, value, true);
     };
 
-    // Handle Enter key press in search input
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             handleSearchClick();
         }
     };
 
-    // Handle page change
     const handlePageChange = (event, newPage) => {
         setPage(newPage);
         updateQueryParams('page', newPage.toString());
     };
 
-    // Fetch jewelries on initial load and whenever searchParams change
     useEffect(() => {
         fetchJewelries();
     }, [searchParams, page]);
-
-    // Update component state with query params on mount
-    useEffect(() => {
-        setSearch(searchParams.get('search') || '');
-        setPage(parseInt(searchParams.get('page') || '1', 10));
-    }, [searchParams]);
 
     const handleAddClick = () => {
         setSelectedJewelry(null);
@@ -210,7 +195,7 @@ const AdminContent = () => {
             <DrawerHeader />
             <Container>
                 <Box display="flex" mb={2} flexDirection="column">
-                    <Box display="flex" mb={2}>
+                    <Box mb={2}>
                         <CustomTextField
                             size="normal"
                             label="Search..."
@@ -314,34 +299,34 @@ const AdminContent = () => {
                         <TableBody>
                             {jewelries.length > 0 ? (
                                 jewelries.map((jewelry) => (
-                                <TableRow key={jewelry._id}>
-                                    <CustomTableCell>{jewelry.name}</CustomTableCell>
-                                    <CustomTableCell>{jewelry.category}</CustomTableCell>
-                                    <CustomTableCell>{jewelry.on_sale === true ? 'Yes' : 'No'}</CustomTableCell>
-                                    <CustomTableCell>{jewelry.available === true ? 'Yes' : 'No'}</CustomTableCell>
-                                    <CustomTableCell>{jewelry.type}</CustomTableCell>
-                                    <CustomTableCell>{jewelry.price}</CustomTableCell>
-                                    <TableCell>
-                                        {jewelry.images[0] && (
-                                            <CardMedia
-                                                component="img"
-                                                alt="Jewelry"
-                                                image={jewelry.images[0]}
-                                                sx={{ width: '100%', maxHeight: '400px', margin: '0px' }}
-                                            />
-                                        )}
-                                    </TableCell>
-                                    <TableCell align='center'>
-                                        <StyledIconButton onClick={() => handleEditClick(jewelry)}>
-                                            <Edit />
-                                        </StyledIconButton>
-                                        <StyledIconButton onClick={() => handleDeleteClick(jewelry._id)}>
-                                            <Delete />
-                                        </StyledIconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                            ) : (          
+                                    <TableRow key={jewelry._id}>
+                                        <CustomTableCell>{jewelry.name}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.category}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.on_sale === true ? 'Yes' : 'No'}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.available === true ? 'Yes' : 'No'}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.type}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.price}</CustomTableCell>
+                                        <TableCell>
+                                            {jewelry.images[0] && (
+                                                <CardMedia
+                                                    component="img"
+                                                    alt="Jewelry"
+                                                    image={jewelry.images[0]}
+                                                    sx={{ width: '100%', maxHeight: '400px', margin: '0px' }}
+                                                />
+                                            )}
+                                        </TableCell>
+                                        <TableCell align='center'>
+                                            <StyledIconButton onClick={() => handleEditClick(jewelry)}>
+                                                <Edit />
+                                            </StyledIconButton>
+                                            <StyledIconButton onClick={() => handleDeleteClick(jewelry._id)}>
+                                                <Delete />
+                                            </StyledIconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
                                 <TableRow>
                                     <TableCell align='center' colSpan={9}>
                                         <Typography variant="h6">No products found</Typography>
@@ -352,7 +337,6 @@ const AdminContent = () => {
                     </Table>
                 </TableContainer>
 
-                {/* Pagination */}
                 <Box display="flex" justifyContent="center" marginTop="20px">
                     <Stack spacing={2}>
                         <Pagination
@@ -366,7 +350,6 @@ const AdminContent = () => {
                     </Stack>
                 </Box>
 
-                {/* Dialog for Add/Edit Jewelry */}
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <DialogTitle>{selectedJewelry ? 'Edit Jewelry' : 'Add Jewelry'}</DialogTitle>
                     <DialogContent>
