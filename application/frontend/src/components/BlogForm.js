@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/system';
+import axios from 'axios'; // Make sure to import axios
 
 const CustomTextField = styled(TextField)({
     '& label.Mui-focused': {
@@ -43,6 +44,7 @@ const CustomIconButton = styled(IconButton)({
 const BlogForm = ({ initialValues = { blog_title: '', blog_content: '', blog_images: [] }, onSubmit }) => {
     const [selectedImages, setSelectedImages] = useState(initialValues.blog_images || []);
     const [newImages, setNewImages] = useState([]);
+    const [imagesToDelete, setImagesToDelete] = useState([]);
 
     useEffect(() => {
         setSelectedImages(initialValues.blog_images || []);
@@ -69,8 +71,11 @@ const BlogForm = ({ initialValues = { blog_title: '', blog_content: '', blog_ima
                     formData.append(key, values[key]);
                 }
             });
-            console.log('FormData keys:', Array.from(formData.keys())); // Log FormData keys
-            console.log('FormData entries:', Array.from(formData.entries())); // Log FormData entries
+
+            imagesToDelete.forEach((image) => {
+                formData.append('imagesToDelete', image);
+            });
+
             return onSubmit(formData);
         },
     });
@@ -91,19 +96,27 @@ const BlogForm = ({ initialValues = { blog_title: '', blog_content: '', blog_ima
         });
 
         Promise.all(readers).then(results => {
-            const newSelectedImages = results.map(result => result.url);
+            const newSelectedImages = [...selectedImages, ...results.map(result => result.url)];
             setSelectedImages(newSelectedImages);
-            setNewImages(results.map(result => result.file));
-            formik.setFieldValue("blog_images", results.map(result => result.file));
+            setNewImages([...newImages, ...results.map(result => result.file)]);
         });
     };
 
     const handleRemoveImage = (index) => {
         const newSelectedImages = [...selectedImages];
-        newSelectedImages.splice(index, 1);
-
+        const removedImage = newSelectedImages.splice(index, 1)[0];
         setSelectedImages(newSelectedImages);
-        formik.setFieldValue("blog_images", newSelectedImages);
+        
+        if (typeof removedImage === 'string') {
+            setImagesToDelete([...imagesToDelete, removedImage]);
+        } else {
+            const newImageIndex = newImages.findIndex(image => image.url === removedImage.url);
+            if (newImageIndex !== -1) {
+                const newImagesCopy = [...newImages];
+                newImagesCopy.splice(newImageIndex, 1);
+                setNewImages(newImagesCopy);
+            }
+        }
     };
 
     return (
@@ -142,7 +155,7 @@ const BlogForm = ({ initialValues = { blog_title: '', blog_content: '', blog_ima
                                     <CardMedia
                                         component="img"
                                         alt={`Selected ${index}`}
-                                        image={image}
+                                        image={typeof image === 'string' ? image : image.url}
                                         sx={{ right: 4, left: 4, width: '100%', maxHeight: '150px' }}
                                     />
                                     <CustomIconButton
