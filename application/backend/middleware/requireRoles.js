@@ -87,7 +87,7 @@ const requireUserOrManagerOrSale = (req, res, next) => {
 }
 
 const requireAdminOrManagerOrSale = (req, res, next) => {
-  if (req.role !== 'admin' && req.role !== 'manager') {
+  if (req.role !== 'admin' && req.role !== 'manager' && req.role !== 'sale_staff') {
     return res.status(403).json({ error: 'Admin or Manager or Sale staff access required' });
   }
 

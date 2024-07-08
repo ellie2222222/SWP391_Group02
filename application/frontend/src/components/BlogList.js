@@ -19,7 +19,7 @@ const CustomButton1 = styled(Button)({
 });
 
 const BlogLists = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [blogsData, setBlogsData] = useState({ blogs: [], total: 0 });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ const BlogLists = () => {
     const fetchBlogs = async () => {
       try {
         const response = await axiosInstance.get('/blogs');
-        setBlogs(response.data);
+        setBlogsData(response.data); // expecting response.data to be { blogs: [], total: ..., totalPages: ..., currentPage: ... }
         setLoading(false);
       } catch (error) {
         console.error('There was an error fetching the blogs!', error);
@@ -46,10 +46,10 @@ const BlogLists = () => {
     );
   }
 
-  if (blogs.length <= 0) {
+  if (blogsData.blogs.length <= 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <Typography variant="h5">There was an error getting blogs!</Typography>
+        <Typography variant="h5">There are no blogs available.</Typography>
       </Box>
     );
   }
@@ -58,7 +58,7 @@ const BlogLists = () => {
     <Container>
       <Box padding="60px 0">
         <Grid container spacing={4}>
-          {blogs.map((blog, index) => (
+          {blogsData.blogs.map((blog, index) => (
             <Grid item xs={12} md={6} key={index}>
               <Card
                 onClick={() => navigate(`/blog/${blog._id}`)}
@@ -66,7 +66,7 @@ const BlogLists = () => {
               >
                 <CardMedia
                   component="img"
-                  image={blog.image_url}
+                  image={blog.blog_images && blog.blog_images.length > 0 ? blog.blog_images[0] : ''} // Use the first image as the thumbnail
                   alt={blog.blog_title}
                   style={{ width: '40%', height: '180px', borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
                 />

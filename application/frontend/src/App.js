@@ -9,6 +9,7 @@ import Signup from "./pages/Signup";
 import JewelryDashboard from "./pages/JewelryDashboard";
 import UsersDashboard from "./pages/UsersDashboard";
 import BlogContents from "./pages/BlogContents";
+import BlogCreate from "./pages/BlogCreate";
 import Warranty from './pages/Warranty'; // Import the new page
 import WarrantyList from "./pages/WarrantyList";
 import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
@@ -62,6 +63,7 @@ function App() {
           <Route path="/admin/gemstones" element={<Gemstones />}></Route>
           <Route path="/admin/materials" element={<Material />}></Route>
           <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path='/admin/blogs' element={<BlogCreate />}></Route>
         </Route>
 
         <Route element={<UserRoute />}>

@@ -5,6 +5,7 @@ import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
+import FeedIcon from '@mui/icons-material/Feed';
 import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
@@ -227,6 +228,20 @@ export default function Sidebar() {
                                     <CustomListItemIcon
                                     >
                                         <PeopleIcon />
+
+                                    </CustomListItemIcon>
+                                    <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                                </CustomListItemButton>
+                            </Link>
+                        </ListItem>
+                    )}
+                    {user.role === 'admin' && (
+                        <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
+                            <Link to='/admin/blogs'>
+                                <CustomListItemButton>
+                                    <CustomListItemIcon
+                                    >
+                                        <FeedIcon />
 
                                     </CustomListItemIcon>
                                     <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
