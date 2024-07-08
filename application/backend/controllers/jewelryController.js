@@ -6,8 +6,7 @@ const { cloudinary } = require('../cloudinary');
 // Helper functions for validation
 const validateEmptyFields = (data) => {
     const {
-        name, description,
-        material_id, material_weight, price, category, type, on_sale, sale_percentage, available
+        name, description, material_id, material_weight, price, category, type, on_sale, sale_percentage, available
     } = data;
     let emptyFields = [];
 
@@ -22,10 +21,10 @@ const validateEmptyFields = (data) => {
     if (!sale_percentage) emptyFields.push('sale_percentage');
 
     if (emptyFields.length > 0) {
-        return "Please fill in the required field"
+        return "Please fill in the required fields";
     }
 
-    return null
+    return null;
 };
 
 const validateInputData = (data) => {
@@ -36,13 +35,12 @@ const validateInputData = (data) => {
     if (material_id) material_id = material_id.trim();
 
     if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
-        validationErrors.push('Invalid gemstones ID');
+        validationErrors.push('Invalid gemstone ID');
     }
     if (material_id && !mongoose.Types.ObjectId.isValid(material_id)) {
         validationErrors.push('Invalid material ID');
     }
 
-    // Convert values to numbers before checking
     price = parseFloat(price);
     material_weight = parseFloat(material_weight);
     sale_percentage = parseFloat(sale_percentage);
@@ -57,7 +55,7 @@ const validateInputData = (data) => {
         sale_percentage = 0;
     }
     if (on_sale === 'true' && sale_percentage <= 0) {
-        validationErrors.push('Sale percentage must not 0 when it is on sale');
+        validationErrors.push('Sale percentage must not be 0 when it is on sale');
     }
     if (sale_percentage != null && (!Number.isFinite(sale_percentage) || sale_percentage < 0 || sale_percentage > 100)) {
         validationErrors.push('Sale percentage must be a positive number between 0 and 100');
@@ -75,17 +73,14 @@ const createJewelry = async (req, res) => {
     try {
         let { name, description, price, gemstone_id, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
 
-        // Trim IDs
         if (gemstone_id) gemstone_id = gemstone_id.trim();
         if (material_id) material_id = material_id.trim();
 
-        // Validate Empty Fields
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
         }
 
-        // Validate Input Data
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
@@ -98,13 +93,12 @@ const createJewelry = async (req, res) => {
         const images = [];
         const image_public_ids = [];
 
-        // Handle file uploads
         if (req.files && req.files.length > 0) {
             const uploadPromises = req.files.map(file => {
                 return new Promise((resolve, reject) => {
                     const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
                         if (error) {
-                            console.error('Upload Error:', error); // Log upload errors
+                            console.error('Upload Error:', error);
                             reject(error);
                         } else {
                             images.push(result.secure_url);
@@ -121,7 +115,6 @@ const createJewelry = async (req, res) => {
             return res.status(400).json({ error: 'No files uploaded' });
         }
 
-        // Create new jewelry item
         const newJewelry = new Jewelry({
             name,
             description,
@@ -138,23 +131,19 @@ const createJewelry = async (req, res) => {
             image_public_ids
         });
 
-        const savedJewelry = await newJewelry.save(); 
+        const savedJewelry = await newJewelry.save();
         const populatedJewelry = await Jewelry.findById(savedJewelry._id).populate('gemstone_id').populate('material_id');
 
         res.status(201).json(populatedJewelry);
     } catch (error) {
-        console.error('Server Error:', error); // Log server errors
+        console.error('Server Error:', error);
         res.status(500).json({ error: error.message });
     }
 };
 
-//update
 const updateJewelry = async (req, res) => {
     try {
-        let { 
-            name, description, price, gemstone_id, 
-            material_id, material_weight, category, type, on_sale, sale_percentage, available
-        } = req.body;
+        let { name, description, price, gemstone_id, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
 
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
@@ -183,10 +172,20 @@ const updateJewelry = async (req, res) => {
         if (sale_percentage) updateData.sale_percentage = sale_percentage;
         if (available) updateData.available = available;
 
-        if (req.files && req.files.length > 0) {
-            const deletePromises = existingJewelry.image_public_ids.map(publicId => cloudinary.uploader.destroy(publicId));
+        // Initialize updateData.images and updateData.image_public_ids as arrays
+        updateData.images = existingJewelry.images || [];
+        updateData.image_public_ids = existingJewelry.image_public_ids || [];
+
+        if (req.body.removedImages && req.body.removedImages.length > 0) {
+            const removedImages = Array.isArray(req.body.removedImages) ? req.body.removedImages : [req.body.removedImages];
+            const deletePromises = removedImages.map(publicId => cloudinary.uploader.destroy(publicId));
             await Promise.all(deletePromises);
 
+            updateData.images = updateData.images.filter(image => !removedImages.includes(image));
+            updateData.image_public_ids = updateData.image_public_ids.filter(publicId => !removedImages.includes(publicId));
+        }
+
+        if (req.files && req.files.length > 0) {
             const images = [];
             const image_public_ids = [];
             const uploadPromises = req.files.map(file => {
@@ -203,16 +202,17 @@ const updateJewelry = async (req, res) => {
                     streamifier.createReadStream(file.buffer).pipe(uploadStream);
                 });
             });
-            
+
             await Promise.all(uploadPromises);
 
-            updateData.images = images;
-            updateData.image_public_ids = image_public_ids;
+            // Concatenate the new images and public IDs
+            updateData.images = [...updateData.images, ...images];
+            updateData.image_public_ids = [...updateData.image_public_ids, ...image_public_ids];
         }
 
         const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true })
-        .populate('gemstone_id')
-        .populate('material_id');
+            .populate('gemstone_id')
+            .populate('material_id');
         res.status(200).json(updatedJewelry);
     } catch (error) {
         res.status(500).json({ error: error.message });

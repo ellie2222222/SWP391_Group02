@@ -72,10 +72,12 @@ const CustomFormControl = styled(FormControl)({
 const JewelryForm = ({ initialValues, onSubmit }) => {
     const { user } = useAuth();
     const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
+    const [removedImages, setRemovedImages] = useState([]);
     const [gemstones, setGemstones] = useState([]);
     const [materials, setMaterials] = useState([]);
     const [gemstonePrice, setGemstonePrice] = useState(0);
     const [materialPrice, setMaterialPrice] = useState(0);
+
     useEffect(() => {
         const fetchOptions = async () => {
             try {
@@ -101,7 +103,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             available: initialValues.available ?? false,
         },
         onSubmit: async (values) => {
-            console.log(values)
             const formData = new FormData();
             Object.keys(values).forEach((key) => {
                 if (key === 'images') {
@@ -111,6 +112,9 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 } else {
                     formData.append(key, values[key]);
                 }
+            });
+            removedImages.forEach((image) => {
+                formData.append('removedImages', image);
             });
             return onSubmit(formData);
         },
@@ -146,7 +150,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
         formik.setFieldValue('price', gemstonePrice + materialPrice);
     }, [formik.values.gemstone_id, formik.values.material_id, formik.values.material_weight, gemstones, materials, gemstonePrice, materialPrice]);
 
-
     const handleImageChange = (event) => {
         const files = event.currentTarget.files;
         const fileArray = Array.from(files);
@@ -170,10 +173,12 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     };
 
     const handleRemoveImage = (index) => {
+        const removedImage = selectedImages[index];
         const newSelectedImages = selectedImages.filter((_, i) => i !== index);
         const newImages = formik.values.images.filter((_, i) => i !== index);
         setSelectedImages(newSelectedImages);
         formik.setFieldValue("images", newImages);
+        setRemovedImages([...removedImages, removedImage]);
     };
 
     return (
