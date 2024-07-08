@@ -82,56 +82,70 @@ const createBlog = async (req, res) => {
 };
 
 const updateBlog = async (req, res) => {
-  try {
-      let { blog_title, blog_content } = req.body;
-
+    try {
+      let { blog_title, blog_content, imagesToDelete } = req.body;
+  
       const validationErrors = validateInputData(req.body);
       if (validationErrors.length > 0) {
-          return res.status(400).json({ error: validationErrors.join(', ') });
+        return res.status(400).json({ error: validationErrors.join(', ') });
       }
-
+  
       const existingBlog = await Blog.findById(req.params.id);
       if (!existingBlog) {
-          return res.status(404).json({ error: 'Blog not found' });
+        return res.status(404).json({ error: 'Blog not found' });
       }
-
+  
       let updateData = {};
       if (blog_title) updateData.blog_title = blog_title;
       if (blog_content) updateData.blog_content = blog_content;
-
-      if (req.files && req.files.length > 0) {
-          const deletePromises = existingBlog.images_public_ids.map(publicId => cloudinary.uploader.destroy(publicId));
+  
+      if (imagesToDelete) {
+        imagesToDelete = Array.isArray(imagesToDelete) ? imagesToDelete : [imagesToDelete];
+  
+        if (imagesToDelete.length > 0) {
+          const deletePromises = imagesToDelete.map(publicId => cloudinary.uploader.destroy(publicId));
           await Promise.all(deletePromises);
-
-          const blog_images = [];
-          const images_public_ids = [];
-          const uploadPromises = req.files.map(file => {
-              return new Promise((resolve, reject) => {
-                  const uploadStream = cloudinary.uploader.upload_stream({ folder: 'blogs' }, (error, result) => {
-                      if (error) {
-                          reject(error);
-                      } else {
-                          blog_images.push(result.secure_url);
-                          images_public_ids.push(result.public_id);
-                          resolve();
-                      }
-                  });
-                  streamifier.createReadStream(file.buffer).pipe(uploadStream);
-              });
-          });
-
-          await Promise.all(uploadPromises);
-
-          updateData.blog_images = blog_images;
-          updateData.images_public_ids = images_public_ids;
+  
+          existingBlog.blog_images = existingBlog.blog_images.filter(img => !imagesToDelete.includes(img));
+          existingBlog.images_public_ids = existingBlog.images_public_ids.filter(id => !imagesToDelete.includes(id));
+  
+          updateData.blog_images = existingBlog.blog_images;
+          updateData.images_public_ids = existingBlog.images_public_ids;
+        }
       }
-
-      const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, updateData, { new: true });
-      res.status(200).json(updatedBlog);
-  } catch (error) {
-      res.status(500).json({ error: error.message });
-  }
-};
+  
+      if (req.files && req.files.length > 0) {
+        const blog_images = [];
+        const images_public_ids = [];
+        const uploadPromises = req.files.map(file => {
+          return new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream({ folder: 'blogs' }, (error, result) => {
+              if (error) {
+                reject(error);
+              } else {
+                blog_images.push(result.secure_url);
+                images_public_ids.push(result.public_id);
+                resolve();
+              }
+            });
+            streamifier.createReadStream(file.buffer).pipe(uploadStream);
+          });
+        });
+  
+        await Promise.all(uploadPromises);
+  
+        updateData.blog_images = [...existingBlog.blog_images, ...blog_images];
+        updateData.images_public_ids = [...existingBlog.images_public_ids, ...images_public_ids];
+      }
+  
+      await Blog.findByIdAndUpdate(req.params.id, updateData);
+  
+      return res.json({ message: 'Blog updated successfully' });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+  };
 
 const getBlogs = async (req, res) => {
     const { blog_title, page = 1, limit = 12 } = req.query;
