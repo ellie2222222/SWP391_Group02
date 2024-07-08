@@ -182,7 +182,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 {initialValues._id ? 'Edit Jewelry' : 'Add Jewelry'}
             </Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-                {(user.role === 'manager' || user.role === 'sale_staff') && (
                     <React.Fragment>
                         <CustomTextField
                             name="name"
@@ -346,7 +345,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     label="Available"
                 />
                 </React.Fragment>
-                )}
+                
                 {selectedImages.length > 0 && (
                     <Grid container spacing={2} sx={{ mt: 2 }}>
                         {selectedImages.map((image, index) => (

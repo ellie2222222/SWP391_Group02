@@ -3,7 +3,6 @@ import { Box, Typography, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import { Grid, Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import DesignForm from './DesignForm';
-import JewelryForm from './JewelryForm';
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
