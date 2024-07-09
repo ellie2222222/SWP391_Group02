@@ -51,19 +51,63 @@ const BlogDetails = () => {
 
   const renderBlogContent = (content, images) => {
     if (!content || !images) return null;
-
-    const parts = content.split(/(\[image\d+\])/);
+  
+    const parts = content.split(/(\[image\d+\]|\[header\]|\[endheader\])/);
+    let isHeader = false;
+  
     return parts.map((part, index) => {
+      if (part === '[header]') {
+        isHeader = true;
+        return null; // Skip rendering the header tag itself
+      }
+      
+      if (part === '[endheader]') {
+        isHeader = false;
+        return null; // Skip rendering the endheader tag itself
+      }
+  
       const match = part.match(/\[image(\d+)\]/);
       if (match) {
         const imageIndex = parseInt(match[1], 10);
         if (images[imageIndex]) {
-          return <img key={index} src={images[imageIndex]} alt={`blog image ${imageIndex}`} style={{ width: '100%', borderRadius: '10px', margin: '20px 0' }} />;
+          return (
+            <img
+              key={`image-${index}`}
+              src={images[imageIndex]}
+              alt={`blog image ${imageIndex}`}
+              style={{ width: '100%', borderRadius: '10px', margin: '20px 0' }}
+            />
+          );
         }
+        return null;
       }
-      return <Typography key={index} variant="body1" component="div" style={{ whiteSpace: 'pre-line' }}>{part}</Typography>;
+  
+      if (isHeader) {
+        return (
+          <Typography
+            key={`header-${index}`}
+            variant="h5"
+            component="div"
+            style={{ fontWeight: 'bold', margin: '20px 0' }}
+          >
+            {part.trim()}
+          </Typography>
+        );
+      }
+  
+      return (
+        <Typography
+          key={`text-${index}`}
+          variant="body1"
+          component="div"
+          style={{ whiteSpace: 'pre-line' }}
+        >
+          {part.trim()}
+        </Typography>
+      );
     });
   };
+  
 
   if (loading) {
     return (
