@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, styled, TextField, Card, CardActions, CardContent, Stepper, Step, StepLabel } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -19,7 +19,7 @@ const CustomButton1 = styled(Button)({
     },
 });
 
-const steps = ['pending', 'quote','accepted', 'design', 'production',  'payment' , 'warranty','completed',];
+const steps = ['pending', 'quote', 'accepted', 'design', 'production', 'payment', 'warranty', 'completed',];
 
 const RequestList = () => {
     const [loading, setLoading] = useState(true);
@@ -104,6 +104,30 @@ const RequestList = () => {
                             <Typography variant="h5" component="p" marginBottom="20px">Request #{index + 1}</Typography>
                             <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
                             <Typography variant="h5">Status: {request.request_status}</Typography>
+                            <Typography variant="h5">Type: {request.jewelry_id ? request.jewelry_id.type : 'Custom'}</Typography>
+                            {request.jewelry_id && request.jewelry_id.type == 'Sample' && (
+                                <>
+                                    {request.jewelry_id.on_sale ? (
+                                        <>
+                                            <Typography variant="h5" sx={{ color: 'red', fontWeight: '300', mr: 1, display: 'inline-block' }}>
+                                                Price: {(request.jewelry_id.price - (request.jewelry_id.price * (request.jewelry_id.sale_percentage / 100))).toLocaleString()}₫
+                                            </Typography>
+                                            <Typography variant="h6" sx={{ textDecoration: 'line-through', fontWeight: '300', display: 'inline-block' }}>
+                                                {request.jewelry_id.price.toLocaleString()}₫
+                                            </Typography>
+                                        </>
+                                    ) : (
+                                        <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
+                                            Price: {request.jewelry_id.price.toLocaleString()}₫
+                                        </Typography>
+                                    )}
+                                </>
+                            )}
+                            {request.jewelry_id && request.jewelry_id.type == 'Custom' && (
+                                 <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
+                                 Price: {request.quote_amount.toLocaleString()}₫
+                             </Typography>
+                            )}
                             <Stepper activeStep={getStatusStep(request.request_status)} alternativeLabel sx={{ marginTop: '20px' }} >
                                 {steps.map((label) => (
                                     <Step key={label}>
