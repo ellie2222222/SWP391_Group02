@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { styled } from '@mui/system';
 import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
@@ -24,6 +25,7 @@ const validationSchema = Yup.object({
 export default function DesignForm({ initialValues, onSubmit }) {
     const [images, setImages] = useState(initialValues.jewelry_id.images || []);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [removedImages, setRemovedImages] = useState([]);
 
     const formik = useFormik({
         initialValues: {
@@ -41,8 +43,13 @@ export default function DesignForm({ initialValues, onSubmit }) {
             // Append existing image URLs
             images.forEach((image, index) => {
                 if (typeof image === 'string') {
-                    formData.append(`images`, image);
+                    formData.append('images', image);
                 }
+            });
+
+            // Append removed images
+            removedImages.forEach((image, index) => {
+                formData.append('removedImages', image);
             });
 
             formData.append('gemstone_id', initialValues.jewelry_id.gemstone_id._id);
@@ -80,10 +87,16 @@ export default function DesignForm({ initialValues, onSubmit }) {
     };
 
     const handleRemoveImage = (index) => {
+        const imageToRemove = images[index];
         const newImages = images.filter((_, i) => i !== index);
         const newFiles = selectedFiles.filter((_, i) => i !== index);
+
         setImages(newImages);
         setSelectedFiles(newFiles);
+
+        if (typeof imageToRemove === 'string') {
+            setRemovedImages([...removedImages, imageToRemove]);
+        }
     };
 
     return (
