@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -32,7 +34,6 @@ const JewelryDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [payment, setPayment] = useState(null);
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
@@ -58,6 +59,7 @@ const JewelryDetails = () => {
   const handleCreateOrder = async () => {
     if (!user) {
       navigate('/login');
+      return;
     }
 
     try {
@@ -67,10 +69,12 @@ const JewelryDetails = () => {
       
       setError('');
       setOpen(false); // Close the dialog
+      toast.success('Order placed successfully');
     } catch (error) {
       console.error('Error while creating order information!', error);
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
+      toast.error(error.response?.data?.error || error.message);
     }
   };
 
@@ -153,6 +157,8 @@ const JewelryDetails = () => {
           </CustomButton1>
         </DialogActions>
       </Dialog>
+
+      <ToastContainer />
     </Container>
   );
 };
