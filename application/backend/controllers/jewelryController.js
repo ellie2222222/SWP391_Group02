@@ -30,7 +30,7 @@ const validateEmptyFields = (data) => {
 const validateInputData = (data) => {
     let { gemstone_id, material_id, price, material_weight,subgemstone_id, subgemstone_quantity, sale_percentage, type, on_sale } = data;
     let validationErrors = [];
-
+    console.log(subgemstone_id)
     if (gemstone_id) gemstone_id = gemstone_id.trim();
     if (material_id) material_id = material_id.trim();
     if (subgemstone_id) subgemstone_id = subgemstone_id.trim();
@@ -55,7 +55,7 @@ const validateInputData = (data) => {
     if (material_weight != null && (!Number.isFinite(material_weight) || material_weight <= 0)) {
         validationErrors.push('Material weight must be a positive number');
     }
-    if (subgemstone_quantity != null && (!Number.isInteger(subgemstone_quantity) || subgemstone_quantity <= 0)) {
+    if (subgemstone_quantity != null && (!Number.isInteger(subgemstone_quantity) || subgemstone_quantity < 0)) {
         validationErrors.push('Sub gemstone quantity must be a positive number');
     }
     if (on_sale === 'false') {
@@ -126,10 +126,10 @@ const createJewelry = async (req, res) => {
             name,
             description,
             price,
-            gemstone_id,
+            // gemstone_id,
             material_id,
             material_weight,
-            subgemstone_id,
+            //subgemstone_id,
             subgemstone_quantity,
             category,
             type,
@@ -140,8 +140,19 @@ const createJewelry = async (req, res) => {
             image_public_ids
         });
 
+        if (gemstone_id) {
+            newJewelry.gemstone_id = gemstone_id;
+        }else{
+            newJewelry.gemstone_id = null;
+        }
+        if (subgemstone_id) {
+            newJewelry.subgemstone_id = subgemstone_id;
+        }else{
+            newJewelry.subgemstone_id = null;
+        }
+
         const savedJewelry = await newJewelry.save();
-        const populatedJewelry = await Jewelry.findById(savedJewelry._id).populate('gemstone_id').populate('material_id');
+        const populatedJewelry = await Jewelry.findById(savedJewelry._id).populate('gemstone_id').populate('material_id').populate('subgemstone_id');
 
         res.status(201).json(populatedJewelry);
     } catch (error) {
@@ -153,7 +164,7 @@ const createJewelry = async (req, res) => {
 const updateJewelry = async (req, res) => {
     try {
         let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, on_sale, sale_percentage, available } = req.body;
-
+        console.log(gemstone_id)
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
@@ -175,6 +186,8 @@ const updateJewelry = async (req, res) => {
         if (gemstone_id) updateData.gemstone_id = gemstone_id ? gemstone_id.trim() : null;
         if (material_id) updateData.material_id = material_id ? material_id.trim() : null;
         if (material_weight) updateData.material_weight = material_weight;
+        if (subgemstone_id) updateData.subgemstone_id = subgemstone_id ? subgemstone_id.trim() : null;
+        if (subgemstone_quantity) updateData.subgemstone_quantity = subgemstone_quantity;
         if (category) updateData.category = category;
         if (type) updateData.type = type;
         if (on_sale) updateData.on_sale = on_sale;
@@ -221,7 +234,8 @@ const updateJewelry = async (req, res) => {
 
         const updatedJewelry = await Jewelry.findByIdAndUpdate(req.params.id, updateData, { new: true })
             .populate('gemstone_id')
-            .populate('material_id');
+            .populate('material_id')
+            .populate('subgemstone_id');
         res.status(200).json(updatedJewelry);
     } catch (error) {
         res.status(500).json({ error: error.message });

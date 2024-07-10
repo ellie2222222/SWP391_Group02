@@ -17,8 +17,6 @@ const jewelrySchema = new Schema( {
     gemstone_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gemstone',
-       
-        default: null
     },
     material_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -32,8 +30,6 @@ const jewelrySchema = new Schema( {
     subgemstone_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gemstone',
-       
-        default: null
     },
     subgemstone_quantity: {
         type: Number,

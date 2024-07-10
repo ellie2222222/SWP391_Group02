@@ -77,7 +77,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     const [materials, setMaterials] = useState([]);
     const [gemstonePrice, setGemstonePrice] = useState(0);
     const [materialPrice, setMaterialPrice] = useState(0);
-
+    console.log(initialValues)
     useEffect(() => {
         const fetchOptions = async () => {
             try {
