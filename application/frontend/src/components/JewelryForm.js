@@ -122,8 +122,10 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             name: Yup.string().required("Required."),
             description: Yup.string().required("Required."),
             price: Yup.number().required("Required.").typeError("Must be a number"),
-            gemstone_id: Yup.string(),
-            material_id: Yup.string().required("Required."),
+            gemstone_id: Yup.string().nullable(),
+            subgemstone_id: Yup.string().nullable(),
+            subgemstone_quantity: Yup.number().typeError("Must be a number") .nullable(),
+            material_id: Yup.string(),
             material_weight: Yup.number().required("Required.").typeError("Must be a number"),
             category: Yup.string().required("Required."),
             type: Yup.string().required("Required."),
@@ -243,6 +245,39 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                                 <Typography variant="caption" color="red">{formik.errors.gemstone_id}</Typography>
                             )}
                         </CustomFormControl>
+                        <CustomFormControl variant="outlined" fullWidth>
+                            <InputLabel id="subgemstone_id-label">Sub Gemstone</InputLabel>
+                            <Select
+                                labelId="subgemstone_id-label"
+                                name="subgemstone_id"
+                                value={formik.values.subgemstone_id ? formik.values.subgemstone_id: '' }
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                label="Sub Gemstone"
+                                error={formik.touched.subgemstone_id && Boolean(formik.errors.subgemstone_id)}
+                                sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.subgemstone_id && formik.errors.subgemstone_id ? 'red' : '#b48c72' } }}
+                            >
+                                {gemstones.map((gemstone) => (
+                                    <MenuItem key={gemstone._id} value={gemstone._id}>
+                                        {gemstone.name} - Carat:{gemstone.carat} - Cut:{gemstone.cut} - Clarity:{gemstone.clarity} - Color:{gemstone.color}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            {formik.touched.subgemstone_id && formik.errors.subgemstone_id && (
+                                <Typography variant="caption" color="red">{formik.errors.subgemstone_id}</Typography>
+                            )}
+                        </CustomFormControl>
+                        <CustomTextField
+                            name="subgemstone_quantity"
+                            label="Sub Gemstone Quantity"
+                            type="number"
+                            variant="outlined"
+                            value={formik.values.subgemstone_quantity ? formik.values.subgemstone_quantity :0  }
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.subgemstone_quantity && Boolean(formik.errors.subgemstone_quantity)}
+                            helperText={formik.touched.subgemstone_quantity && formik.errors.subgemstone_quantity}
+                        />
                         <CustomFormControl variant="outlined" fullWidth>
                             <InputLabel id="material_id-label">Material</InputLabel>
                             <Select

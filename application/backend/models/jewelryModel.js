@@ -36,9 +36,7 @@ const jewelrySchema = new Schema( {
         default: null
     },
     subgemstone_quantity: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Gemstone',
-       
+        type: Number,
         default: null
     },
     category: {
