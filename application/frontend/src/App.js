@@ -9,6 +9,7 @@ import Signup from "./pages/Signup";
 import JewelryDashboard from "./pages/JewelryDashboard";
 import UsersDashboard from "./pages/UsersDashboard";
 import BlogContents from "./pages/BlogContents";
+import BlogCreate from "./pages/BlogCreate";
 import Warranty from './pages/Warranty'; // Import the new page
 import WarrantyList from "./pages/WarrantyList";
 import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
@@ -21,6 +22,12 @@ import QuotedRequest from "./pages/QuotedRequest";
 import Payment from "./pages/Payment";
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Gemstones from "./pages/Gemstones";
+import Material from "./pages/Material";
+import WarrantyPolicy from "./pages/WarrantyPolicy";
+import ExchangePolicy from "./pages/ExchangePolicy";
+import GoldPrice from "./pages/GoldPrice";
+import Dashboard from "./pages/Dashboard";
 function App() {
   const { user } = useAuth()
 
@@ -44,23 +51,34 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/warranties/create" element={<Warranty />} />
         <Route path="/warranties" element={<WarrantyList />} />
+        <Route path="/warranty-policy" element={<WarrantyPolicy />} />
+        <Route path="/exchange-policy" element={<ExchangePolicy />} />
+        <Route path="/gold-price" element={<GoldPrice />} />
 
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<JewelryDashboard/>} />
-          <Route path="/admin/users" element={<UsersDashboard/>} />
+          <Route path="/admin" element={<JewelryDashboard />} />
+          <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
-          <Route path="/admin/quotedRequest" element={<QuotedRequest/>}></Route>
+          <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
+          <Route path="/admin/gemstones" element={<Gemstones />}></Route>
+          <Route path="/admin/materials" element={<Material />}></Route>
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path='/admin/blogs' element={<BlogCreate />}></Route>
         </Route>
 
         <Route element={<UserRoute />}>
           <Route path="/requests" element={<Requests />} />
-          <Route path="/request" element={<CustomRequest />} />
           <Route path='/products/:id/payment-status' element={<Payment />} />
         </Route>
 
+        <Route element={<AuthRoute />}>
+          <Route path="/request" element={<CustomRequest />} />
+        </Route>
       </Routes>
     </div>
   );
 }
 
 export default App;
+
+

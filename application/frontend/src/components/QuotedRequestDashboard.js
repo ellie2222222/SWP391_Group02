@@ -68,9 +68,9 @@ export default function QuotedRequestDashBoard() {
                     </TableHead>
 
                     <TableBody>
-                        {requests.map((request, index) => (
+                        {requests.map(request => (
                             request.request_status === 'quote' && (
-                                <TableRow key={index}>
+                                <TableRow key={request._id}>
                                     <TableCell>{request._id}</TableCell>
                                     <TableCell>{request.quote_content}</TableCell>
                                     <TableCell>{request.quote_amount}</TableCell>

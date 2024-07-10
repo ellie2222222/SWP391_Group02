@@ -6,7 +6,11 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
 const createToken = (_id, role) => {
-  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "3d" });
+  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "30m" });
+};
+
+const createRefreshToken = (_id, role) => {
+  return jwt.sign({ _id, role }, process.env.REFRESH_SECRET, { expiresIn: '7d' });
 };
 
 // login a user
@@ -18,8 +22,11 @@ const loginUser = async (req, res) => {
 
     // create a token
     const token = createToken(user._id, user.role);
+    const refreshToken = createRefreshToken(user._id, user.role);
 
-    res.status(200).json({ token });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+
+    res.status(200).json({ token, refreshToken});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -110,13 +117,22 @@ const assignRole = async (req, res) => {
 };
 
 // get all users
+// get all users
 const getUsers = async (req, res) => {
-  const { username, sort } = req.query;
+  const { search, sort, role, page = 1 } = req.query;
 
   try {
     let query = {};
-    if (username) {
-      query.username = new RegExp(username, 'i'); // 'i' for case-insensitive search
+    if (search) {
+      query = {
+        $or: [
+          { username: new RegExp(search, 'i') },
+          { email: new RegExp(search, 'i') }
+        ]
+      };
+    }
+    if (role) {
+      query.role = new RegExp(role, 'i');
     }
 
     // Determine the sort field and order
@@ -126,13 +142,28 @@ const getUsers = async (req, res) => {
       sortField[field] = order === 'asc' ? 1 : -1;
     }
 
-    const users = await User.find(query).sort(sortField);
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
-    return res.status(200).json({ users });
+    const users = await User.find(query)
+      .select('-password')
+      .sort(sortField)
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    return res.status(200).json({
+      users,
+      total: totalUsers,
+      totalPages
+    });
   } catch (error) {
     return res.status(500).json({ error: "Error while getting users" });
   }
 }
+
 
 
 const getUser = async (req, res) => {
@@ -221,6 +252,33 @@ const resetPassword = async (req, res) => {
   })
 };
 
+const refreshToken = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  console.log("refresh:", refreshToken);
+
+  if (!refreshToken) return res.sendStatus(401);
+
+  jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
+    if (err) return res.sendStatus(403);
+
+    const token = createToken(decoded._id, decoded.role);
+    // const currentTime = new Date().toLocaleString(); // Get current time
+
+    res.json({ token, existToken: true });
+    // console.log("access:", token);
+    // // Log token creation time and expiration
+    // console.log(`Token created at: ${currentTime}`);
+    // console.log(`Token expires at: ${new Date(decoded.exp * 1000).toLocaleString()}`);
+  });
+};
+
+// Logout user
+const logout = (req, res) => {
+  res.clearCookie('refreshToken');
+  res.sendStatus(200);
+};
 
 
-module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword };
+
+module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout };

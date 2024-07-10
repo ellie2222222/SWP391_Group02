@@ -3,29 +3,29 @@ const mongoose = require('mongoose');
 
 // Helper functions for validation
 const validateEmptyFields = (data) => {
-    const { name, price, carat } = data;
+    const { name, buy_price, sell_price } = data;
     let emptyFields = [];
 
     if (!name) emptyFields.push('name');
-    if (!price) emptyFields.push('price');
-    if (!carat) emptyFields.push('carat');
+    if (!buy_price) emptyFields.push('buy_price');
+    if (!sell_price) emptyFields.push('sell_price');
 
     if (emptyFields.length > 0) {
-        return "Please fill in the required field"
+        return `Please fill in the required fields: ${emptyFields.join(', ')}`;
     }
 
     return null;
 };
 
 const validateInputData = (data) => {
-    const { price, carat } = data;
+    const { buy_price, sell_price } = data;
     let validationErrors = [];
 
-    if (price != null && (typeof price !== 'number' || price <= 0)) {
-        validationErrors.push('Price must be a positive number');
+    if (buy_price != null && (typeof buy_price !== 'number' || buy_price <= 0)) {
+        validationErrors.push('Buy price must be a positive number');
     }
-    if (carat != null && (typeof carat !== 'number' || carat <= 0)) {
-        validationErrors.push('Carat must be a positive number');
+    if (sell_price != null && (typeof sell_price !== 'number' || sell_price <= 0)) {
+        validationErrors.push('Sell price must be a positive number');
     }
 
     return validationErrors;
@@ -38,7 +38,7 @@ const getMaterials = async (req, res) => {
     try {
         let query = {};
         if (name) {
-            query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
+            query.name = new RegExp(name, 'i'); // Case-insensitive search
         }
 
         const materials = await Material.find(query);
@@ -75,15 +75,11 @@ const createMaterial = async (req, res) => {
     const validationErrors = validateInputData(req.body);
 
     if (emptyFields) {
-        return res.status(400).json({
-            error: emptyFields
-        });
+        return res.status(400).json({ error: emptyFields });
     }
 
     if (validationErrors.length > 0) {
-        return res.status(400).json({
-            error: validationErrors
-        });
+        return res.status(400).json({ error: validationErrors });
     }
 
     try {
@@ -126,9 +122,7 @@ const updateMaterial = async (req, res) => {
     const validationErrors = validateInputData(req.body);
 
     if (validationErrors.length > 0) {
-      return res.status(400).json({
-          error: validationErrors
-      });
+        return res.status(400).json({ error: validationErrors });
     }
 
     try {

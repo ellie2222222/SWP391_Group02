@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled } from '@mui/material';
-import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Box, Typography, styled, TextField, InputAdornment, IconButton, Select, MenuItem, FormControl, InputLabel, Pagination, Stack } from '@mui/material';
+import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import JewelryForm from './JewelryForm';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -13,35 +14,143 @@ const CustomButton1 = styled(Button)({
     color: '#fff',
     width: '100%',
     fontSize: '1rem',
-    marginTop: '20px',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
 
-const AdminContent = () => {
-    const DrawerHeader = styled('div')(({ theme }) => ({
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
-    }));
+const StyledIconButton = styled(IconButton)({
+    color: '#b48c72',
+    '&:hover': {
+        color: '#8e735c',
+    },
+});
 
+const DrawerHeader = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(0, 1),
+    ...theme.mixins.toolbar,
+}));
+
+const CustomTextField = styled(TextField)({
+    width: '100%',
+    variant: "outlined",
+    padding: "0",
+    "& .MuiOutlinedInput-root": {
+        "&:hover fieldset": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#b48c72",
+        },
+    },
+    "& .MuiInputLabel-root": {
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+});
+
+const CustomFormControl = styled(FormControl)({
+    minWidth: 120,
+    "& .MuiInputLabel-root": {
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiOutlinedInput-root": {
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+    },
+});
+
+const CustomTableCell = styled(TableCell)({
+    fontSize: '1.3rem',
+});
+
+const AdminContent = () => {
     const [jewelries, setJewelries] = useState([]);
+    const [total, setTotal] = useState(0);
     const [selectedJewelry, setSelectedJewelry] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const [category, setCategory] = useState("");
+    const [type, setType] = useState("");
+    const [onSale, setOnSale] = useState("");
+    const [sortOrder, setSortOrder] = useState("");
+    const [available, setAvailable] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const fetchJewelries = async () => {
         try {
-            const response = await axiosInstance.get('/jewelries');
-            setJewelries(response.data);
+            const response = await axiosInstance.get('/jewelries', {
+                params: {
+                    ...Object.fromEntries(searchParams),
+                },
+            });
+
+            setJewelries(response.data.jewelries);
+            setTotal(response.data.total);
+            setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error("There was an error fetching the jewelries!", error);
         }
     };
+
+    const updateQueryParams = (key, value, resetPage = false) => {
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (value) {
+            newSearchParams.set(key, value);
+        } else {
+            newSearchParams.delete(key);
+        }
+        if (resetPage) {
+            newSearchParams.set('page', '1');
+        }
+        setSearchParams(newSearchParams);
+    };
+
+    useEffect(() => {
+        setSearch(searchParams.get('name') || '');
+        setOnSale(searchParams.get('on_sale') || '');
+        setCategory(searchParams.get('category') || '');
+        setSortOrder(searchParams.get('sortByPrice') || '');
+        setAvailable(searchParams.get('available') || '');
+        setType(searchParams.get('type') || '');
+        setPage(parseInt(searchParams.get('page') || '1', 10));
+    }, [searchParams]);
+
+    const handleSearchClick = () => {
+        updateQueryParams('name', search, true);
+    };
+
+    const handleFilterChange = (key, value) => {
+        updateQueryParams(key, value, true);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleSearchClick();
+        }
+    };
+
+    const handlePageChange = (event, newPage) => {
+        setPage(newPage);
+        updateQueryParams('page', newPage.toString());
+    };
+
+    useEffect(() => {
+        fetchJewelries();
+    }, [searchParams, page]);
 
     const handleAddClick = () => {
         setSelectedJewelry(null);
@@ -59,13 +168,14 @@ const AdminContent = () => {
             fetchJewelries();
             toast.success('Jewelry item deleted successfully');
         } catch (error) {
-            console.error("There was an error deleting the jewelry!", error);
+            console.error('Error deleting jewelry:', error);
             toast.error('Failed to delete jewelry item');
         }
     };
 
     const handleSubmit = async (values) => {
         try {
+            console.log(values)
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
                 toast.success('Jewelry item updated successfully');
@@ -81,57 +191,166 @@ const AdminContent = () => {
         }
     };
 
-    useEffect(() => {
-        fetchJewelries();
-    }, []);
-
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             <Container>
-                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick} sx={{ backgroundColor: '#b48c72' }}>
+                <Box display="flex" mb={2} flexDirection="column">
+                    <Box mb={2}>
+                        <CustomTextField
+                            size="normal"
+                            label="Search..."
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            onKeyDown={handleKeyDown}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <StyledIconButton color="inherit" onClick={handleSearchClick}>
+                                            <Search fontSize="large" />
+                                        </StyledIconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </Box>
+                    <Box display="flex">
+                        <CustomFormControl>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
+                            <Select
+                                value={onSale}
+                                onChange={(event) => handleFilterChange('on_sale', event.target.value)}
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                <MenuItem value="false">Not On Sale</MenuItem>
+                                <MenuItem value="true">On Sale</MenuItem>
+                            </Select>
+                        </CustomFormControl>
+                        <CustomFormControl style={{ marginLeft: 20 }}>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
+                            <Select
+                                value={category}
+                                onChange={(event) => handleFilterChange('category', event.target.value)}
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                <MenuItem value="Ring">Ring</MenuItem>
+                                <MenuItem value="Necklace">Necklace</MenuItem>
+                                <MenuItem value="Bracelet">Bracelet</MenuItem>
+                                <MenuItem value="Earring">Earring</MenuItem>
+                                <MenuItem value="Other">Other</MenuItem>
+                            </Select>
+                        </CustomFormControl>
+                        <CustomFormControl style={{ marginLeft: 20 }}>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Type</InputLabel>
+                            <Select
+                                value={type}
+                                onChange={(event) => handleFilterChange('type', event.target.value)}
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                <MenuItem value="Sample">Sample</MenuItem>
+                                <MenuItem value="Custom">Custom</MenuItem>
+                            </Select>
+                        </CustomFormControl>
+                        <CustomFormControl style={{ marginLeft: 20 }}>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By Price</InputLabel>
+                            <Select
+                                value={sortOrder}
+                                onChange={(event) => handleFilterChange('sortByPrice', event.target.value)}
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                <MenuItem value="asc">Ascending</MenuItem>
+                                <MenuItem value="desc">Descending</MenuItem>
+                            </Select>
+                        </CustomFormControl>
+                        <CustomFormControl style={{ marginLeft: 20 }}>
+                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Available</InputLabel>
+                            <Select
+                                value={available}
+                                onChange={(event) => handleFilterChange('available', event.target.value)}
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                <MenuItem value="true">Yes</MenuItem>
+                                <MenuItem value="false">No</MenuItem>
+                            </Select>
+                        </CustomFormControl>
+                    </Box>
+                </Box>
+
+                <Box mb={2}>
+                    <Typography variant='h5'>There are a total of {total} result(s)</Typography>
+                </Box>
+
+                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick}>
                     Add Jewelry
                 </CustomButton1>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Description</TableCell>
-                                <TableCell>Price</TableCell>
-                                <TableCell>Images</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <CustomTableCell>Name</CustomTableCell>
+                                <CustomTableCell>Category</CustomTableCell>
+                                <CustomTableCell>On Sale</CustomTableCell>
+                                <CustomTableCell>Available</CustomTableCell>
+                                <CustomTableCell>Type</CustomTableCell>
+                                <CustomTableCell>Price</CustomTableCell>
+                                <CustomTableCell align='center'>Images</CustomTableCell>
+                                <CustomTableCell align='center'>Actions</CustomTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {jewelries.map((jewelry) => (
-                                <TableRow key={jewelry._id}>
-                                    <TableCell>{jewelry.name}</TableCell>
-                                    <TableCell>{jewelry.description}</TableCell>
-                                    <TableCell>{jewelry.price}</TableCell>
-                                    <TableCell>
-                                        {jewelry.images[0] && (
-                                            <CardMedia
-                                                component="img"
-                                                alt="Jewelry"
-                                                image={jewelry.images[0]}
-                                                sx={{ width: '50%', maxHeight: '200px', margin: '0px' }}
-                                            />
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <IconButton color="primary" onClick={() => handleEditClick(jewelry)}>
-                                            <Edit />
-                                        </IconButton>
-                                        <IconButton color="secondary" onClick={() => handleDeleteClick(jewelry._id)}>
-                                            <Delete />
-                                        </IconButton>
+                            {jewelries.length > 0 ? (
+                                jewelries.map((jewelry) => (
+                                    <TableRow key={jewelry._id}>
+                                        <CustomTableCell>{jewelry.name}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.category}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.on_sale === true ? 'Yes' : 'No'}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.available === true ? 'Yes' : 'No'}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.type}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.price}</CustomTableCell>
+                                        <TableCell>
+                                            {jewelry.images[0] && (
+                                                <CardMedia
+                                                    component="img"
+                                                    alt="Jewelry"
+                                                    image={jewelry.images[0]}
+                                                    sx={{ width: '100%', maxHeight: '400px', margin: '0px' }}
+                                                />
+                                            )}
+                                        </TableCell>
+                                        <TableCell align='center'>
+                                            <StyledIconButton onClick={() => handleEditClick(jewelry)}>
+                                                <Edit />
+                                            </StyledIconButton>
+                                            <StyledIconButton onClick={() => handleDeleteClick(jewelry._id)}>
+                                                <Delete />
+                                            </StyledIconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell align='center' colSpan={9}>
+                                        <Typography variant="h6">No products found</Typography>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                <Box display="flex" justifyContent="center" marginTop="20px">
+                    <Stack spacing={2}>
+                        <Pagination
+                            size='large'
+                            count={totalPages}
+                            page={page}
+                            onChange={handlePageChange}
+                            showFirstButton
+                            showLastButton
+                        />
+                    </Stack>
+                </Box>
+
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <DialogTitle>{selectedJewelry ? 'Edit Jewelry' : 'Add Jewelry'}</DialogTitle>
                     <DialogContent>

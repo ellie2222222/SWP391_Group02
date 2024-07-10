@@ -46,7 +46,7 @@ export default function SaleStaffDashboard() {
         setIsDialogOpen(true);
         setSelectedRequest(request)
     };
-    
+
     useEffect(() => {
         fetchRequests();
     }, []);
@@ -75,7 +75,7 @@ export default function SaleStaffDashboard() {
                                     <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
                                     <TableCell>
                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>
-                                            <Add sx={{color: '#b48c72'}}/>
+                                            <Add sx={{ color: '#b48c72' }} />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
@@ -88,7 +88,12 @@ export default function SaleStaffDashboard() {
             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                 <DialogTitle>Quote</DialogTitle>
                 <DialogContent>
-                        <QuoteForm initialValues={selectedRequest} onSubmit={handleSubmit}/>
+                    <QuoteForm
+                        initialValues={{
+                            ...selectedRequest,
+                        }}
+                        onSubmit={handleSubmit}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsDialogOpen(false)} color="primary">

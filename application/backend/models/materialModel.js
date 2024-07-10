@@ -7,14 +7,14 @@ const materialSchema = new Schema({
         type: String,
         required: true
     },
-    carat: {
+    buy_price: {
         type: Number,
         required: true
     },
-    price: {
+    sell_price: {
         type: Number,
         required: true
-    }
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Material', materialSchema);

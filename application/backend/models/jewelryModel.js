@@ -20,11 +20,6 @@ const jewelrySchema = new Schema( {
        
         default: null
     },
-    gemstone_weight: {
-        type: Number,
-        
-        default: null
-    },
     material_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Material', 
