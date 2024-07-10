@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, CardMedia, Grid } from '@mui/material';
+import { Container, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, CardMedia, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
 import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -26,6 +28,8 @@ export default function DesignForm({ initialValues, onSubmit }) {
     const [images, setImages] = useState(initialValues.jewelry_id.images || []);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [removedImages, setRemovedImages] = useState([]);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [imageIndexToRemove, setImageIndexToRemove] = useState(null);
 
     const formik = useFormik({
         initialValues: {
@@ -73,8 +77,10 @@ export default function DesignForm({ initialValues, onSubmit }) {
                     request_status: values.request_status,
                 });
 
+                toast.success('Form submitted successfully!');
                 onSubmit();
             } catch (error) {
+                toast.error(`Error submitting form: ${error.response?.data?.error || error.message}`);
                 console.error('Error submitting form', error);
             }
         },
@@ -87,9 +93,14 @@ export default function DesignForm({ initialValues, onSubmit }) {
     };
 
     const handleRemoveImage = (index) => {
-        const imageToRemove = images[index];
-        const newImages = images.filter((_, i) => i !== index);
-        const newFiles = selectedFiles.filter((_, i) => i !== index);
+        setImageIndexToRemove(index);
+        setOpenConfirmDialog(true);
+    };
+
+    const confirmRemoveImage = () => {
+        const imageToRemove = images[imageIndexToRemove];
+        const newImages = images.filter((_, i) => i !== imageIndexToRemove);
+        const newFiles = selectedFiles.filter((_, i) => i !== imageIndexToRemove);
 
         setImages(newImages);
         setSelectedFiles(newFiles);
@@ -97,10 +108,20 @@ export default function DesignForm({ initialValues, onSubmit }) {
         if (typeof imageToRemove === 'string') {
             setRemovedImages([...removedImages, imageToRemove]);
         }
+
+        setOpenConfirmDialog(false);
+        setImageIndexToRemove(null);
+        toast.info('Image removed.');
+    };
+
+    const cancelRemoveImage = () => {
+        setOpenConfirmDialog(false);
+        setImageIndexToRemove(null);
     };
 
     return (
         <Container>
+            <ToastContainer />
             <form onSubmit={formik.handleSubmit}>
                 <CustomButton1 variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '1em', alignItems: 'center' }}>
                     <AddPhotoAlternateIcon />
@@ -151,6 +172,26 @@ export default function DesignForm({ initialValues, onSubmit }) {
                     <CustomButton1 type="submit">Submit</CustomButton1>
                 </Box>
             </form>
+
+            <Dialog
+                open={openConfirmDialog}
+                onClose={cancelRemoveImage}
+            >
+                <DialogTitle>Remove Image</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to remove this image?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={cancelRemoveImage} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmRemoveImage} color="primary">
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }

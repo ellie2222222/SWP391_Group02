@@ -29,6 +29,16 @@ const jewelrySchema = new Schema( {
         type: Number,
         required: true
     },
+    subgemstone_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Gemstone',
+       
+        default: null
+    },
+    subgemstone_quantity: {
+        type: Number,
+        default: null
+    },
     category: {
         type: String,
         enum: ["Ring", "Necklace", "Bracelet", "Earring", "Other"],

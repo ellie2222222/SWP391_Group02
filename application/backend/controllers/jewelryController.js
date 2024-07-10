@@ -19,7 +19,7 @@ const validateEmptyFields = (data) => {
     if (type && type === 'Sample' && !price) emptyFields.push('price');
     if (!on_sale) emptyFields.push('on_sale');
     if (!sale_percentage) emptyFields.push('sale_percentage');
-
+    if (!material_id) emptyFields.push('material_id');
     if (emptyFields.length > 0) {
         return "Please fill in the required fields";
     }
@@ -28,28 +28,35 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    let { gemstone_id, material_id, price, material_weight, sale_percentage, type, on_sale } = data;
+    let { gemstone_id, material_id, price, material_weight,subgemstone_id, subgemstone_quantity, sale_percentage, type, on_sale } = data;
     let validationErrors = [];
 
     if (gemstone_id) gemstone_id = gemstone_id.trim();
     if (material_id) material_id = material_id.trim();
-
+    if (subgemstone_id) subgemstone_id = subgemstone_id.trim();
     if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
         validationErrors.push('Invalid gemstone ID');
     }
     if (material_id && !mongoose.Types.ObjectId.isValid(material_id)) {
         validationErrors.push('Invalid material ID');
     }
+    if (subgemstone_id && !mongoose.Types.ObjectId.isValid(subgemstone_id)) {
+        validationErrors.push('Invalid sub gemstone ID');
+    }
 
     price = parseFloat(price);
     material_weight = parseFloat(material_weight);
     sale_percentage = parseFloat(sale_percentage);
+    if (subgemstone_quantity) subgemstone_quantity = parseFloat(subgemstone_quantity);
 
     if (price != null && (!Number.isFinite(price) || price <= 0)) {
         validationErrors.push('Price must be a positive number');
     }
     if (material_weight != null && (!Number.isFinite(material_weight) || material_weight <= 0)) {
         validationErrors.push('Material weight must be a positive number');
+    }
+    if (subgemstone_quantity != null && (!Number.isInteger(subgemstone_quantity) || subgemstone_quantity <= 0)) {
+        validationErrors.push('Sub gemstone quantity must be a positive number');
     }
     if (on_sale === 'false') {
         sale_percentage = 0;
@@ -71,11 +78,11 @@ const validateInputData = (data) => {
 
 const createJewelry = async (req, res) => {
     try {
-        let { name, description, price, gemstone_id, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
+        let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, on_sale, sale_percentage, available } = req.body;
 
         if (gemstone_id) gemstone_id = gemstone_id.trim();
         if (material_id) material_id = material_id.trim();
-
+        if (subgemstone_id) subgemstone_id = subgemstone_id.trim();
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
@@ -122,6 +129,8 @@ const createJewelry = async (req, res) => {
             gemstone_id,
             material_id,
             material_weight,
+            subgemstone_id,
+            subgemstone_quantity,
             category,
             type,
             on_sale,
@@ -143,7 +152,7 @@ const createJewelry = async (req, res) => {
 
 const updateJewelry = async (req, res) => {
     try {
-        let { name, description, price, gemstone_id, material_id, material_weight, category, type, on_sale, sale_percentage, available } = req.body;
+        let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, on_sale, sale_percentage, available } = req.body;
 
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {

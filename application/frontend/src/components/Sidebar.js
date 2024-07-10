@@ -251,7 +251,8 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
+                    {user.role === 'sales_staff' && user.role === 'manager' && (
+                        <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
                         <Link to=''>
                             <CustomListItemButton>
                                 <CustomListItemIcon>
@@ -261,6 +262,8 @@ export default function Sidebar() {
                             </CustomListItemButton>
                         </Link>
                     </ListItem>
+                    )}
+                    
                 </List>
                 <Divider />
             </Drawer>
