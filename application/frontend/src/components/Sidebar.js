@@ -21,8 +21,9 @@ import { Link } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import useAuth from '../hooks/useAuthContext';
-import { Diamond, Done } from '@mui/icons-material';
+import { Dashboard, Diamond, Done } from '@mui/icons-material';
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -181,7 +182,7 @@ export default function Sidebar() {
                                     <CustomListItemButton>
                                         <CustomListItemIcon
                                         >
-                                            <PeopleIcon />
+                                            <Dashboard />
 
                                         </CustomListItemIcon>
                                         <ListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
@@ -235,7 +236,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'admin' && (
+                    {user.role === 'admin' || user.role === 'manager' && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
