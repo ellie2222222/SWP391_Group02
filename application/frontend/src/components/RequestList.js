@@ -63,20 +63,29 @@ const RequestList = () => {
         try {
             const decoded = jwtDecode(user.token);
             const userResponse = await axiosInstance.get(`/users/` + decoded._id);
+            
+            let price;
+            if (request.type === "Sample") {
+                if (request.on_sale === true) {
+                    price = request.jewelry_id.price;
+                } else {
+                    price = request.jewelry_id.price - (request.jewelry_id.price * (request.jewelry_id.sale_percentage / 100));
+                }
+            } else {
+                price = request.quote_amount;
+            }
+            console.log(price)
 
             const payment = await axiosInstance.post('/payment', {
                 user_info: userResponse.data,
                 product: request.jewelry_id,
+                price: price,
             });
-
-            console.log(payment.data.result);
 
             const transaction = await axiosInstance.post('transactions', {
                 trans_id: payment.data.trans_id,
                 request_id: request._id,
             });
-
-            console.log(transaction);
 
             window.open(payment.data.result.order_url, '_blank');
         } catch (error) {

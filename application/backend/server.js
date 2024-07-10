@@ -90,7 +90,7 @@ let config = {
 
 const requireAuth = require('./middleware/requireAuth');
 app.post('/api/payment', requireAuth, async (req, res) => {
-  const { user_info, product } = req.body;
+  const { user_info, product, price } = req.body;
 
   const embed_data = {
     // redirecturl: "https://frontend-chk2.onrender.com/",
@@ -106,7 +106,7 @@ app.post('/api/payment', requireAuth, async (req, res) => {
     app_time: Date.now(), // miliseconds
     item: JSON.stringify(items),
     embed_data: JSON.stringify(embed_data),
-    amount: product.on_sale === true ? (product.price - (product.price * (product.sale_percentage / 100))) : product.price,
+    amount: price,
     description: `Payment for the order #${transID}`,
     bank_code: "",
     email: user_info.email,
