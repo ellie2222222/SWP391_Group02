@@ -21,9 +21,11 @@ import { Link } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import Button from '@mui/material/Button';
 import useAuth from '../hooks/useAuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Dashboard, Diamond, Done } from '@mui/icons-material';
+
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -91,6 +93,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
         }),
     }),
 );
+
 const CustomListItemButton = styled(ListItemButton)({
     minHeight: 48,
     justifyContent: 'initial',
@@ -99,11 +102,12 @@ const CustomListItemButton = styled(ListItemButton)({
     color: '#000',
 });
 
-
 export default function Sidebar() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const { user } = useAuth()
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -112,6 +116,11 @@ export default function Sidebar() {
     const handleDrawerClose = () => {
         setOpen(false);
     };
+
+    const handleLogout = () => {
+        logout();
+    };
+
     const CustomListItemIcon = styled(ListItemIcon)({
         minWidth: 0,
         mr: open ? 3 : 'auto',
@@ -120,7 +129,6 @@ export default function Sidebar() {
     });
 
     return (
-
         <Box>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
@@ -140,6 +148,9 @@ export default function Sidebar() {
                     <Typography variant="h6" noWrap component="div">
                         Management
                     </Typography>
+                    <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 'auto' }}>
+                        Logout
+                    </Button>
                 </Toolbar>
             </AppBar>
             <Drawer variant="permanent" open={open}>
@@ -153,8 +164,7 @@ export default function Sidebar() {
                     <ListItem key="Jewelry" disablePadding sx={{ display: 'block' }}>
                         <Link to='/admin'>
                             <CustomListItemButton>
-                                <CustomListItemIcon
-                                >
+                                <CustomListItemIcon>
                                     <LocalOfferIcon />
                                 </CustomListItemIcon>
                                 <ListItemText primary="Jewelry" sx={{ opacity: open ? 1 : 0 }} />
@@ -165,25 +175,21 @@ export default function Sidebar() {
                         <ListItem key="My Requests" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/requests'>
                                 <CustomListItemButton>
-                                    <CustomListItemIcon
-                                    >
+                                    <CustomListItemIcon>
                                         <ShoppingCartIcon />
                                     </CustomListItemIcon>
                                     <ListItemText primary="My Requests" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>
-
                     )}
                     {user.role === 'manager' && (
                         <div>
                             <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
                                 <Link to='/admin/dashboard'>
                                     <CustomListItemButton>
-                                        <CustomListItemIcon
-                                        >
+                                        <CustomListItemIcon>
                                             <Dashboard />
-
                                         </CustomListItemIcon>
                                         <ListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
@@ -192,8 +198,7 @@ export default function Sidebar() {
                             <ListItem key="Quoted Requests" disablePadding sx={{ display: 'block' }}>
                                 <Link to='/admin/quotedRequest'>
                                     <CustomListItemButton>
-                                        <CustomListItemIcon
-                                        >
+                                        <CustomListItemIcon>
                                             <Done />
                                         </CustomListItemIcon>
                                         <ListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
@@ -226,24 +231,20 @@ export default function Sidebar() {
                         <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/users'>
                                 <CustomListItemButton>
-                                    <CustomListItemIcon
-                                    >
+                                    <CustomListItemIcon>
                                         <PeopleIcon />
-
                                     </CustomListItemIcon>
                                     <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'admin' || user.role === 'manager' && (
+                    {user.role === 'admin' && user.role === 'manager' && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
-                                    <CustomListItemIcon
-                                    >
+                                    <CustomListItemIcon>
                                         <FeedIcon />
-
                                     </CustomListItemIcon>
                                     <ListItemText primary="Blogs" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
@@ -253,10 +254,8 @@ export default function Sidebar() {
                     <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
                         <Link to=''>
                             <CustomListItemButton>
-                                <CustomListItemIcon
-                                >
+                                <CustomListItemIcon>
                                     <PeopleIcon />
-
                                 </CustomListItemIcon>
                                 <ListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
                             </CustomListItemButton>
@@ -264,9 +263,7 @@ export default function Sidebar() {
                     </ListItem>
                 </List>
                 <Divider />
-
             </Drawer>
         </Box>
-
     );
 }
