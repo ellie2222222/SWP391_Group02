@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, CardMedia, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Container, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, CardMedia, Grid, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
 import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -32,8 +32,8 @@ export default function DesignForm({ initialValues, onSubmit }) {
     const [images, setImages] = useState(initialValues.jewelry_id.images || []);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [removedImages, setRemovedImages] = useState([]);
-    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-    const [imageIndexToRemove, setImageIndexToRemove] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -41,6 +41,8 @@ export default function DesignForm({ initialValues, onSubmit }) {
         },
         validationSchema,
         onSubmit: async (values) => {
+            setOpen(false);
+            setLoading(true);
             const formData = new FormData();
 
             // Append new image files
@@ -49,14 +51,14 @@ export default function DesignForm({ initialValues, onSubmit }) {
             });
 
             // Append existing image URLs
-            images.forEach((image, index) => {
+            images.forEach((image) => {
                 if (typeof image === 'string') {
                     formData.append('images', image);
                 }
             });
 
             // Append removed images
-            removedImages.forEach((image, index) => {
+            removedImages.forEach((image) => {
                 formData.append('removedImages', image);
             });
 
@@ -81,11 +83,12 @@ export default function DesignForm({ initialValues, onSubmit }) {
                     request_status: values.request_status,
                 });
 
-                toast.success('Form submitted successfully!');
+                toast.success('Form submitted successfully');
+                setLoading(false);
                 onSubmit();
             } catch (error) {
-                toast.error(`Error submitting form: ${error.response?.data?.error || error.message}`);
-                console.error('Error submitting form', error);
+                toast.error('Error submitting form');
+                setLoading(false);
             }
         },
     });
@@ -97,14 +100,9 @@ export default function DesignForm({ initialValues, onSubmit }) {
     };
 
     const handleRemoveImage = (index) => {
-        setImageIndexToRemove(index);
-        setOpenConfirmDialog(true);
-    };
-
-    const confirmRemoveImage = () => {
-        const imageToRemove = images[imageIndexToRemove];
-        const newImages = images.filter((_, i) => i !== imageIndexToRemove);
-        const newFiles = selectedFiles.filter((_, i) => i !== imageIndexToRemove);
+        const imageToRemove = images[index];
+        const newImages = images.filter((_, i) => i !== index);
+        const newFiles = selectedFiles.filter((_, i) => i !== index);
 
         setImages(newImages);
         setSelectedFiles(newFiles);
@@ -112,20 +110,18 @@ export default function DesignForm({ initialValues, onSubmit }) {
         if (typeof imageToRemove === 'string') {
             setRemovedImages([...removedImages, imageToRemove]);
         }
-
-        setOpenConfirmDialog(false);
-        setImageIndexToRemove(null);
-        toast.info('Image removed.');
     };
 
-    const cancelRemoveImage = () => {
-        setOpenConfirmDialog(false);
-        setImageIndexToRemove(null);
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
     };
 
     return (
         <Container>
-            <ToastContainer />
             <form onSubmit={formik.handleSubmit}>
                 <CustomButton1 variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '1em', alignItems: 'center' }}>
                     <AddPhotoAlternateIcon />
@@ -173,29 +169,33 @@ export default function DesignForm({ initialValues, onSubmit }) {
                     </FormControl>
                 </Box>
                 <Box sx={{ marginTop: 2 }}>
-                    <CustomButton1 type="submit">Submit</CustomButton1>
+                    <CustomButton1 variant="contained" onClick={handleClickOpen} disabled={loading}>
+                        {loading ? <CircularProgress size={24} /> : 'Submit'}
+                    </CustomButton1>
                 </Box>
             </form>
-
             <Dialog
-                open={openConfirmDialog}
-                onClose={cancelRemoveImage}
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="confirm-dialog-title"
+                aria-describedby="confirm-dialog-description"
             >
-                <DialogTitle>Remove Image</DialogTitle>
+                <DialogTitle id="confirm-dialog-title">{"Confirm Submission"}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to remove this image?
+                    <DialogContentText id="confirm-dialog-description">
+                        Are you sure you want to submit this form?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={cancelRemoveImage} color="primary">
+                    <CustomButton1 onClick={handleClose} color="primary">
                         Cancel
-                    </Button>
-                    <Button onClick={confirmRemoveImage} color="primary">
+                    </CustomButton1>
+                    <CustomButton1 onClick={formik.handleSubmit} color="primary" autoFocus>
                         Confirm
-                    </Button>
+                    </CustomButton1>
                 </DialogActions>
             </Dialog>
+            <ToastContainer />
         </Container>
     );
 }
