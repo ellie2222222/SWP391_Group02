@@ -25,7 +25,7 @@ export default function DesignStaffDashboard() {
     const fetchRequests = async () => {
         try {
             const response = await axiosInstance.get('/requests');
-            setRequests(response.data);
+            setRequests(response.data.requests);
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
         }

@@ -3,7 +3,8 @@ import { Box, Typography, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
-import MateriaForm from './MateriaForm';
+import MaterialForm from './MaterialForm';
+
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
@@ -15,12 +16,18 @@ const CustomButton1 = styled(Button)({
         backgroundColor: 'transparent',
     },
 });
+
 const StyledIconButton = styled(IconButton)({
     color: '#b48c72',
     '&:hover': {
         color: '#8e735c',
     },
 });
+
+const CustomTableCell = styled(TableCell)({
+    fontSize: '1.3rem',
+});
+
 export default function MaterialDashboard() {
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -73,55 +80,53 @@ export default function MaterialDashboard() {
     useEffect(() => {
         fetchMaterials();
     }, []);
-  return (
-    <Container>
-        <DrawerHeader/>
-        <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={() => handleAddClick()}>
-                Add Material
-        </CustomButton1>
-        <TableContainer component={Paper}>
+
+    return (
+        <Container>
+            <DrawerHeader />
+            <CustomButton1 startIcon={<Add fontSize='large' />} variant="contained" color="primary" onClick={() => handleAddClick()}>
+                <Typography sx={{ fontSize: "1.3rem", fontWeight: "bold" }}>Add Material</Typography>
+            </CustomButton1>
+            <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Buy Price</TableCell>
-                            <TableCell>Sell Price</TableCell>
-                            <TableCell>Carat</TableCell>
-                            <TableCell align='center'>Action</TableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Name</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Buy Price</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Sell Price</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Action</CustomTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {materials.map(material => (
                             <TableRow key={material._id}>
-                                <TableCell>{material.name}</TableCell>
-                                <TableCell>{material.buy_price}</TableCell>
-                                <TableCell>{material.sell_price}</TableCell>
-                                <TableCell>{material.carat}</TableCell>
-                                <TableCell align='center'>
+                                <CustomTableCell align='center' sx={{ fontWeight: "bold" }}>{material.name}</CustomTableCell>
+                                <CustomTableCell align='center'>{material.buy_price && material.buy_price.toLocaleString() + '₫'}</CustomTableCell>
+                                <CustomTableCell align='center'>{material.sell_price && material.sell_price.toLocaleString() + '₫'}</CustomTableCell>
+                                <CustomTableCell align='center'>
                                     <StyledIconButton onClick={() => handleEditClick(material)}>
-                                        <Edit />
+                                        <Edit fontSize='large' />
                                     </StyledIconButton>
                                     <StyledIconButton onClick={() => handleDeleteClick(material._id)}>
-                                        <Delete />
+                                        <Delete fontSize='large' />
                                     </StyledIconButton>
-                                </TableCell>
+                                </CustomTableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <DialogTitle>{selectedMaterial ? 'Edit Material' : 'Add Material'}</DialogTitle>
                 <DialogContent>
-                    <MateriaForm initialValues={selectedMaterial || {name:'', buy_price: 0, sell_price: 0, carat: 0, cut:'', clarity:'', color:'' }} onSubmit={handleSubmit}/>
+                    <MaterialForm initialValues={selectedMaterial || { name: '', buy_price: 0, sell_price: 0, carat: 0, cut: '', clarity: '', color: '' }} onSubmit={handleSubmit} />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                    <Button onClick={() => setIsDialogOpen(false)} sx={{ color: "#b48c72", fontSize: "1.3rem" }}>
                         Cancel
                     </Button>
                 </DialogActions>
             </Dialog>
-    </Container>
-   
-  )
+        </Container>
+
+    )
 }

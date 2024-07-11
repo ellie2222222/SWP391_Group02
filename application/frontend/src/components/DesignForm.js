@@ -20,6 +20,10 @@ const CustomButton1 = styled(Button)({
     },
 });
 
+const CustomMenuItem = styled(MenuItem)({
+    fontSize: '1.3rem',
+})
+
 const validationSchema = Yup.object({
     request_status: Yup.string().required('Status is required'),
 });
@@ -159,9 +163,9 @@ export default function DesignForm({ initialValues, onSubmit }) {
                             onChange={formik.handleChange}
                             error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                         >
-                            <MenuItem value="design">Design</MenuItem>
-                            <MenuItem value="production">Complete Design</MenuItem>
-                            <MenuItem value="cancelled">Cancelled</MenuItem>
+                            <CustomMenuItem value="design">Design</CustomMenuItem>
+                            <CustomMenuItem value="production">Complete Design</CustomMenuItem>
+                            <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
                         </Select>
                         {formik.touched.request_status && formik.errors.request_status && (
                             <Typography color="error">{formik.errors.request_status}</Typography>

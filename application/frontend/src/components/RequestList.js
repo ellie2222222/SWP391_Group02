@@ -32,7 +32,7 @@ const RequestList = () => {
     const fetchRequests = async () => {
         try {
             const response = await axiosInstance.get(`/requests/user-requests/`);
-            setRequests(response.data);
+            setRequests(response.data.requests);
             setError('');
             setLoading(false);
         } catch (error) {
@@ -65,7 +65,7 @@ const RequestList = () => {
             const userResponse = await axiosInstance.get(`/users/` + decoded._id);
             
             let price;
-            if (request.type === "Sample") {
+            if (request.jewelry_id.type === "Sample") {
                 if (request.on_sale === true) {
                     price = request.jewelry_id.price;
                 } else {
@@ -74,7 +74,6 @@ const RequestList = () => {
             } else {
                 price = request.quote_amount;
             }
-            console.log(price)
 
             const payment = await axiosInstance.post('/payment', {
                 user_info: userResponse.data,
@@ -87,7 +86,7 @@ const RequestList = () => {
                 request_id: request._id,
             });
 
-            window.open(payment.data.result.order_url, '_blank');
+            window.location.href = payment.data.result.order_url;
         } catch (error) {
             console.error('Error, cannot proceed to payment', error);
         }
