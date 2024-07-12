@@ -51,7 +51,7 @@ const BlogLists = () => {
                   component="img"
                   image={blogsData.blogs[0].blog_images && blogsData.blogs[0].blog_images.length > 0 ? blogsData.blogs[0].blog_images[0] : ''}
                   alt={blogsData.blogs[0].blog_title}
-                  style={{ width: '50%', height: '250px', borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
+                  style={{ width: '60%', height: '300px', borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
                 />
                 <CardContent style={{ flex: '1 0 auto' }}>
                   <Typography variant="subtitle2" color="textSecondary" gutterBottom style={{ fontSize: '1.2rem' }}>
