@@ -2,6 +2,8 @@ import React from 'react';
 import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, styled } from '@mui/material';
 import * as Yup from 'yup';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const convertToInputDateFormat = (dateStr) => {
     const date = new Date(dateStr);
@@ -101,7 +103,12 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
             production_status: Yup.string(),
         }),
         onSubmit: async (values) => {
-            await onSubmit(values);
+            try {
+                await onSubmit(values);
+                toast.success('Form submitted successfully!');
+            } catch (error) {
+                toast.error('Error submitting form');
+            }
         }
     });
 
@@ -281,6 +288,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     Submit
                 </CustomButton1>
             </Box>
+            <ToastContainer />
         </Container>
     );
 };
