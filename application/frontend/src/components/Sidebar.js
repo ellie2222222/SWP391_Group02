@@ -17,6 +17,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { Link } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -102,7 +104,7 @@ const CustomListItemButton = styled(ListItemButton)({
     color: '#000',
 });
 
-const CustomListItemText = styled(ListItemText) ({
+const CustomListItemText = styled(ListItemText)({
     '& .MuiListItemText-primary': {
         fontSize: '1.3rem'
     }
@@ -173,7 +175,7 @@ export default function Sidebar() {
                                 <CustomListItemIcon>
                                     <LocalOfferIcon fontSize='large' />
                                 </CustomListItemIcon>
-                                <CustomListItemText primary="Jewelry" sx={{ opacity: open ? 1 : 0 }}/>
+                                <CustomListItemText primary="Jewelry" sx={{ opacity: open ? 1 : 0 }} />
                             </CustomListItemButton>
                         </Link>
                     </ListItem>
@@ -195,17 +197,17 @@ export default function Sidebar() {
                                 <Link to='/admin/dashboard'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
-                                            <Dashboard fontSize='large'/>
+                                            <Dashboard fontSize='large' />
                                         </CustomListItemIcon>
                                         <CustomListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>
                             <ListItem key="Quoted Requests" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/quotedRequest'>
+                                <Link to='/admin/quoted-request'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
-                                            <Done fontSize='large' />
+                                            <RequestQuoteIcon fontSize='large' />
                                         </CustomListItemIcon>
                                         <CustomListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
@@ -245,7 +247,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'admin' && user.role === 'manager' && (
+                    {user.role === 'admin' || user.role === 'manager' && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
@@ -257,19 +259,31 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'sales_staff' && user.role === 'manager' && (
-                        <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
-                        <Link to=''>
-                            <CustomListItemButton>
-                                <CustomListItemIcon>
-                                    <PeopleIcon fontSize='large' />
-                                </CustomListItemIcon>
-                                <CustomListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
-                            </CustomListItemButton>
-                        </Link>
-                    </ListItem>
+                    {user.role === 'sale_staff' || user.role === 'manager' && (
+                        <div>
+                            <ListItem key="invoices" disablePadding sx={{ display: 'block' }}>
+                                <Link to='/admin/invoices'>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                            <ReceiptIcon fontSize='large' />
+                                        </CustomListItemIcon>
+                                        <CustomListItemText primary="Invoices" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+                            </ListItem>
+                            <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
+                                <Link to=''>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                            <PeopleIcon fontSize='large' />
+                                        </CustomListItemIcon>
+                                        <CustomListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+                            </ListItem>
+                        </div>
                     )}
-                    
+
                 </List>
                 <Divider />
             </Drawer>

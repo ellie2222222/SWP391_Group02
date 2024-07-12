@@ -81,7 +81,6 @@ const UserForm = ({ initialValues, onSubmit }) => {
     validationSchema: Yup.object({
       address: Yup.string().required('Address is required'),
       email: Yup.string().email('Invalid email format').required('Email is required'),
-      password: Yup.string().required('Password is required'),
       phone_number: Yup.string().matches(/^(\d{8,})$/, 'Phone number is not valid').required('Phone number is required'),
       role: Yup.string().oneOf(['user', 'admin', 'manager', 'sale_staff', 'design_staff', 'production_staff'], 'Invalid role').required('Role is required'),
       username: Yup.string().required('Username is required'),

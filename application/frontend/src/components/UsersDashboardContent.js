@@ -5,6 +5,8 @@ import { Edit, Delete, Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import UserForm from './UserForm';
 import { useSearchParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const StyledIconButton = styled(IconButton)({
     color: '#b48c72',
@@ -19,7 +21,7 @@ const CustomButton = styled(Button)({
     '&:hover': {
       backgroundColor: '#a57d65',
     },
-  });
+});
 
 const CustomTextField = styled(TextField)({
     width: '100%',
@@ -63,7 +65,7 @@ const CustomFormControl = styled(FormControl)({
 
 const CustomMenuItem = styled(MenuItem)({
     fontSize: '1.3rem',
-})  
+});
 
 const CustomTableCell = styled(TableCell)({
     fontSize: '1.3rem',
@@ -71,11 +73,11 @@ const CustomTableCell = styled(TableCell)({
 
 const capitalizeWords = (str) => {
     const words = str.split('_').map(word =>
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
     );
-    
+
     return words.join(' ');
-  };
+};
 
 const UserDashboardContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
@@ -170,25 +172,29 @@ const UserDashboardContent = () => {
             await axiosInstance.delete(`/users/${id}`);
             fetchUsers(); // Refresh the user list
             setIsDeleteDialogOpen(false); // Close the dialog
+            toast.success('User deleted successfully!');
         } catch (error) {
             console.error("There was an error deleting the user!", error);
+            toast.error('Failed to delete user. Please try again.');
         }
     };
 
     const handleSubmit = async (values) => {
         try {
             await axiosInstance.patch(`/users/role-assignment/${selectedUser._id}`, values);
-            
             fetchUsers();
             setIsDialogOpen(false);
+            toast.success('User updated successfully!');
         } catch (error) {
             console.error("There was an error saving the user!", error);
+            toast.error('Failed to update user. Please try again.');
         }
     };
 
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
+            <ToastContainer />
             <Container>
                 <Box display="flex" mb={2} flexDirection="column">
                     <Box mb={2}>

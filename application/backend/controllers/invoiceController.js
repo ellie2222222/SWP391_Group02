@@ -38,14 +38,14 @@ const createInvoice = async (req, res) => {
 
         let updatedRequest = await Request.findByIdAndUpdate(
             requestId,
-            { $set: {request_status: 'warranty'} },
+            { $set: { request_status: 'warranty' } },
             { new: true, runValidators: true }
         );
 
         // Create the invoice
         const invoice = new Invoice({ transaction_id, payment_method, payment_gateway, total_amount });
         await invoice.save();
-        
+
         res.status(201).json(invoice);
     } catch (error) {
         console.error('Error creating invoice:', error);
@@ -68,17 +68,49 @@ const getInvoiceById = async (req, res) => {
         }
         res.json(invoice);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 // Get all Invoices
 const getAllInvoices = async (req, res) => {
+    const { page = 1, limit = 10, payment_method, payment_gateway, sortBy = 'createdAt', sortOrder = 'desc', search } = req.query;
+
+    // Create filter object
+    const filter = {};
+    if (payment_method) filter.payment_method = payment_method;
+    if (payment_gateway) filter.payment_gateway = payment_gateway;
+
+    // Create sort object
+    const sort = {};
+    if (sortBy) sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
     try {
-        const invoices = await Invoice.find();
-        res.json(invoices);
+        // Fetch invoices with filters, sorting, and pagination
+        const invoices = await Invoice.find(filter)
+            .sort(sort)
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit))
+            .populate({
+                path: 'transaction_id',
+                populate: {
+                    path: 'request_id',
+                    populate: {
+                        path: 'user_id',
+                        match: search ? { email: { $regex: search, $options: 'i' } } : {}
+                    }
+                }
+            });
+
+        // Filter out invoices where the user didn't match the email search (if search was provided)
+        const filteredInvoices = invoices.filter(invoice => invoice.transaction_id?.request_id?.user_id);
+
+        // Get total count of filtered invoices
+        const totalInvoices = await Invoice.countDocuments(filter);
+
+        res.json({ totalInvoices, invoices: filteredInvoices });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -100,7 +132,7 @@ const updateInvoiceById = async (req, res) => {
                 return res.status(404).json({ message: 'Request not found' });
             }
         }
-        
+
         // Check if the total_amount is provided and not negative
         if ('total_amount' in updates && updates.total_amount < 0) {
             return res.status(400).json({ message: 'Total amount cannot be negative.' });
@@ -112,7 +144,7 @@ const updateInvoiceById = async (req, res) => {
         }
         res.json(invoice);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
@@ -129,9 +161,10 @@ const deleteInvoiceById = async (req, res) => {
         if (!invoice) {
             return res.status(404).json({ message: 'Invoice not found' });
         }
+
         res.json({ message: 'Invoice deleted' });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
