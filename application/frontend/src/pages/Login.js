@@ -116,10 +116,10 @@ const Login = () => {
       <Grid container style={{ height: '100vh', margin: 0, padding: 0 }}>
         <Grid item xs={12} md={5} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingLeft: 150, margin: 0 }}>
           <FormContainer elevation={3} style={{ height: '100%' }}>
-            <CustomTypography variant="h6" align="center">
+            <CustomTypography variant="h6" align="center" style={{fontSize: '2.1rem'}}>
               WELCOME TO OUR JEWELRY SHOP
             </CustomTypography>
-            <SubtitleTypography variant="subtitle1" align="center">
+            <SubtitleTypography variant="subtitle1" align="center" style={{fontSize: '1.5rem'}}>
               Let's get started with our jewelry shop
             </SubtitleTypography>
             <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -156,8 +156,8 @@ const Login = () => {
                 </Typography>
               )}
             </form>
-            <CustomLink to="/forgot-password">Forgot Password?</CustomLink>
-            <Typography variant="body2" align="center" style={{ marginTop: '1rem' }}>
+            <CustomLink style={{fontSize: '1.5rem'}} to="/forgot-password">Forgot Password?</CustomLink>
+            <Typography variant="body2" align="center" style={{ marginTop: '1rem' , fontSize: '1.3rem'}}>
               Don't have an account? <Link to="/signup" style={{ color: '#b48c72', fontWeight: 'bold' }}>Sign up</Link>
             </Typography>
           </FormContainer>

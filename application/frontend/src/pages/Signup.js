@@ -89,7 +89,7 @@ const Signup = () => {
   return (
     <CustomContainer container>
       <FormContainer item>
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography variant="h4" align="center" style={{fontSize: '2.2rem', fontWeight: 'bold'}} gutterBottom>
           Sign Up
         </Typography>
         <form onSubmit={handleSubmit}>
@@ -134,12 +134,12 @@ const Signup = () => {
             value={userData.address}
             onChange={handleChange}
           />
-          <CustomButton variant="contained" type="submit">
+          <CustomButton variant="contained" type="submit" >
             Sign Up
           </CustomButton>
           {error && <Typography color="error" style={{ marginTop: '16px' }}>{error}</Typography>}
         </form>
-        <Typography variant="body2" align="center" style={{ marginTop: '1rem' }}>
+        <Typography variant="body2" align="center" style={{ marginTop: '1rem' , fontSize: '1.3rem'}}>
           Already have an account? <CustomLink to="/login">Sign in</CustomLink>
         </Typography>
       </FormContainer>
