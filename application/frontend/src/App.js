@@ -29,6 +29,7 @@ import ExchangePolicy from "./pages/ExchangePolicy";
 import GoldPrice from "./pages/GoldPrice";
 import Dashboard from "./pages/Dashboard";
 import InvoiceDashboard from "./pages/InvoiceDashboard";
+import WarrantyDashboard from "./pages/WarrantyDashboard";
 function App() {
   return (
     <div className="App">
@@ -59,6 +60,7 @@ function App() {
           <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
           <Route path="/admin/quote-request" element={<QuotedRequest />} />
+          <Route path="/admin/warranty-request" element={<WarrantyDashboard />} />
           <Route path="/admin/gemstones" element={<Gemstones />}></Route>
           <Route path="/admin/materials" element={<Material />}></Route>
           <Route path="/admin/dashboard" element={<Dashboard />} />

@@ -272,7 +272,7 @@ export default function Sidebar() {
                                 </Link>
                             </ListItem>
                             <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
-                                <Link to=''>
+                                <Link to='/admin/warranty-request'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <PeopleIcon fontSize='large' />
