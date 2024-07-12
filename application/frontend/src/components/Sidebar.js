@@ -239,7 +239,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'admin' && user.role === 'manager' && (
+                    { (user.role === 'manager' || user.role === 'admin') && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
@@ -251,7 +251,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'sales_staff' && user.role === 'manager' && (
+                    {(user.role === 'sale_staff' || user.role === 'manager') && (
                         <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
                         <Link to=''>
                             <CustomListItemButton>
