@@ -63,7 +63,7 @@ const PaymentStatus = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: '10px', width: '100%' }}>
+        <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: '10px', width: '100%', boxShadow: 2 }}>
           {orderStatus ? (
             <>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2 }}>

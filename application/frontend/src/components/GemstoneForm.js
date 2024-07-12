@@ -12,6 +12,7 @@ const CustomTextField = styled(TextField)({
     borderBottomColor: '#b48c72', // underline color after focus
   },
   '& .MuiOutlinedInput-root': {
+    fontSize: "1.3rem",
     '& fieldset': {
       borderColor: '#b48c72', // outline color
     },
@@ -22,6 +23,14 @@ const CustomTextField = styled(TextField)({
       borderColor: '#b48c72', // outline color when focused
     },
   },
+  "& .MuiFormHelperText-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
+  },
+  "& .MuiTypography-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
+  },
 });
 
 const CustomButton = styled(Button)({
@@ -30,6 +39,10 @@ const CustomButton = styled(Button)({
     backgroundColor: '#a57d65', // button background color on hover
   },
 });
+
+const CustomMenuItem = styled(MenuItem)({
+  fontSize: '1.3rem',
+})
 
 const GemstoneForm = ({ initialValues, onSubmit }) => {
   const formik = useFormik({
@@ -51,9 +64,9 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
-        Edit Diamond
-      </Typography>
+      <Typography variant="h4" gutterBottom align='center'>
+        {initialValues._id ? 'Edit Gemstone' : 'Add Gemstone'}
+      </Typography> 
       <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
         <CustomTextField
           name="name"
@@ -98,11 +111,11 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
             label="Cut"
             error={formik.touched.cut && Boolean(formik.errors.cut)}
           >
-            <MenuItem value="Excellent">Excellent</MenuItem>
-            <MenuItem value="Very Good">Very Good</MenuItem>
-            <MenuItem value="Good">Good</MenuItem>
-            <MenuItem value="Fair">Fair</MenuItem>
-            <MenuItem value="Poor">Poor</MenuItem>
+            <CustomMenuItem value="Excellent">Excellent</CustomMenuItem>
+            <CustomMenuItem value="Very Good">Very Good</CustomMenuItem>
+            <CustomMenuItem value="Good">Good</CustomMenuItem>
+            <CustomMenuItem value="Fair">Fair</CustomMenuItem>
+            <CustomMenuItem value="Poor">Poor</CustomMenuItem>
           </Select>
           {formik.touched.cut && formik.errors.cut && (
             <Typography variant="caption" color="red">{formik.errors.cut}</Typography>
@@ -119,17 +132,17 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
             label="Clarity"
             error={formik.touched.clarity && Boolean(formik.errors.clarity)}
           >
-            <MenuItem value="FL">FL</MenuItem>
-            <MenuItem value="IF">IF</MenuItem>
-            <MenuItem value="VVS1">VVS1</MenuItem>
-            <MenuItem value="VVS2">VVS2</MenuItem>
-            <MenuItem value="VS1">VS1</MenuItem>
-            <MenuItem value="VS2">VS2</MenuItem>
-            <MenuItem value="SI1">SI1</MenuItem>
-            <MenuItem value="SI2">SI2</MenuItem>
-            <MenuItem value="I1">I1</MenuItem>
-            <MenuItem value="I2">I2</MenuItem>
-            <MenuItem value="I3">I3</MenuItem>
+            <CustomMenuItem value="FL">FL</CustomMenuItem>
+            <CustomMenuItem value="IF">IF</CustomMenuItem>
+            <CustomMenuItem value="VVS1">VVS1</CustomMenuItem>
+            <CustomMenuItem value="VVS2">VVS2</CustomMenuItem>
+            <CustomMenuItem value="VS1">VS1</CustomMenuItem>
+            <CustomMenuItem value="VS2">VS2</CustomMenuItem>
+            <CustomMenuItem value="SI1">SI1</CustomMenuItem>
+            <CustomMenuItem value="SI2">SI2</CustomMenuItem>
+            <CustomMenuItem value="I1">I1</CustomMenuItem>
+            <CustomMenuItem value="I2">I2</CustomMenuItem>
+            <CustomMenuItem value="I3">I3</CustomMenuItem>
           </Select>
           {formik.touched.clarity && formik.errors.clarity && (
             <Typography variant="caption" color="red">{formik.errors.clarity}</Typography>
@@ -146,11 +159,11 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
             label="Color"
             error={formik.touched.color && Boolean(formik.errors.color)}
           >
-            <MenuItem value="Colorless">Colorless</MenuItem>
-            <MenuItem value="Near Colorless">Near Colorless</MenuItem>
-            <MenuItem value="Faint Yellow">Faint Yellow</MenuItem>
-            <MenuItem value="Very Light Yellow">Very Light Yellow</MenuItem>
-            <MenuItem value="Light Yellow">Light Yellow</MenuItem>
+            <CustomMenuItem value="Colorless">Colorless</CustomMenuItem>
+            <CustomMenuItem value="Near Colorless">Near Colorless</CustomMenuItem>
+            <CustomMenuItem value="Faint Yellow">Faint Yellow</CustomMenuItem>
+            <CustomMenuItem value="Very Light Yellow">Very Light Yellow</CustomMenuItem>
+            <CustomMenuItem value="Light Yellow">Light Yellow</CustomMenuItem>
           </Select>
           {formik.touched.color && formik.errors.color && (
             <Typography variant="caption" color="red">{formik.errors.color}</Typography>

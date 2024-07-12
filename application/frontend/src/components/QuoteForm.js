@@ -18,6 +18,10 @@ const CustomButton1 = styled(Button)({
     },
 });
 
+const CustomMenuItem = styled(MenuItem)({
+    fontSize: '1.3rem',
+})
+
 export default function QuoteForm({ initialValues, onSubmit }) {
     const [isJewelryFormOpen, setIsJewelryFormOpen] = useState(false);
     const [jewelryId, setJewelryId] = useState(initialValues.jewelry_id ? initialValues.jewelry_id._id : '');
@@ -116,9 +120,9 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                         label="request_status"
                         error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                     >
-                        <MenuItem value="pending">Pending</MenuItem>
-                        <MenuItem value="cancelled">Cancelled</MenuItem>
-                        <MenuItem value="quote">Quote</MenuItem>
+                        <CustomMenuItem value="pending">Pending</CustomMenuItem>
+                        <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
+                        <CustomMenuItem value="quote">Quote</CustomMenuItem>
                     </Select>
                     {formik.touched.request_status && formik.errors.request_status && (
                         <Typography variant="caption" color="red">{formik.errors.request_status}</Typography>

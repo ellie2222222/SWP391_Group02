@@ -15,7 +15,7 @@ const CustomButton1 = styled(Button)({
   border: '1px solid #000',
   color: '#000',
   width: '100%',
-  fontSize: '1rem',
+  fontSize: '1.3rem',
   marginTop: '20px',
   '&:hover': {
     color: '#b48c72',
@@ -29,6 +29,7 @@ const CustomTextField = styled(TextField)({
   variant: "outlined",
   padding: "0",
   "& .MuiOutlinedInput-root": {
+    fontSize: '1.3rem',
     "&:hover fieldset": {
       borderColor: "#b48c72",
     },
@@ -37,6 +38,7 @@ const CustomTextField = styled(TextField)({
     },
   },
   "& .MuiInputLabel-root": {
+    fontSize: '1.3rem',
     "&.Mui-focused": {
       color: "#b48c72",
     },
@@ -47,22 +49,22 @@ const CustomTextField = styled(TextField)({
 });
 
 const CustomIconButton = styled(IconButton)({
-  color: "#000",
-  fontSize: "2.6rem",
-  "&:hover": {
-    backgroundColor: "transparent",
-    color: "#b48c72",
+  color: '#b48c72',
+  '&:hover': {
+      color: '#8e735c',
   },
 });
 
 const CustomFormControl = styled(FormControl)({
   minWidth: 120,
   "& .MuiInputLabel-root": {
+    fontSize: '1.3rem',
     "&.Mui-focused": {
       color: "#b48c72",
     },
   },
   "& .MuiOutlinedInput-root": {
+    fontSize: '1.3rem',
     "&:hover .MuiOutlinedInput-notchedOutline": {
       borderColor: "#b48c72",
     },
@@ -71,6 +73,10 @@ const CustomFormControl = styled(FormControl)({
     },
   },
 });
+
+const CustomMenuItem = styled(MenuItem)({
+  fontSize: '1.3rem',
+})
 
 const JewelryList = () => {
   const [products, setProducts] = useState([]);
@@ -197,41 +203,47 @@ const JewelryList = () => {
           <Box display="flex">
             {/* On Sale Filter */}
             <CustomFormControl>
-              <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
+              <InputLabel id="on_sale-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
               <Select
+                labelId='on_sale_label'
+                label='On Sale'
                 value={onSale}
                 onChange={(event) => handleFilterChange('on_sale', event.target.value)}
               >
-                <MenuItem value=""><em>None</em></MenuItem>
-                <MenuItem value="false">Not On Sale</MenuItem>
-                <MenuItem value="true">On Sale</MenuItem>
+                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                <CustomMenuItem value="false">Not On Sale</CustomMenuItem>
+                <CustomMenuItem value="true">On Sale</CustomMenuItem>
               </Select>
             </CustomFormControl>
             {/* Category Filter */}
             <CustomFormControl style={{ marginLeft: 20 }}>
-              <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
+              <InputLabel id="category-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
               <Select
+                labelId='category-label'
+                label='Category'
                 value={category}
                 onChange={(event) => handleFilterChange('category', event.target.value)}
               >
-                <MenuItem value=""><em>None</em></MenuItem>
-                <MenuItem value="Ring">Ring</MenuItem>
-                <MenuItem value="Necklace">Necklace</MenuItem>
-                <MenuItem value="Bracelet">Bracelet</MenuItem>
-                <MenuItem value="Earring">Earring</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
+                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                <CustomMenuItem value="Ring">Ring</CustomMenuItem>
+                <CustomMenuItem value="Necklace">Necklace</CustomMenuItem>
+                <CustomMenuItem value="Bracelet">Bracelet</CustomMenuItem>
+                <CustomMenuItem value="Earring">Earring</CustomMenuItem>
+                <CustomMenuItem value="Other">Other</CustomMenuItem>
               </Select>
             </CustomFormControl>
             {/* Sort By Price Filter */}
             <CustomFormControl style={{ marginLeft: 20 }}>
-              <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By Price</InputLabel>
+              <InputLabel id="sort_by_price-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By Price</InputLabel>
               <Select
+                labelId='sort_by_price-label'
+                label='Sort By Price'
                 value={sortOrder}
                 onChange={(event) => handleFilterChange('sortByPrice', event.target.value)}
               >
-                <MenuItem value=""><em>None</em></MenuItem>
-                <MenuItem value="asc">Ascending</MenuItem>
-                <MenuItem value="desc">Descending</MenuItem>
+                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                <CustomMenuItem value="asc">Ascending</CustomMenuItem>
+                <CustomMenuItem value="desc">Descending</CustomMenuItem>
               </Select>
             </CustomFormControl>
           </Box>

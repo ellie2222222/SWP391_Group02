@@ -12,6 +12,7 @@ const CustomTextField = styled(TextField)({
     borderBottomColor: '#b48c72', // underline color after focus
   },
   '& .MuiOutlinedInput-root': {
+    fontSize: "1.3rem",
     '& fieldset': {
       borderColor: '#b48c72', // outline color
     },
@@ -22,12 +23,50 @@ const CustomTextField = styled(TextField)({
       borderColor: '#b48c72', // outline color when focused
     },
   },
+  "& .MuiInputLabel-root": {
+    fontSize: '1.3rem',
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
+  },
+  "& .MuiFormHelperText-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
+  },
+  "& .MuiTypography-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
+  },
 });
 
+const CustomFormControl = styled(FormControl)({
+  minWidth: 120,
+  "& .MuiInputLabel-root": {
+      fontSize: '1.3rem',
+      "&.Mui-focused": {
+          color: "#b48c72",
+      },
+  },
+  "& .MuiOutlinedInput-root": {
+      fontSize: '1.3rem',
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+          borderColor: "#b48c72",
+      },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          borderColor: "#b48c72",
+      },
+  },
+});
+
+const CustomMenuItem = styled(MenuItem)({
+  fontSize: '1.3rem',
+})
+
 const CustomButton = styled(Button)({
-  backgroundColor: '#b48c72', // button background color
+  backgroundColor: '#b48c72',
+  fontSize: '1.3rem',
   '&:hover': {
-    backgroundColor: '#a57d65', // button background color on hover
+    backgroundColor: '#a57d65',
   },
 });
 
@@ -42,22 +81,21 @@ const UserForm = ({ initialValues, onSubmit }) => {
     validationSchema: Yup.object({
       address: Yup.string().required('Address is required'),
       email: Yup.string().email('Invalid email format').required('Email is required'),
-      password: Yup.string().required('Password is required'),
       phone_number: Yup.string().matches(/^(\d{8,})$/, 'Phone number is not valid').required('Phone number is required'),
-      role: Yup.string().oneOf(['user', 'admin', 'sale_staff', 'manager', 'design_staff'], 'Role must be either "user" or "admin"').required('Role is required'),
+      role: Yup.string().oneOf(['user', 'admin', 'manager', 'sale_staff', 'design_staff', 'production_staff'], 'Invalid role').required('Role is required'),
       username: Yup.string().required('Username is required'),
     }),
   });
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom align='center'>
         Edit User
       </Typography>
       <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
         <CustomTextField
           name="username"
-          label="User Name"
+          label="Username"
           variant="outlined"
           value={formik.values.username}
           onChange={formik.handleChange}
@@ -95,7 +133,7 @@ const UserForm = ({ initialValues, onSubmit }) => {
           error={formik.touched.email && Boolean(formik.errors.email)}
           helperText={formik.touched.email && formik.errors.email}
         />
-        <FormControl variant="outlined" fullWidth>
+        <CustomFormControl variant="outlined" fullWidth>
           <InputLabel id="role-label">Role</InputLabel>
           <Select
             labelId="role-label"
@@ -106,21 +144,21 @@ const UserForm = ({ initialValues, onSubmit }) => {
             label="Role"
             error={formik.touched.role && Boolean(formik.errors.role)}
           >
-            <MenuItem value="user">User</MenuItem>
-            <MenuItem value="admin">Admin</MenuItem>
-            <MenuItem value="manager">Manager</MenuItem>
-            <MenuItem value="sale_staff">Sale Staff</MenuItem>
-            <MenuItem value="design_staff">Design Staff</MenuItem>
+            <CustomMenuItem value="user">User</CustomMenuItem>
+            <CustomMenuItem value="admin">Admin</CustomMenuItem>
+            <CustomMenuItem value="manager">Manager</CustomMenuItem>
+            <CustomMenuItem value="sale_staff">Sale Staff</CustomMenuItem>
+            <CustomMenuItem value="design_staff">Design Staff</CustomMenuItem>
+            <CustomMenuItem value="production_staff">Production Staff</CustomMenuItem>
           </Select>
           {formik.touched.role && formik.errors.role && (
             <Typography variant="caption" color="red">{formik.errors.role}</Typography>
           )}
-        </FormControl>
+        </CustomFormControl>
 
         <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
           Submit
         </CustomButton>
-
       </Box>
     </Container>
   );

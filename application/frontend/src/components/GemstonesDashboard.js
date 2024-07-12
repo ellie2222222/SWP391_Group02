@@ -4,23 +4,30 @@ import axiosInstance from '../utils/axiosInstance';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import GemstoneForm from './GemstoneForm';
+
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
+
 const StyledIconButton = styled(IconButton)({
     color: '#b48c72',
     '&:hover': {
         color: '#8e735c',
     },
 });
+
+const CustomTableCell = styled(TableCell)({
+    fontSize: '1.3rem',
+});
+
 export default function GemstonesDashboard() {
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -76,46 +83,45 @@ export default function GemstonesDashboard() {
     return (
         <Container >
             <DrawerHeader />
-            <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={() => handleAddClick()}>
-                Add Gemstones
+            <CustomButton1 startIcon={<Add fontSize='large'/>} variant="contained" color="primary" onClick={() => handleAddClick()}>
+                <Typography sx={{ fontSize: "1.3rem", fontWeight: "bold" }}>Add Gemstones</Typography>
             </CustomButton1>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Price</TableCell>
-                            <TableCell>Carat</TableCell>
-                            <TableCell>Cut</TableCell>
-                            <TableCell>Clarity</TableCell>
-                            <TableCell>Color</TableCell>
-                            <TableCell align='center'>Action</TableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Name</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Price</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Carat</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Cut</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Clarity</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Color</CustomTableCell>
+                            <CustomTableCell  sx={{ fontWeight: "bold"}} align='center'>Action</CustomTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {gemstones.map(gemstone => (
                             <TableRow key={gemstone._id}>
-                                <TableCell>{gemstone.name}</TableCell>
-                                <TableCell>{gemstone.price}</TableCell>
-                                <TableCell>{gemstone.carat}</TableCell>
-                                <TableCell>{gemstone.cut}</TableCell>
-                                <TableCell>{gemstone.clarity}</TableCell>
-                                <TableCell>{gemstone.color}</TableCell>
-                                <TableCell align='center'>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>{gemstone.name}</CustomTableCell>
+                                <CustomTableCell>{gemstone.price && gemstone.price.toLocaleString() + '₫'}</CustomTableCell>
+                                <CustomTableCell>{gemstone.carat}</CustomTableCell>
+                                <CustomTableCell>{gemstone.cut}</CustomTableCell>
+                                <CustomTableCell>{gemstone.clarity}</CustomTableCell>
+                                <CustomTableCell>{gemstone.color}</CustomTableCell>
+                                <CustomTableCell align='center'>
                                     <StyledIconButton onClick={() => handleEditClick(gemstone)}>
-                                        <Edit />
+                                        <Edit fontSize='large'/>
                                     </StyledIconButton>
                                     <StyledIconButton onClick={() => handleDeleteClick(gemstone._id)}>
-                                        <Delete />
+                                        <Delete fontSize='large'/>
                                     </StyledIconButton>
-                                </TableCell>
+                                </CustomTableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <DialogTitle>{selectedGemstone ? 'Edit Gemstone' : 'Add Gemstone'}</DialogTitle>
                 <DialogContent>
                     <GemstoneForm initialValues={selectedGemstone || {name:'', price: 0, carat: 0, cut:'', clarity:'', color:'' }} onSubmit={handleSubmit}/>
                 </DialogContent>

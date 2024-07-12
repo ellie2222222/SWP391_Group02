@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosInstance';
-import { Box, Typography, MenuItem, FormControl, Select, InputLabel, styled } from '@mui/material';
+import { Box, Typography, MenuItem, FormControl, Select, InputLabel, styled, CircularProgress, Grid } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PaidIcon from '@mui/icons-material/Paid';
@@ -9,11 +9,13 @@ import LineChart from './LineChart';
 const CustomFormControl = styled(FormControl)({
   minWidth: 120,
   "& .MuiInputLabel-root": {
+    fontSize: "1.3rem",
     "&.Mui-focused": {
       color: "#b48c72",
     },
   },
   "& .MuiOutlinedInput-root": {
+    fontSize: "1.3rem",
     "&:hover .MuiOutlinedInput-notchedOutline": {
       borderColor: "#b48c72",
     },
@@ -22,6 +24,10 @@ const CustomFormControl = styled(FormControl)({
     },
   },
 });
+
+const CustomMenuItem = styled(MenuItem)({
+  fontSize: '1.3rem',
+})
 
 const DashboardContent = () => {
   const [totalRevenue, setTotalRevenue] = useState(0);
@@ -34,6 +40,8 @@ const DashboardContent = () => {
   const [quarterValue, setQuarterValue] = useState(Math.floor(new Date().getMonth() / 3) + 1);
   const [yearValue, setYearValue] = useState(new Date().getFullYear());
   const [recentInvoices, setRecentInvoices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingRecentInvoices, setLoadingRecentInvoices] = useState(false);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -41,8 +49,9 @@ const DashboardContent = () => {
   ];
 
   const fetchGraphRevenue = async () => {
+    let response;
     try {
-      let response;
+      setLoading(true);
 
       if (period === 'month') {
         response = await axiosInstance.get(`/analytics/daily-revenue`, {
@@ -63,7 +72,10 @@ const DashboardContent = () => {
 
     } catch (error) {
       console.error(error);
+    } finally {
+      if (response) setLoading(false);
     }
+    console.log(loading)
   };
 
   const fetchTotalRevenue = async () => {
@@ -78,11 +90,14 @@ const DashboardContent = () => {
 
   const fetchRecentInvoices = async () => {
     try {
+      setLoadingRecentInvoices(true);
       const response = await axiosInstance.get(`/analytics/recent-invoices`)
 
       setRecentInvoices(response.data.invoices);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoadingRecentInvoices(false);
     }
   }
 
@@ -111,6 +126,9 @@ const DashboardContent = () => {
     fetchTotalRequests();
     fetchRecentInvoices();
     fetchTotalRevenue();
+  }, []);
+
+  useEffect(() => {
     fetchGraphRevenue();
   }, [period, monthValue, quarterValue, yearValue]);
 
@@ -131,30 +149,30 @@ const DashboardContent = () => {
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 4, mt: 7, backgroundColor: 'white' }}>
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="150px" gap="20px" mb={3}>
-        <Box display="flex" alignItems="center" justifyContent="center" flexDirection='column' gridColumn="span 4" gap="2rem" borderRadius='5px' border="1px solid #b48c72">
-          <Box display="flex" alignItems="center" justifyContent="center">
-            <PersonIcon sx={{ fontSize: '2rem', mr: 1 }} />
+        <Box display="flex" alignItems="center" justifyContent="center" flexDirection='column' gridColumn="span 4" gap="2rem" borderRadius='5px' border="2px solid #b48c72">
+          <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+            <PersonIcon fontSize='large' />
             <Typography variant='h4'>Total customers</Typography>
           </Box>
           <Typography variant='h4'>{customers}</Typography>
         </Box>
-        <Box display="flex" alignItems="center" justifyContent="center" flexDirection='column' gridColumn="span 4" gap="2rem" borderRadius='5px' border="1px solid #b48c72">
-          <Box display="flex" alignItems="center" justifyContent="center">
-            <ShoppingCartIcon sx={{ fontSize: '2rem', mr: 1 }} />
+        <Box display="flex" alignItems="center" justifyContent="center" flexDirection='column' gridColumn="span 4" gap="2rem" borderRadius='5px' border="2px solid #b48c72">
+          <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+            <ShoppingCartIcon fontSize='large' />
             <Typography variant='h4'>Total requests</Typography>
           </Box>
           <Typography variant='h4'>{totalRequest}</Typography>
         </Box>
-        <Box display="flex" alignItems="center" justifyContent="center" flexDirection='column' gridColumn="span 4" gap="2rem" borderRadius='5px' border="1px solid #b48c72">
-          <Box display="flex" alignItems="center" justifyContent="center">
-            <PaidIcon sx={{ fontSize: '2rem', mr: 1 }} />
+        <Box display="flex" alignItems="center" justifyContent="center" flexDirection='column' gridColumn="span 4" gap="2rem" borderRadius='5px' border="2px solid #b48c72">
+          <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+            <PaidIcon fontSize='large' />
             <Typography variant='h4'>Total revenue generated</Typography>
           </Box>
           <Typography variant='h4'>{allRevenue.toLocaleString()}₫</Typography>
         </Box>
       </Box>
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="200px" gap="20px" mb={3}>
-        <Box gridRow="span 2" gridColumn="span 12" gap="2rem" borderRadius='5px' border="1px solid #b48c72">
+        <Box gridRow="span 2" gridColumn="span 12" gap="2rem" borderRadius='5px' border="2px solid #b48c72">
           <Box display='flex' alignItems="center" justifyContent="space-between" padding='0 30px' mt={2}>
             <Box>
               <Typography variant='h4'>{getRevenueText()}</Typography>
@@ -169,9 +187,9 @@ const DashboardContent = () => {
                   onChange={handlePeriodChange}
                   label="Period"
                 >
-                  <MenuItem value="month">Month</MenuItem>
-                  <MenuItem value="quarter">Quarter</MenuItem>
-                  <MenuItem value="year">Year</MenuItem>
+                  <CustomMenuItem value="month">Month</CustomMenuItem>
+                  <CustomMenuItem value="quarter">Quarter</CustomMenuItem>
+                  <CustomMenuItem value="year">Year</CustomMenuItem>
                 </Select>
               </CustomFormControl>
               {period === 'month' && (
@@ -184,9 +202,9 @@ const DashboardContent = () => {
                     label="Month"
                   >
                     {months.map((month, index) => (
-                      <MenuItem key={month} value={index + 1}>
+                      <CustomMenuItem key={month} value={index + 1}>
                         {month}
-                      </MenuItem>
+                      </CustomMenuItem>
                     ))}
                   </Select>
                 </CustomFormControl>
@@ -200,10 +218,10 @@ const DashboardContent = () => {
                     onChange={(e) => setQuarterValue(e.target.value)}
                     label="Quarter"
                   >
-                    <MenuItem value={1}>Q1</MenuItem>
-                    <MenuItem value={2}>Q2</MenuItem>
-                    <MenuItem value={3}>Q3</MenuItem>
-                    <MenuItem value={4}>Q4</MenuItem>
+                    <CustomMenuItem value={1}>Q1</CustomMenuItem>
+                    <CustomMenuItem value={2}>Q2</CustomMenuItem>
+                    <CustomMenuItem value={3}>Q3</CustomMenuItem>
+                    <CustomMenuItem value={4}>Q4</CustomMenuItem>
                   </Select>
                 </CustomFormControl>
               )}
@@ -217,9 +235,9 @@ const DashboardContent = () => {
                 >
                   {/* Generate a range of years */}
                   {Array.from({ length: 10 }, (_, index) => (
-                    <MenuItem key={index} value={new Date().getFullYear() - index}>
+                    <CustomMenuItem key={index} value={new Date().getFullYear() - index}>
                       {new Date().getFullYear() - index}
-                    </MenuItem>
+                    </CustomMenuItem>
                   ))}
                 </Select>
               </CustomFormControl>
@@ -227,33 +245,53 @@ const DashboardContent = () => {
           </Box>
 
           <Box height="80%" width='100%' sx={{ paddingLeft: '30px' }}>
-            <LineChart data={revenueData} />
+            {loading ? (
+              <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                <CircularProgress />
+              </Box>
+            ) : (
+              <LineChart data={revenueData} />
+            )}
           </Box>
         </Box>
       </Box>
-      <Box display="flex" flexDirection='column' gridRow="span 2" gridColumn="span 12" gap="2rem" maxHeight='470px'>
-          <Box backgroundColor="#b48c72" borderRadius='5px'>
-            <Typography variant='h4' p={1} sx={{ color: "#fff" }}>Recent Transactions</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Box backgroundColor="#b48c72" borderRadius="5px" boxShadow={2}>
+            <Typography variant="h4" p={1} sx={{ color: "#fff" }}>
+              Recent Transactions
+            </Typography>
           </Box>
-          <Box backgroundColor="#b48c72" borderRadius='5px' display="flex" alignItems="center">
-            <Typography variant='h5' p={1} sx={{ color: "#fff", fontWeight: "bold", flex: 1 }}>No</Typography>
-            <Typography variant='h5' p={1} sx={{ color: "#fff", fontWeight: "bold", flex: 1 }}>Transactions ID</Typography>
-            <Typography variant='h5' p={1} sx={{ color: "#fff", fontWeight: "bold", flex: 1 }}>Customer</Typography>
-            <Typography variant='h5' p={1} sx={{ color: "#fff", fontWeight: "bold", flex: 1 }}>Date</Typography>
-            <Typography variant='h5' p={1} sx={{ color: "#fff", fontWeight: "bold", flex: 1, textAlign: 'center' }}>Amount</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Box backgroundColor="#b48c72" borderRadius="5px" display="flex" alignItems="center" boxShadow={2} color="#fff">
+            <Typography variant="h5" p={1} sx={{ fontWeight: "bold", flex: 1 }}>No</Typography>
+            <Typography variant="h5" p={1} sx={{ fontWeight: "bold", flex: 1 }}>Transactions ID</Typography>
+            <Typography variant="h5" p={1} sx={{ fontWeight: "bold", flex: 1 }}>Customer</Typography>
+            <Typography variant="h5" p={1} sx={{ fontWeight: "bold", flex: 1 }}>Date</Typography>
+            <Typography variant="h5" p={1} sx={{ fontWeight: "bold", flex: 1, textAlign: 'center' }}>Amount</Typography>
           </Box>
-          <Box sx={{ overflowY: 'auto', maxHeight: '100%' }}>
-            {recentInvoices.map((invoice, index) => (
-              <Box key={invoice._id} p={1} borderRadius='5px' display="flex" alignItems="center" gap="20px" boxShadow={3} mb={2} bgcolor='rgba(255, 255, 255, 0.9)'>
-                <Typography variant='h5' sx={{ flex: 1}}>{index + 1}</Typography>
-                <Typography variant='h5' sx={{ flex: 1}}>{invoice.transaction_id._id}</Typography>
-                <Typography variant='h5' sx={{ flex: 1}}>{invoice.transaction_id.request_id.user_id.email}</Typography>
-                <Typography variant='h5' sx={{ flex: 1}}>{new Date(invoice.createdAt).toLocaleDateString()}</Typography>
-                <Typography variant='h5' sx={{ flex: 1, padding: '10px', backgroundColor: "#b48c72", borderRadius: "10px", color: "#fff", textAlign: 'center' }}>{invoice.total_amount.toLocaleString()}₫</Typography>
+        </Grid>
+        <Grid item xs={12} sx={{ overflowY: 'auto', maxHeight: 1000 }}>
+          {loadingRecentInvoices ? (
+            <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+              <CircularProgress />
+            </Box>
+          ) : (
+            recentInvoices.map((invoice, index) => (
+              <Box key={invoice._id} p={1} borderRadius="5px" display="flex" alignItems="center" gap="20px" boxShadow={3} mb={2} bgcolor="rgba(255, 255, 255, 0.9)">
+                <Typography variant="h5" sx={{ flex: 1, fontWeight: 'bold' }}>{index + 1}</Typography>
+                <Typography variant="h5" sx={{ flex: 1 }}>{invoice.transaction_id._id}</Typography>
+                <Typography variant="h5" sx={{ flex: 1 }}>{invoice.transaction_id.request_id.user_id.email}</Typography>
+                <Typography variant="h5" sx={{ flex: 1 }}>{new Date(invoice.createdAt).toLocaleDateString()}</Typography>
+                <Typography variant="h5" sx={{ flex: 1, padding: '10px', backgroundColor: "#b48c72", borderRadius: "10px", color: "#fff", textAlign: 'center' }}>
+                  {invoice.total_amount.toLocaleString()}₫
+                </Typography>
               </Box>
-            ))}
-          </Box>
-        </Box>
+            ))
+          )}
+        </Grid>
+      </Grid>
     </Box>
   );
 };

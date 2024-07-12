@@ -28,6 +28,7 @@ import WarrantyPolicy from "./pages/WarrantyPolicy";
 import ExchangePolicy from "./pages/ExchangePolicy";
 import GoldPrice from "./pages/GoldPrice";
 import Dashboard from "./pages/Dashboard";
+import InvoiceDashboard from "./pages/InvoiceDashboard";
 function App() {
   const { user } = useAuth()
 
@@ -59,10 +60,11 @@ function App() {
           <Route path="/admin" element={<JewelryDashboard />} />
           <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
-          <Route path="/admin/quotedRequest" element={<QuotedRequest />}></Route>
+          <Route path="/admin/quoted-request" element={<QuotedRequest />}></Route>
           <Route path="/admin/gemstones" element={<Gemstones />}></Route>
           <Route path="/admin/materials" element={<Material />}></Route>
           <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/invoices" element={<InvoiceDashboard />} />
           <Route path='/admin/blogs' element={<BlogCreate />}></Route>
         </Route>
 

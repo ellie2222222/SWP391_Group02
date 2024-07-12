@@ -2,19 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
 
+const CustomTableCell = styled(TableCell)({
+    fontSize: '1.3rem',
+});
 
 export default function QuotedRequestDashBoard() {
     const DrawerHeader = styled('div')(({ theme }) => ({
@@ -28,64 +33,95 @@ export default function QuotedRequestDashBoard() {
 
     const [requests, setRequests] = useState([]);
     const [error, setError] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedRequestId, setSelectedRequestId] = useState(null);
 
     const fetchRequests = async () => {
         try {
             const response = await axiosInstance.get('/requests');
-            setRequests(response.data);
+            setRequests(response.data.requests);
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
         }
     };
-    const handleAcceptRequest = async (requestId) => {
+
+    const handleAcceptRequest = async () => {
         try {
-            await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'accepted' })
+            await axiosInstance.patch(`/requests/${selectedRequestId}`, { request_status: 'accepted' });
             setError('');
             fetchRequests();
+            handleCloseDialog();
+            toast.success('Quote approved successfully!');
         } catch (error) {
             if (error.response === undefined) setError(error.message);
             else setError(error.response.data.error);
+            toast.error('Failed to approve the quote.');
         }
-    }
+    };
+    
+
+    const handleOpenDialog = (requestId) => {
+        setSelectedRequestId(requestId);
+        setIsDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedRequestId(null);
+    };
+
     useEffect(() => {
         fetchRequests();
     }, []);
 
     return (
         <Container>
-             <DrawerHeader/>
+            <DrawerHeader />
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Request ID</TableCell>
-                            <TableCell>Quote Content</TableCell>
-                            <TableCell>Quote Amount</TableCell>
-                            <TableCell>Request Status</TableCell>
-                            <TableCell>Product Type</TableCell>
-                            <TableCell align='center'>Actions</TableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Request ID</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Quote Content</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Quote Amount</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Request Status</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}}>Product Type</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: "bold"}} align='center'>Actions</CustomTableCell>
                         </TableRow>
                     </TableHead>
-
                     <TableBody>
-                        {requests.map(request => (
+                        {requests.map((request) => (
                             request.request_status === 'quote' && (
                                 <TableRow key={request._id}>
-                                    <TableCell>{request._id}</TableCell>
-                                    <TableCell>{request.quote_content}</TableCell>
-                                    <TableCell>{request.quote_amount}</TableCell>
-                                    <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
-                                    <TableCell>{request.jewelry_id ? request.jewelry_id._id : 'Custom'}</TableCell>
-                                    <TableCell>
-                                        <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Approve Quote</CustomButton1>
-                                    </TableCell>
+                                    <CustomTableCell sx={{ fontWeight: "bold"}}>{request._id}</CustomTableCell>
+                                    <CustomTableCell>{request.quote_content}</CustomTableCell>
+                                    <CustomTableCell>{request.quote_amount}</CustomTableCell>
+                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
+                                    <CustomTableCell>{request.jewelry_id ? request.jewelry_id.type : 'N/A'}</CustomTableCell>
+                                    <CustomTableCell>
+                                        <CustomButton1 onClick={() => handleOpenDialog(request._id)}>Approve Quote</CustomButton1>
+                                    </CustomTableCell>
                                 </TableRow>
                             )
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle align='center'>Confirm Approval</DialogTitle>
+                <DialogContent>
+                    <Typography variant='p' sx={{fontSize: "1.3rem"}}>Are you sure you want to approve this quote?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <CustomButton1 onClick={handleCloseDialog} sx={{ color: "white" }}>
+                        Cancel
+                    </CustomButton1>
+                    <CustomButton1 onClick={handleAcceptRequest} sx={{ color: "white" }}>
+                        Confirm
+                    </CustomButton1>
+                </DialogActions>
+            </Dialog>
+            <ToastContainer />
         </Container>
-
-    )
+    );    
 }

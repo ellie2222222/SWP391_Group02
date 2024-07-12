@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, styled, TextField, InputAdornment, IconButton, Select, MenuItem, FormControl, InputLabel, Pagination, Stack } from '@mui/material';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
+import { CircularProgress } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import JewelryForm from './JewelryForm';
 import { ToastContainer, toast } from 'react-toastify';
@@ -13,17 +14,10 @@ const CustomButton1 = styled(Button)({
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
-    },
-});
-
-const StyledIconButton = styled(IconButton)({
-    color: '#b48c72',
-    '&:hover': {
-        color: '#8e735c',
     },
 });
 
@@ -40,6 +34,7 @@ const CustomTextField = styled(TextField)({
     variant: "outlined",
     padding: "0",
     "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
         "&:hover fieldset": {
             borderColor: "#b48c72",
         },
@@ -48,6 +43,7 @@ const CustomTextField = styled(TextField)({
         },
     },
     "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
         "&.Mui-focused": {
             color: "#b48c72",
         },
@@ -57,11 +53,13 @@ const CustomTextField = styled(TextField)({
 const CustomFormControl = styled(FormControl)({
     minWidth: 120,
     "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
         "&.Mui-focused": {
             color: "#b48c72",
         },
     },
     "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
         "&:hover .MuiOutlinedInput-notchedOutline": {
             borderColor: "#b48c72",
         },
@@ -74,6 +72,17 @@ const CustomFormControl = styled(FormControl)({
 const CustomTableCell = styled(TableCell)({
     fontSize: '1.3rem',
 });
+
+const StyledIconButton = styled(IconButton)({
+    color: '#b48c72',
+    '&:hover': {
+        color: '#8e735c',
+    },
+});
+
+const CustomMenuItem = styled(MenuItem)({
+    fontSize: '1.3rem',
+})
 
 const AdminContent = () => {
     const [jewelries, setJewelries] = useState([]);
@@ -89,6 +98,8 @@ const AdminContent = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [loading, setLoading] = useState(false);
+
 
     const fetchJewelries = async () => {
         try {
@@ -175,7 +186,7 @@ const AdminContent = () => {
 
     const handleSubmit = async (values) => {
         try {
-            console.log(values)
+            setLoading(true);
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
                 toast.success('Jewelry item updated successfully');
@@ -188,8 +199,11 @@ const AdminContent = () => {
         } catch (error) {
             console.error("There was an error saving the jewelry!", error);
             toast.error(error.response?.data?.error || error.message);
+        } finally {
+            setLoading(false);
         }
     };
+
 
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -207,7 +221,7 @@ const AdminContent = () => {
                                 endAdornment: (
                                     <InputAdornment position="end">
                                         <StyledIconButton color="inherit" onClick={handleSearchClick}>
-                                            <Search fontSize="large" />
+                                            <Search fontSize="large"/>
                                         </StyledIconButton>
                                     </InputAdornment>
                                 ),
@@ -216,61 +230,71 @@ const AdminContent = () => {
                     </Box>
                     <Box display="flex">
                         <CustomFormControl>
-                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
+                            <InputLabel id="on_sale-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
                             <Select
+                                labelId='on_sale-label'
+                                label="On Sale"
                                 value={onSale}
                                 onChange={(event) => handleFilterChange('on_sale', event.target.value)}
                             >
-                                <MenuItem value=""><em>None</em></MenuItem>
-                                <MenuItem value="false">Not On Sale</MenuItem>
-                                <MenuItem value="true">On Sale</MenuItem>
+                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                <CustomMenuItem value="false">Not On Sale</CustomMenuItem>
+                                <CustomMenuItem value="true">On Sale</CustomMenuItem>
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
+                            <InputLabel id="category-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
                             <Select
+                                labelId='category-label'
+                                label="Category"
                                 value={category}
                                 onChange={(event) => handleFilterChange('category', event.target.value)}
                             >
-                                <MenuItem value=""><em>None</em></MenuItem>
-                                <MenuItem value="Ring">Ring</MenuItem>
-                                <MenuItem value="Necklace">Necklace</MenuItem>
-                                <MenuItem value="Bracelet">Bracelet</MenuItem>
-                                <MenuItem value="Earring">Earring</MenuItem>
-                                <MenuItem value="Other">Other</MenuItem>
+                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                <CustomMenuItem value="Ring">Ring</CustomMenuItem>
+                                <CustomMenuItem value="Necklace">Necklace</CustomMenuItem>
+                                <CustomMenuItem value="Bracelet">Bracelet</CustomMenuItem>
+                                <CustomMenuItem value="Earring">Earring</CustomMenuItem>
+                                <CustomMenuItem value="Other">Other</CustomMenuItem>
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Type</InputLabel>
+                            <InputLabel id="type-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Type</InputLabel>
                             <Select
+                                labelId='type-label'
+                                label="Type"
                                 value={type}
                                 onChange={(event) => handleFilterChange('type', event.target.value)}
                             >
-                                <MenuItem value=""><em>None</em></MenuItem>
-                                <MenuItem value="Sample">Sample</MenuItem>
-                                <MenuItem value="Custom">Custom</MenuItem>
+                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                <CustomMenuItem value="Sample">Sample</CustomMenuItem>
+                                <CustomMenuItem value="Custom">Custom</CustomMenuItem>
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By Price</InputLabel>
+                            <InputLabel id="sort_by_price-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By Price</InputLabel>
                             <Select
+                                labelId='sort_by_price-label'
+                                label="Sort By Price"
                                 value={sortOrder}
                                 onChange={(event) => handleFilterChange('sortByPrice', event.target.value)}
                             >
-                                <MenuItem value=""><em>None</em></MenuItem>
-                                <MenuItem value="asc">Ascending</MenuItem>
-                                <MenuItem value="desc">Descending</MenuItem>
+                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                <CustomMenuItem value="asc">Ascending</CustomMenuItem>
+                                <CustomMenuItem value="desc">Descending</CustomMenuItem>
                             </Select>
                         </CustomFormControl>
                         <CustomFormControl style={{ marginLeft: 20 }}>
-                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Available</InputLabel>
+                            <InputLabel id="available-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Available</InputLabel>
                             <Select
+                                labelId='available-label'
+                                label="Available"
                                 value={available}
                                 onChange={(event) => handleFilterChange('available', event.target.value)}
                             >
-                                <MenuItem value=""><em>None</em></MenuItem>
-                                <MenuItem value="true">Yes</MenuItem>
-                                <MenuItem value="false">No</MenuItem>
+                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                <CustomMenuItem value="true">Yes</CustomMenuItem>
+                                <CustomMenuItem value="false">No</CustomMenuItem>
                             </Select>
                         </CustomFormControl>
                     </Box>
@@ -280,50 +304,57 @@ const AdminContent = () => {
                     <Typography variant='h5'>There are a total of {total} result(s)</Typography>
                 </Box>
 
-                <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick}>
-                    Add Jewelry
+                <CustomButton1
+                    startIcon={loading ? <CircularProgress size={20} /> : <Add fontSize='large'/>}
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddClick}
+                    disabled={loading}
+                >
+                    <Typography sx={{ fontSize: "1.3rem", fontWeight: "bold" }}>{loading ? 'Loading...' : 'Add Jewelry'}</Typography>
                 </CustomButton1>
+
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <CustomTableCell>Name</CustomTableCell>
-                                <CustomTableCell>Category</CustomTableCell>
-                                <CustomTableCell>On Sale</CustomTableCell>
-                                <CustomTableCell>Available</CustomTableCell>
-                                <CustomTableCell>Type</CustomTableCell>
-                                <CustomTableCell>Price</CustomTableCell>
-                                <CustomTableCell align='center'>Images</CustomTableCell>
-                                <CustomTableCell align='center'>Actions</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>Name</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>Category</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>On Sale</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>Available</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>Type</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>Price</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}} align='center'>Images</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold"}} align='center'>Actions</CustomTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {jewelries.length > 0 ? (
                                 jewelries.map((jewelry) => (
                                     <TableRow key={jewelry._id}>
-                                        <CustomTableCell>{jewelry.name}</CustomTableCell>
+                                        <CustomTableCell sx={{ fontWeight: "bold"}}>{jewelry.name}</CustomTableCell>
                                         <CustomTableCell>{jewelry.category}</CustomTableCell>
                                         <CustomTableCell>{jewelry.on_sale === true ? 'Yes' : 'No'}</CustomTableCell>
                                         <CustomTableCell>{jewelry.available === true ? 'Yes' : 'No'}</CustomTableCell>
                                         <CustomTableCell>{jewelry.type}</CustomTableCell>
-                                        <CustomTableCell>{jewelry.price}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.price && jewelry.price.toLocaleString() + "₫"}</CustomTableCell>
                                         <TableCell>
                                             {jewelry.images[0] && (
                                                 <CardMedia
                                                     component="img"
                                                     alt="Jewelry"
                                                     image={jewelry.images[0]}
-                                                    sx={{ width: '100%', maxHeight: '400px', margin: '0px' }}
+                                                    sx={{ width: '250px', maxHeight: '400px', margin: "auto", padding: 0 }}
                                                 />
                                             )}
                                         </TableCell>
                                         <TableCell align='center'>
-                                            <StyledIconButton onClick={() => handleEditClick(jewelry)}>
-                                                <Edit />
-                                            </StyledIconButton>
-                                            <StyledIconButton onClick={() => handleDeleteClick(jewelry._id)}>
-                                                <Delete />
-                                            </StyledIconButton>
+                                            <IconButton onClick={() => handleEditClick(jewelry)}>
+                                                <Edit sx={{ color: "#b48c72" }} fontSize="large" />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleDeleteClick(jewelry._id)}>
+                                                <Delete sx={{ color: "#b48c72" }} fontSize="large" />
+                                            </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -352,12 +383,11 @@ const AdminContent = () => {
                 </Box>
 
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                    <DialogTitle>{selectedJewelry ? 'Edit Jewelry' : 'Add Jewelry'}</DialogTitle>
                     <DialogContent>
-                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false, subgemstone_id:'', subgemstone_quantity:0 }} onSubmit={handleSubmit} />
+                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false, subgemstone_id: '', subgemstone_quantity: 0 }} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                        <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: "1.3rem", color: "#b48c72" }} disabled={loading}>
                             Cancel
                         </Button>
                     </DialogActions>

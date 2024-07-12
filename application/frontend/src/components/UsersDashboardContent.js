@@ -5,18 +5,21 @@ import { Edit, Delete, Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import UserForm from './UserForm';
 import { useSearchParams } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const CustomEditIcon = styled(Edit)({
+const StyledIconButton = styled(IconButton)({
     color: '#b48c72',
     '&:hover': {
-        color: '#a57d65',
+        color: '#8e735c',
     },
 });
 
-const CustomDeleteIcon = styled(Delete)({
-    color: '#b48c72',
+const CustomButton = styled(Button)({
+    backgroundColor: '#b48c72',
+    fontSize: '1.3rem',
     '&:hover': {
-        color: '#a57d65',
+      backgroundColor: '#a57d65',
     },
 });
 
@@ -25,6 +28,7 @@ const CustomTextField = styled(TextField)({
     variant: "outlined",
     padding: "0",
     "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
         "&:hover fieldset": {
             borderColor: "#b48c72",
         },
@@ -33,6 +37,7 @@ const CustomTextField = styled(TextField)({
         },
     },
     "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
         "&.Mui-focused": {
             color: "#b48c72",
         },
@@ -42,11 +47,13 @@ const CustomTextField = styled(TextField)({
 const CustomFormControl = styled(FormControl)({
     minWidth: 120,
     "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
         "&.Mui-focused": {
             color: "#b48c72",
         },
     },
     "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
         "&:hover .MuiOutlinedInput-notchedOutline": {
             borderColor: "#b48c72",
         },
@@ -55,6 +62,22 @@ const CustomFormControl = styled(FormControl)({
         },
     },
 });
+
+const CustomMenuItem = styled(MenuItem)({
+    fontSize: '1.3rem',
+});
+
+const CustomTableCell = styled(TableCell)({
+    fontSize: '1.3rem',
+});
+
+const capitalizeWords = (str) => {
+    const words = str.split('_').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    );
+
+    return words.join(' ');
+};
 
 const UserDashboardContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
@@ -69,6 +92,8 @@ const UserDashboardContent = () => {
     const [total, setTotal] = useState(0);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [deleteUserId, setDeleteUserId] = useState(null);
     const [search, setSearch] = useState('');
     const [role, setRole] = useState('');
     const [page, setPage] = useState(1);
@@ -137,12 +162,20 @@ const UserDashboardContent = () => {
         setIsDialogOpen(true);
     };
 
-    const handleDeleteClick = async (id) => {
+    const handleDeleteClick = (id) => {
+        setDeleteUserId(id);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleConfirmDelete = async (id) => {
         try {
             await axiosInstance.delete(`/users/${id}`);
-            fetchUsers();
+            fetchUsers(); // Refresh the user list
+            setIsDeleteDialogOpen(false); // Close the dialog
+            toast.success('User deleted successfully!');
         } catch (error) {
             console.error("There was an error deleting the user!", error);
+            toast.error('Failed to delete user. Please try again.');
         }
     };
 
@@ -151,19 +184,21 @@ const UserDashboardContent = () => {
             await axiosInstance.patch(`/users/role-assignment/${selectedUser._id}`, values);
             fetchUsers();
             setIsDialogOpen(false);
+            toast.success('User updated successfully!');
         } catch (error) {
             console.error("There was an error saving the user!", error);
+            toast.error('Failed to update user. Please try again.');
         }
     };
 
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
+            <ToastContainer />
             <Container>
                 <Box display="flex" mb={2} flexDirection="column">
                     <Box mb={2}>
                         <CustomTextField
-                            size="normal"
                             label="Search by username or email"
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
@@ -171,9 +206,9 @@ const UserDashboardContent = () => {
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton color="inherit" onClick={handleSearchClick}>
+                                        <StyledIconButton color="inherit" onClick={handleSearchClick}>
                                             <Search fontSize="large" />
-                                        </IconButton>
+                                        </StyledIconButton>
                                     </InputAdornment>
                                 ),
                             }}
@@ -181,18 +216,20 @@ const UserDashboardContent = () => {
                     </Box>
                     <Box display="flex">
                         <CustomFormControl>
-                            <InputLabel sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Role</InputLabel>
+                            <InputLabel id="role-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Role</InputLabel>
                             <Select
+                                labelId='role-label'
+                                label='Role'
                                 value={role}
                                 onChange={(event) => handleFilterChange('role', event.target.value)}
                             >
-                                <MenuItem value=""><em>None</em></MenuItem>
-                                <MenuItem value="admin">Admin</MenuItem>
-                                <MenuItem value="user">User</MenuItem>
-                                <MenuItem value="manager">Manager</MenuItem>
-                                <MenuItem value="sale_staff">Sale Staff</MenuItem>
-                                <MenuItem value="design_staff">Design Staff</MenuItem>
-                                <MenuItem value="production_staff">Production Staff</MenuItem>
+                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                <CustomMenuItem value="admin">Admin</CustomMenuItem>
+                                <CustomMenuItem value="user">User</CustomMenuItem>
+                                <CustomMenuItem value="manager">Manager</CustomMenuItem>
+                                <CustomMenuItem value="sale_staff">Sale Staff</CustomMenuItem>
+                                <CustomMenuItem value="design_staff">Design Staff</CustomMenuItem>
+                                <CustomMenuItem value="production_staff">Production Staff</CustomMenuItem>
                             </Select>
                         </CustomFormControl>
                     </Box>
@@ -206,38 +243,40 @@ const UserDashboardContent = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Phone Number</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Email</TableCell>
-                                <TableCell>Address</TableCell>
-                                <TableCell>Role</TableCell>
-                                <TableCell align='center'>Actions</TableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>UID</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Name</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Email</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Phone Number</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Address</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Role</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {users.length > 0 ? (
                                 users.map((user) => (
                                     <TableRow key={user._id}>
-                                        <TableCell>{user.phone_number}</TableCell>
-                                        <TableCell>{user.username}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell>{user.address}</TableCell>
-                                        <TableCell>{user.role}</TableCell>
-                                        <TableCell align='center'>
-                                            <IconButton color="primary" onClick={() => handleEditClick(user)}>
-                                                <CustomEditIcon />
-                                            </IconButton>
-                                            <IconButton color="secondary" onClick={() => handleDeleteClick(user._id)}>
-                                                <CustomDeleteIcon />
-                                            </IconButton>
-                                        </TableCell>
+                                        <CustomTableCell sx={{ fontWeight: 'bold' }}>{user._id}</CustomTableCell>
+                                        <CustomTableCell>{user.username}</CustomTableCell>
+                                        <CustomTableCell>{user.email}</CustomTableCell>
+                                        <CustomTableCell>{user.phone_number}</CustomTableCell>
+                                        <CustomTableCell>{user.address}</CustomTableCell>
+                                        <CustomTableCell sx={{ textTransform: 'capitalize' }}>{user.role && capitalizeWords(user.role)}</CustomTableCell>
+                                        <CustomTableCell align='center'>
+                                            <StyledIconButton color="primary" onClick={() => handleEditClick(user)}>
+                                                <Edit fontSize='large' />
+                                            </StyledIconButton>
+                                            <StyledIconButton color="secondary" onClick={() => handleDeleteClick(user._id)}>
+                                                <Delete fontSize='large' />
+                                            </StyledIconButton>
+                                        </CustomTableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell align='center' colSpan={6}>
+                                    <CustomTableCell align='center' colSpan={6}>
                                         <Typography variant="h6">No users found</Typography>
-                                    </TableCell>
+                                    </CustomTableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -258,14 +297,30 @@ const UserDashboardContent = () => {
                 </Box>
 
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                    <DialogTitle>Edit User</DialogTitle>
                     <DialogContent>
                         <UserForm initialValues={selectedUser} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                        <Button onClick={() => setIsDialogOpen(false)} sx={{ color: "#b48c72", fontSize: '1.3rem' }}>
                             Cancel
                         </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
+                    <DialogTitle align='center'>Delete User</DialogTitle>
+                    <DialogContent>
+                        <Typography variant="p" sx={{ fontSize: '1.3rem' }}>
+                            Are you sure you want to delete this user?
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <CustomButton onClick={() => setIsDeleteDialogOpen(false)} variant="contained">
+                            Cancel
+                        </CustomButton>
+                        <CustomButton onClick={() => handleConfirmDelete(deleteUserId)} variant="contained">
+                            Delete
+                        </CustomButton>
                     </DialogActions>
                 </Dialog>
             </Container>

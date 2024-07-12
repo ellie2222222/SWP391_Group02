@@ -17,6 +17,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { Link } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -102,6 +104,12 @@ const CustomListItemButton = styled(ListItemButton)({
     color: '#000',
 });
 
+const CustomListItemText = styled(ListItemText)({
+    '& .MuiListItemText-primary': {
+        fontSize: '1.3rem'
+    }
+})
+
 export default function Sidebar() {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
@@ -143,12 +151,12 @@ export default function Sidebar() {
                             ...(open && { display: 'none' }),
                         }}
                     >
-                        <MenuIcon />
+                        <MenuIcon fontSize='large' />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div">
+                    <Typography variant="h4" noWrap component="div">
                         Management
                     </Typography>
-                    <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 'auto' }}>
+                    <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 'auto', fontSize: "1.5rem" }}>
                         Logout
                     </Button>
                 </Toolbar>
@@ -156,7 +164,7 @@ export default function Sidebar() {
             <Drawer variant="permanent" open={open}>
                 <DrawerHeader>
                     <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                        {theme.direction === 'rtl' ? <ChevronRightIcon fontSize='large' /> : <ChevronLeftIcon fontSize='large' />}
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
@@ -165,9 +173,9 @@ export default function Sidebar() {
                         <Link to='/admin'>
                             <CustomListItemButton>
                                 <CustomListItemIcon>
-                                    <LocalOfferIcon />
+                                    <LocalOfferIcon fontSize='large' />
                                 </CustomListItemIcon>
-                                <ListItemText primary="Jewelry" sx={{ opacity: open ? 1 : 0 }} />
+                                <CustomListItemText primary="Jewelry" sx={{ opacity: open ? 1 : 0 }} />
                             </CustomListItemButton>
                         </Link>
                     </ListItem>
@@ -176,9 +184,9 @@ export default function Sidebar() {
                             <Link to='/admin/requests'>
                                 <CustomListItemButton>
                                     <CustomListItemIcon>
-                                        <ShoppingCartIcon />
+                                        <ShoppingCartIcon fontSize='large' />
                                     </CustomListItemIcon>
-                                    <ListItemText primary="My Requests" sx={{ opacity: open ? 1 : 0 }} />
+                                    <CustomListItemText primary="My Requests" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>
@@ -189,19 +197,19 @@ export default function Sidebar() {
                                 <Link to='/admin/dashboard'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
-                                            <Dashboard />
+                                            <Dashboard fontSize='large' />
                                         </CustomListItemIcon>
-                                        <ListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
+                                        <CustomListItemText primary="Dashboard" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>
                             <ListItem key="Quoted Requests" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/quotedRequest'>
+                                <Link to='/admin/quoted-request'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
-                                            <Done />
+                                            <RequestQuoteIcon fontSize='large' />
                                         </CustomListItemIcon>
-                                        <ListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
+                                        <CustomListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>
@@ -209,9 +217,9 @@ export default function Sidebar() {
                                 <Link to='/admin/gemstones'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
-                                            <Diamond />
+                                            <Diamond fontSize='large' />
                                         </CustomListItemIcon>
-                                        <ListItemText primary="Gemstones" sx={{ opacity: open ? 1 : 0 }} />
+                                        <CustomListItemText primary="Gemstones" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>
@@ -219,9 +227,9 @@ export default function Sidebar() {
                                 <Link to='/admin/materials'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
-                                            <Diamond />
+                                            <Diamond fontSize='large' />
                                         </CustomListItemIcon>
-                                        <ListItemText primary="Materials" sx={{ opacity: open ? 1 : 0 }} />
+                                        <CustomListItemText primary="Materials" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>
@@ -232,9 +240,9 @@ export default function Sidebar() {
                             <Link to='/admin/users'>
                                 <CustomListItemButton>
                                     <CustomListItemIcon>
-                                        <PeopleIcon />
+                                        <PeopleIcon fontSize='large' />
                                     </CustomListItemIcon>
-                                    <ListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
+                                    <CustomListItemText primary="Users" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>
@@ -244,26 +252,38 @@ export default function Sidebar() {
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
                                     <CustomListItemIcon>
-                                        <FeedIcon />
+                                        <FeedIcon fontSize='large' />
                                     </CustomListItemIcon>
-                                    <ListItemText primary="Blogs" sx={{ opacity: open ? 1 : 0 }} />
+                                    <CustomListItemText primary="Blogs" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>
                     )}
                     {(user.role === 'sale_staff' || user.role === 'manager') && (
-                        <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
-                        <Link to=''>
-                            <CustomListItemButton>
-                                <CustomListItemIcon>
-                                    <PeopleIcon />
-                                </CustomListItemIcon>
-                                <ListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
-                            </CustomListItemButton>
-                        </Link>
-                    </ListItem>
+                        <div>
+                            <ListItem key="invoices" disablePadding sx={{ display: 'block' }}>
+                                <Link to='/admin/invoices'>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                            <ReceiptIcon fontSize='large' />
+                                        </CustomListItemIcon>
+                                        <CustomListItemText primary="Invoices" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+                            </ListItem>
+                            <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
+                                <Link to=''>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                            <PeopleIcon fontSize='large' />
+                                        </CustomListItemIcon>
+                                        <CustomListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+                            </ListItem>
+                        </div>
                     )}
-                    
+
                 </List>
                 <Divider />
             </Drawer>

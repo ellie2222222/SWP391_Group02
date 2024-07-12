@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/system';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
+
 const CustomTextField = styled(TextField)({
     '& label.Mui-focused': {
         color: '#b48c72',
@@ -15,6 +16,7 @@ const CustomTextField = styled(TextField)({
         borderBottomColor: '#b48c72',
     },
     '& .MuiOutlinedInput-root': {
+        fontSize: "1.3rem",
         '& fieldset': {
             borderColor: '#b48c72',
         },
@@ -25,8 +27,24 @@ const CustomTextField = styled(TextField)({
             borderColor: '#b48c72',
         },
     },
+    "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
 });
+
 const CustomButton = styled(Button)({
+    fontSize: "1.3rem",
     backgroundColor: '#b48c72',
     '&:hover': {
         backgroundColor: '#a57d65',
@@ -54,11 +72,13 @@ const CustomSwitch = styled(Switch)({
 
 const CustomFormControl = styled(FormControl)({
     "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
         "&.Mui-focused": {
             color: "#b48c72",
         },
     },
     "& .MuiOutlinedInput-root": {
+        fontSize: "1.3rem",
         "&:hover .MuiOutlinedInput-notchedOutline": {
             borderColor: "#b48c72",
         },
@@ -66,8 +86,25 @@ const CustomFormControl = styled(FormControl)({
             borderColor: "#b48c72",
         },
     },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
 });
 
+const CustomFormControlLabel = styled(FormControlLabel)({
+    "& .MuiFormControlLabel-label": {
+        fontSize: "1.3rem",
+    }
+})
+
+const CustomMenuItem = styled(MenuItem)({
+    fontSize: '1.3rem',
+})
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
     const { user } = useAuth();
@@ -103,6 +140,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
         },
         onSubmit: async (values) => {
             const formData = new FormData();
+
             Object.keys(values).forEach((key) => {
                 if (key === 'images') {
                     values.images.forEach((image) => {
@@ -112,10 +150,12 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                     formData.append(key, values[key]);
                 }
             });
+
             removedImages.forEach((image) => {
                 formData.append('removedImages', image);
             });
-            return console.log(values);
+
+            onSubmit(formData);
         },
         validationSchema: Yup.object({
             name: Yup.string().required("Required."),
@@ -123,7 +163,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             price: Yup.number().required("Required.").typeError("Must be a number"),
             gemstone_id: Yup.string().nullable(),
             subgemstone_id: Yup.string().nullable(),
-            subgemstone_quantity: Yup.number().typeError("Must be a number") .nullable(),
+            subgemstone_quantity: Yup.number().typeError("Must be a number").nullable(),
             material_id: Yup.string(),
             material_weight: Yup.number().required("Required.").typeError("Must be a number"),
             category: Yup.string().required("Required."),
@@ -184,207 +224,209 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
 
     return (
         <Container maxWidth="sm">
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" gutterBottom align='center'>
                 {initialValues._id ? 'Edit Jewelry' : 'Add Jewelry'}
             </Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-                    <React.Fragment>
-                        <CustomTextField
-                            name="name"
-                            label="Name"
-                            variant="outlined"
-                            value={formik.values.name}
+                <React.Fragment>
+                    <CustomTextField
+                        name="name"
+                        label="Name"
+                        variant="outlined"
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.name && Boolean(formik.errors.name)}
+                        helperText={formik.touched.name && formik.errors.name}
+                    />
+                    <CustomTextField
+                        name="description"
+                        label="Description"
+                        variant="outlined"
+                        value={formik.values.description}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.description && Boolean(formik.errors.description)}
+                        helperText={formik.touched.description && formik.errors.description}
+                    />
+                    <CustomTextField
+                        name="price"
+                        label="Price"
+                        type="number"
+                        variant="outlined"
+                        value={formik.values.price}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.price && Boolean(formik.errors.price)}
+                        helperText={formik.touched.price && formik.errors.price}
+                    />
+                    <CustomFormControl variant="outlined" fullWidth>
+                        <InputLabel id="gemstone_id-label">Gemstone Material</InputLabel>
+                        <Select
+                            labelId="gemstone_id-label"
+                            name="gemstone_id"
+                            value={formik.values.gemstone_id ? formik.values.gemstone_id : ''}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            error={formik.touched.name && Boolean(formik.errors.name)}
-                            helperText={formik.touched.name && formik.errors.name}
-                        />
-                        <CustomTextField
-                            name="description"
-                            label="Description"
-                            variant="outlined"
-                            value={formik.values.description}
+                            label="Gemstone Material"
+                            error={formik.touched.gemstone_id && Boolean(formik.errors.gemstone_id)}
+                            sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.gemstone_id && formik.errors.gemstone_id ? 'red' : '#b48c72' } }}
+                        >
+                            {gemstones.map((gemstone) => (
+                                <CustomMenuItem key={gemstone._id} value={gemstone._id}>
+                                    {gemstone.name} - Carat:{gemstone.carat} - Cut:{gemstone.cut} - Clarity:{gemstone.clarity} - Color:{gemstone.color}
+                                </CustomMenuItem>
+                            ))}
+                        </Select>
+                        {formik.touched.gemstone_id && formik.errors.gemstone_id && (
+                            <Typography variant="caption" color="red">{formik.errors.gemstone_id}</Typography>
+                        )}
+                    </CustomFormControl>
+                    <CustomFormControl variant="outlined" fullWidth>
+                        <InputLabel id="subgemstone_id-label">Sub Gemstone</InputLabel>
+                        <Select
+                            labelId="subgemstone_id-label"
+                            name="subgemstone_id"
+                            value={formik.values.subgemstone_id ? formik.values.subgemstone_id : ''}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            error={formik.touched.description && Boolean(formik.errors.description)}
-                            helperText={formik.touched.description && formik.errors.description}
-                        />
-                        <CustomTextField
-                            name="price"
-                            label="Price"
-                            type="number"
-                            variant="outlined"
-                            value={formik.values.price}
-                            InputProps={{
-                                readOnly: true,
-                            }}
+                            label="Sub Gemstone"
+                            error={formik.touched.subgemstone_id && Boolean(formik.errors.subgemstone_id)}
+                            sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.subgemstone_id && formik.errors.subgemstone_id ? 'red' : '#b48c72' } }}
+                        >
+                            {gemstones.map((gemstone) => (
+                                <CustomMenuItem key={gemstone._id} value={gemstone._id}>
+                                    {gemstone.name} - Carat:{gemstone.carat} - Cut:{gemstone.cut} - Clarity:{gemstone.clarity} - Color:{gemstone.color}
+                                </CustomMenuItem>
+                            ))}
+                        </Select>
+                        {formik.touched.subgemstone_id && formik.errors.subgemstone_id && (
+                            <Typography variant="caption" color="red">{formik.errors.subgemstone_id}</Typography>
+                        )}
+                    </CustomFormControl>
+                    <CustomTextField
+                        name="subgemstone_quantity"
+                        label="Sub Gemstone Quantity"
+                        type="number"
+                        variant="outlined"
+                        value={formik.values.subgemstone_quantity ? formik.values.subgemstone_quantity : 0}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.subgemstone_quantity && Boolean(formik.errors.subgemstone_quantity)}
+                        helperText={formik.touched.subgemstone_quantity && formik.errors.subgemstone_quantity}
+                    />
+                    <CustomFormControl variant="outlined" fullWidth>
+                        <InputLabel id="material_id-label">Material</InputLabel>
+                        <Select
+                            labelId="material_id-label"
+                            name="material_id"
+                            value={formik.values.material_id}
+                            onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            error={formik.touched.price && Boolean(formik.errors.price)}
-                            helperText={formik.touched.price && formik.errors.price}
-                        />
-                        <CustomFormControl variant="outlined" fullWidth>
-                            <InputLabel id="gemstone_id-label">Gemstone Material</InputLabel>
-                            <Select
-                                labelId="gemstone_id-label"
-                                name="gemstone_id"
-                                value={formik.values.gemstone_id ? formik.values.gemstone_id : ''}
+                            label="Material"
+                            error={formik.touched.material_id && Boolean(formik.errors.material_id)}
+                            sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.material_id && formik.errors.material_id ? 'red' : '#b48c72' } }}
+                        >
+                            {materials.map((material) => (
+                                <CustomMenuItem key={material._id} value={material._id}>
+                                    {material.name}
+                                </CustomMenuItem>
+                            ))}
+                        </Select>
+                        {formik.touched.material_id && formik.errors.material_id && (
+                            <Typography variant="caption" color="red">{formik.errors.material_id}</Typography>
+                        )}
+                    </CustomFormControl>
+                    <CustomTextField
+                        name="material_weight"
+                        label="Material Weight"
+                        type="number"
+                        variant="outlined"
+                        value={formik.values.material_weight}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.material_weight && Boolean(formik.errors.material_weight)}
+                        helperText={formik.touched.material_weight && formik.errors.material_weight}
+                    />
+                    <CustomFormControl variant="outlined" fullWidth>
+                        <InputLabel id="category-label">Category</InputLabel>
+                        <Select
+                            labelId="category-label"
+                            name="category"
+                            value={formik.values.category}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            label="Category"
+                            error={formik.touched.category && Boolean(formik.errors.category)}
+                            sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.category && formik.errors.category ? 'red' : '#b48c72' } }}
+                        >
+                            <CustomMenuItem value="Ring">Ring</CustomMenuItem>
+                            <CustomMenuItem value="Necklace">Necklace</CustomMenuItem>
+                            <CustomMenuItem value="Bracelet">Bracelet</CustomMenuItem>
+                            <CustomMenuItem value="Earring">Earring</CustomMenuItem>
+                            <CustomMenuItem value="Other">Other</CustomMenuItem>
+                        </Select>
+                        {formik.touched.category && formik.errors.category && (
+                            <Typography variant="caption" color="red">{formik.errors.category}</Typography>
+                        )}
+                    </CustomFormControl>
+                    <CustomFormControl variant="outlined" fullWidth>
+                        <InputLabel id="type-label">Type</InputLabel>
+                        <Select
+                            labelId="type-label"
+                            name="type"
+                            value={formik.values.type}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            label="Type"
+                            error={formik.touched.type && Boolean(formik.errors.type)}
+                            sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.type && formik.errors.type ? 'red' : '#b48c72' } }}
+                        >
+                            <CustomMenuItem value="Sample">Sample</CustomMenuItem>
+                            <CustomMenuItem value="Custom">Custom</CustomMenuItem>
+                        </Select>
+                        {formik.touched.type && formik.errors.type && (
+                            <Typography variant="caption" color="red">{formik.errors.type}</Typography>
+                        )}
+                    </CustomFormControl>
+                    <CustomFormControlLabel
+                        control={
+                            <CustomSwitch
+                                checked={formik.values.on_sale}
                                 onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                label="Gemstone Material"
-                                error={formik.touched.gemstone_id && Boolean(formik.errors.gemstone_id)}
-                                sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.gemstone_id && formik.errors.gemstone_id ? 'red' : '#b48c72' } }}
-                            >
-                                {gemstones.map((gemstone) => (
-                                    <MenuItem key={gemstone._id} value={gemstone._id}>
-                                        {gemstone.name} - Carat:{gemstone.carat} - Cut:{gemstone.cut} - Clarity:{gemstone.clarity} - Color:{gemstone.color}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            {formik.touched.gemstone_id && formik.errors.gemstone_id && (
-                                <Typography variant="caption" color="red">{formik.errors.gemstone_id}</Typography>
-                            )}
-                        </CustomFormControl>
-                        <CustomFormControl variant="outlined" fullWidth>
-                            <InputLabel id="subgemstone_id-label">Sub Gemstone</InputLabel>
-                            <Select
-                                labelId="subgemstone_id-label"
-                                name="subgemstone_id"
-                                value={formik.values.subgemstone_id ? formik.values.subgemstone_id: '' }
+                                name="on_sale"
+                                size='large'
+                            />
+                        }
+                        label="On Sale"
+                    />
+                    <CustomTextField
+                        name="sale_percentage"
+                        label="Sale Percentage"
+                        type="number"
+                        variant="outlined"
+                        value={formik.values.sale_percentage}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.sale_percentage && Boolean(formik.errors.sale_percentage)}
+                        helperText={formik.touched.sale_percentage && formik.errors.sale_percentage}
+                    />
+
+                    <CustomFormControlLabel
+                        control={
+                            <CustomSwitch
+                                checked={formik.values.available}
                                 onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                label="Sub Gemstone"
-                                error={formik.touched.subgemstone_id && Boolean(formik.errors.subgemstone_id)}
-                                sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.subgemstone_id && formik.errors.subgemstone_id ? 'red' : '#b48c72' } }}
-                            >
-                                {gemstones.map((gemstone) => (
-                                    <MenuItem key={gemstone._id} value={gemstone._id}>
-                                        {gemstone.name} - Carat:{gemstone.carat} - Cut:{gemstone.cut} - Clarity:{gemstone.clarity} - Color:{gemstone.color}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            {formik.touched.subgemstone_id && formik.errors.subgemstone_id && (
-                                <Typography variant="caption" color="red">{formik.errors.subgemstone_id}</Typography>
-                            )}
-                        </CustomFormControl>
-                        <CustomTextField
-                            name="subgemstone_quantity"
-                            label="Sub Gemstone Quantity"
-                            type="number"
-                            variant="outlined"
-                            value={formik.values.subgemstone_quantity ? formik.values.subgemstone_quantity :0  }
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.subgemstone_quantity && Boolean(formik.errors.subgemstone_quantity)}
-                            helperText={formik.touched.subgemstone_quantity && formik.errors.subgemstone_quantity}
-                        />
-                        <CustomFormControl variant="outlined" fullWidth>
-                            <InputLabel id="material_id-label">Material</InputLabel>
-                            <Select
-                                labelId="material_id-label"
-                                name="material_id"
-                                value={formik.values.material_id}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                label="Material"
-                                error={formik.touched.material_id && Boolean(formik.errors.material_id)}
-                                sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.material_id && formik.errors.material_id ? 'red' : '#b48c72' } }}
-                            >
-                                {materials.map((material) => (
-                                    <MenuItem key={material._id} value={material._id}>
-                                        {material.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            {formik.touched.material_id && formik.errors.material_id && (
-                                <Typography variant="caption" color="red">{formik.errors.material_id}</Typography>
-                            )}
-                        </CustomFormControl>
-                        <CustomTextField
-                            name="material_weight"
-                            label="Material Weight"
-                            type="number"
-                            variant="outlined"
-                            value={formik.values.material_weight}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.material_weight && Boolean(formik.errors.material_weight)}
-                            helperText={formik.touched.material_weight && formik.errors.material_weight}
-                        />
-                        <CustomFormControl variant="outlined" fullWidth>
-                            <InputLabel id="category-label">Category</InputLabel>
-                            <Select
-                                labelId="category-label"
-                                name="category"
-                                value={formik.values.category}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                label="Category"
-                                error={formik.touched.category && Boolean(formik.errors.category)}
-                                sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.category && formik.errors.category ? 'red' : '#b48c72' } }}
-                            >
-                                <MenuItem value="Ring">Ring</MenuItem>
-                                <MenuItem value="Necklace">Necklace</MenuItem>
-                                <MenuItem value="Bracelet">Bracelet</MenuItem>
-                                <MenuItem value="Earring">Earring</MenuItem>
-                                <MenuItem value="Other">Other</MenuItem>
-                            </Select>
-                            {formik.touched.category && formik.errors.category && (
-                                <Typography variant="caption" color="red">{formik.errors.category}</Typography>
-                            )}
-                        </CustomFormControl>
-                        <CustomFormControl variant="outlined" fullWidth>
-                            <InputLabel id="type-label">Type</InputLabel>
-                            <Select
-                                labelId="type-label"
-                                name="type"
-                                value={formik.values.type}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                label="Type"
-                                error={formik.touched.type && Boolean(formik.errors.type)}
-                                sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: formik.touched.type && formik.errors.type ? 'red' : '#b48c72' } }}
-                            >
-                                <MenuItem value="Sample">Sample</MenuItem>
-                                <MenuItem value="Custom">Custom</MenuItem>
-                            </Select>
-                            {formik.touched.type && formik.errors.type && (
-                                <Typography variant="caption" color="red">{formik.errors.type}</Typography>
-                            )}
-                        </CustomFormControl>
-                        <FormControlLabel
-                            control={
-                                <CustomSwitch
-                                    checked={formik.values.on_sale}
-                                    onChange={formik.handleChange}
-                                    name="on_sale"
-                                />
-                            }
-                            label="On Sale"
-                        />
-                        <CustomTextField
-                            name="sale_percentage"
-                            label="Sale Percentage"
-                            type="number"
-                            variant="outlined"
-                            value={formik.values.sale_percentage}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.sale_percentage && Boolean(formik.errors.sale_percentage)}
-                            helperText={formik.touched.sale_percentage && formik.errors.sale_percentage}
-                        />
-                    
-                <FormControlLabel
-                    control={
-                        <CustomSwitch
-                            checked={formik.values.available}
-                            onChange={formik.handleChange}
-                            name="available"
-                        />
-                    }
-                    label="Available"
-                />
+                                name="available"
+                                size='large'
+                            />
+                        }
+                        label="Available"
+                    />
                 </React.Fragment>
-                
+
                 {selectedImages.length > 0 && (
                     <Grid container spacing={2} sx={{ mt: 2 }}>
                         {selectedImages.map((image, index) => (
@@ -417,9 +459,9 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 {formik.errors.images && (
                     <Typography variant="caption" color="red">{formik.errors.images}</Typography>
                 )}
-                <CustomButton variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '1em', alignItems: 'center' }}>
-                    <AddPhotoAlternateIcon />
-                    <Typography variant='body1'>Upload Images</Typography>
+                <CustomButton variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '0.5em', alignItems: 'center' }}>
+                    <AddPhotoAlternateIcon sx={{ fontSize: "2rem" }} />
+                    <Typography variant='p' sx={{ fontSize: "1.3rem" }}>Upload Images</Typography>
                     <input
                         type="file"
                         hidden

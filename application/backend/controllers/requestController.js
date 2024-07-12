@@ -1,5 +1,4 @@
 const Request = require("../models/requestModel");
-const WorksOn = require("../models/worksOnModel");
 const Jewelry = require("../models/jewelryModel")
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -8,42 +7,69 @@ const { cloudinary } = require('../cloudinary');
 
 // get all requests
 const getRequests = async (req, res) => {
+  const { request_status, quote_status, production_status, page = 1, limit = 10 } = req.query;
+
   try {
-    let request
-    if (req.role === "sale_staff") {
-      request = await Request.find({ request_status: "pending" })
-        .populate({
-          path: 'user_id',
-          select: 'email'
-        })
-        .populate({
-          path: 'jewelry_id',
-          populate: [
-            { path: 'material_id' },
-            { path: 'gemstone_id' }
-          ]
-        });
-    } else {
-      request = await Request.find({})
-        .populate({
-          path: 'user_id',
-          select: 'email'
-        })
-        .populate({
-          path: 'jewelry_id',
-          populate: [
-            { path: 'material_id' },
-            { path: 'gemstone_id' }
-          ]
-        });
+    // Construct query object
+    let query = {};
+    if (request_status) {
+      query.request_status = new RegExp(request_status, 'i'); // Case-insensitive search
+    }
+    if (quote_status) {
+      query.quote_status = new RegExp(quote_status, 'i');
+    }
+    if (production_status) {
+      query.production_status = new RegExp(production_status, 'i');
     }
 
-    res.status(200).json(request);
+    const skip = (page - 1) * limit;
+
+    let requests;
+    let totalRequests;
+    if (req.role === "sale_staff") {
+      requests = await Request.find({ request_status: "pending" })
+        .populate({
+          path: 'user_id',
+          select: 'email'
+        })
+        .populate({
+          path: 'jewelry_id',
+          populate: [
+            { path: 'material_id' },
+            { path: 'gemstone_id' }
+          ]
+        });
+      totalRequests = await Request.countDocuments({ request_status: "pending" });
+    } else {
+      requests = await Request.find(query)
+        .skip(skip)
+        .limit(parseInt(limit))
+        .populate({
+          path: 'user_id',
+          select: 'email'
+        })
+        .populate({
+          path: 'jewelry_id',
+          populate: [
+            { path: 'material_id' },
+            { path: 'gemstone_id' }
+          ]
+        });
+      totalRequests = await Request.countDocuments(query);
+    }
+
+    res.status(200).json({
+      requests,
+      total: totalRequests,
+      totalPages: Math.ceil(totalRequests / limit),
+      currentPage: parseInt(page),
+    });
   } catch (error) {
     console.error('Error fetching requests:', error);
     res.status(500).json({ error: "An error occurred while fetching requests" });
   }
 };
+
 
 // get one request
 const getRequest = async (req, res) => {
@@ -86,7 +112,7 @@ const getUserRequests = async (req, res) => {
       return res.status(404).json({ error: "No requests found" });
     }
 
-    res.status(200).json(requests);
+    res.status(200).json({ requests });
   } catch (error) {
     console.error('Error fetching request:', error);
     res.status(500).json({ error: "An error occurred while fetching your requests" });
@@ -116,76 +142,6 @@ const getUserRequest = async (req, res) => {
   } catch (error) {
     console.error('Error fetching request:', error);
     res.status(500).json({ error: "An error occurred while fetching your requests" });
-  }
-};
-
-// get staff requests
-const getStaffRequests = async (req, res) => {
-  try {
-    const { authorization } = req.headers
-    const token = authorization.split(' ')[1]
-    const { _id } = jwt.verify(token, process.env.SECRET)
-
-    const worksOn = await WorksOn.find({ staff_ids: _id });
-
-    const requestIds = worksOn.map(w => w.request_id);
-
-    const requests = await Request.find({ _id: { $in: requestIds } })
-      .populate({
-        path: 'user_id',
-        select: 'email'
-      })
-      .populate({
-        path: 'jewelry_id',
-        populate: [
-          { path: 'material_id' },
-          { path: 'gemstone_id' }
-        ]
-      });
-
-    // Check if requests exist
-    if (requests.length === 0) {
-      return res.status(404).json({ error: "No requests found for this staff" });
-    }
-
-    res.status(200).json(requests);
-  } catch (error) {
-    console.error('Error fetching request:', error);
-    res.status(500).json({ error: "An error occurred while fetching staff requests" });
-  }
-};
-
-// get staff request
-const getStaffRequest = async (req, res) => {
-  try {
-    const { id } = req.params
-    const { authorization } = req.headers
-    const token = authorization.split(' ')[1]
-    const { _id } = jwt.verify(token, process.env.SECRET)
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid ID' });
-    }
-
-    // Find request
-    const requests = await Request.findOne({ _id: id });
-
-    // Check if requests exist
-    if (!requests) {
-      return res.status(404).json({ error: "No request found" });
-    }
-
-    // Check if request is staff's request
-    const worksOn = await WorksOn.findOne({ request_id: requests._id, staff_ids: _id });
-
-    if (!worksOn) {
-      return res.status(403).json({ error: "You do not have permission to perform this action" });
-    }
-
-    res.status(200).json(requests);
-  } catch (error) {
-    console.error('Error fetching request:', error);
-    res.status(500).json({ error: "An error occurred while fetching staff requests" });
   }
 };
 
@@ -426,8 +382,6 @@ module.exports = {
   getRequests,
   getRequest,
   createRequest,
-  getStaffRequests,
-  getStaffRequest,
   getUserRequests,
   getUserRequest,
   updateRequest,

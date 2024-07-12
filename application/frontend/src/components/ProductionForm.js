@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, Button, TextField, Typography, Grid, MenuItem, Box } from '@mui/material';
+import { Container, Button, TextField, Typography, MenuItem, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
-import { format, parseISO } from 'date-fns'; // Sử dụng date-fns để định dạng lại ngày tháng
+import { format, parseISO } from 'date-fns';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -18,6 +20,9 @@ const CustomButton1 = styled(Button)({
 });
 
 const ProductionForm = ({ initialValues, onSubmit }) => {
+    const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+
     const today = new Date().toISOString().split('T')[0];
     const formik = useFormik({
         initialValues: {
@@ -38,15 +43,31 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                 .required('Required'),
         }),
         onSubmit: async (values) => {
-            // Format dates before submitting
+            setOpen(false);
+            setLoading(true);
             const formattedValues = {
                 ...values,
-                production_start_date: format(parseISO(values.production_start_date), 'yyyy-MM-dd'), // Định dạng lại thành dd/MM/yy
-                production_end_date: format(parseISO(values.production_end_date), 'yyyy-MM-dd'), // Định dạng lại thành dd/MM/yy
+                production_start_date: format(parseISO(values.production_start_date), 'yyyy-MM-dd'),
+                production_end_date: format(parseISO(values.production_end_date), 'yyyy-MM-dd'),
             };
-            onSubmit(formattedValues);
+            try {
+                await onSubmit(formattedValues);
+                toast.success('Form submitted successfully');
+            } catch (error) {
+                toast.error('Error submitting form');
+            } finally {
+                setLoading(false);
+            }
         },
     });
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     return (
         <Container>
@@ -107,10 +128,32 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                     <MenuItem value="cancelled">Cancelled</MenuItem>
                 </TextField>
 
-                <CustomButton1 type="submit">
-                    Submit
+                <CustomButton1 variant="contained" onClick={handleClickOpen} disabled={loading}>
+                    {loading ? <CircularProgress size={24} /> : 'Submit'}
                 </CustomButton1>
             </Box>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="confirm-dialog-title"
+                aria-describedby="confirm-dialog-description"
+            >
+                <DialogTitle id="confirm-dialog-title">{"Confirm Submission"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="confirm-dialog-description">
+                        Are you sure you want to submit this form?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <CustomButton1 onClick={handleClose} color="primary">
+                        Cancel
+                    </CustomButton1>
+                    <CustomButton1 onClick={formik.handleSubmit} color="primary" autoFocus>
+                        Confirm
+                    </CustomButton1>
+                </DialogActions>
+            </Dialog>
+            <ToastContainer />
         </Container>
     );
 };
