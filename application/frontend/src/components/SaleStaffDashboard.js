@@ -1,28 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography, styled, IconButton } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import QuoteForm from './QuoteForm'
+import QuoteForm from './QuoteForm';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
 
+const CustomTableCell = styled(TableCell)({
+    fontSize: '1.3rem',
+});
+
+const DetailDialog = ({ open, onClose, request }) => (
+    <Dialog open={open} onClose={onClose}>
+        <DialogTitle variant='h5'>Request Details</DialogTitle>
+        <DialogContent>
+            <Typography variant="p" sx={{ fontSize: '1.3rem' }}>{request?.request_description}</Typography>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={onClose} sx={{fontSize: '1.3rem', color: '#b48c72'}}>
+                Close
+            </Button>
+        </DialogActions>
+    </Dialog>
+);
 
 export default function SaleStaffDashboard() {
     const [requests, setRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
-    const [error, setError] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 
     const fetchRequests = async () => {
         try {
@@ -32,19 +49,25 @@ export default function SaleStaffDashboard() {
             console.error("There was an error fetching the requests!", error);
         }
     };
+
     const handleSubmit = async (values) => {
         try {
-            await axiosInstance.patch(`/requests/${selectedRequest._id}`, values)
+            await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
             setIsDialogOpen(false);
             fetchRequests();
         } catch (error) {
-            if (error.response === undefined) setError(error.message);
-            else setError(error.response.data.error);
+            console.error("There was an error saving the request!", error);
         }
-    }
+    };
+
     const handleEditClick = (request) => {
         setIsDialogOpen(true);
-        setSelectedRequest(request)
+        setSelectedRequest(request);
+    };
+
+    const handleDetailClick = (request) => {
+        setIsDetailDialogOpen(true);
+        setSelectedRequest(request);
     };
 
     useEffect(() => {
@@ -57,51 +80,50 @@ export default function SaleStaffDashboard() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Request ID</TableCell>
-                            <TableCell>Sender</TableCell>
-                            <TableCell>Description</TableCell>
-                            <TableCell>Request Status</TableCell>
-                            <TableCell>Create Quote</TableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }}>Request ID</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }}>Sender</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }}>Request Status</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Description</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
                         </TableRow>
                     </TableHead>
-
                     <TableBody>
                         {requests.map((request, index) => (
                             (request.request_status === 'pending' || request.request_status === 'rejected_quote') && (
                                 <TableRow key={index}>
-                                    <TableCell>{request._id}</TableCell>
-                                    <TableCell>{request.user_id ? request.user_id.email : 'User not found'}</TableCell>
-                                    <TableCell>{request.request_description}</TableCell>
-                                    <TableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</TableCell>
-                                    <TableCell>
+                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>{request._id}</CustomTableCell>
+                                    <CustomTableCell>{request.user_id ? request.user_id.email : 'User not found'}</CustomTableCell>
+                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
+                                    <CustomTableCell onClick={() => handleDetailClick(request)}>
+                                        <CustomButton1>
+                                            Detail
+                                        </CustomButton1>
+                                    </CustomTableCell>
+                                    <CustomTableCell align="center">
                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>
-                                            <Add sx={{ color: '#b48c72' }} />
+                                            <Add fontSize="large" sx={{ color: '#b48c72' }} />
                                         </IconButton>
-                                    </TableCell>
+                                    </CustomTableCell>
                                 </TableRow>
                             )
                         ))}
                     </TableBody>
-
                 </Table>
             </TableContainer>
+            <DetailDialog open={isDetailDialogOpen} onClose={() => setIsDetailDialogOpen(false)} request={selectedRequest} />
             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                <DialogTitle>Quote</DialogTitle>
                 <DialogContent>
                     <QuoteForm
-                        initialValues={{
-                            ...selectedRequest,
-                        }}
+                        initialValues={{ ...selectedRequest }}
                         onSubmit={handleSubmit}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                    <Button onClick={() => setIsDialogOpen(false)} sx={{fontSize: '1.3rem', color: '#b48c72'}}>
                         Cancel
                     </Button>
                 </DialogActions>
             </Dialog>
         </Container>
-
-    )
+    );
 }

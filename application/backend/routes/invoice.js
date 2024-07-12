@@ -1,7 +1,7 @@
 const express = require('express');
 const {createInvoice, getInvoiceById, getAllInvoices, updateInvoiceById, deleteInvoiceById} = require('../controllers/invoiceController');
 const requireAuth = require('../middleware/requireAuth');
-const { requireManager } = require('../middleware/requireRoles');
+const { requireManager, requireAdminOrManagerOrSale } = require('../middleware/requireRoles');
 const { requireManagerOrSale } = require('../middleware/requireRoles');
 
 const invoiceRoutes = express.Router();
@@ -12,7 +12,7 @@ invoiceRoutes.use(requireAuth)
 invoiceRoutes.post('/', createInvoice);
 
 // Route to get all Invoices
-invoiceRoutes.get('/', requireManager, getAllInvoices);
+invoiceRoutes.get('/', requireAdminOrManagerOrSale, getAllInvoices);
 
 // Route to get an Invoice by ID
 invoiceRoutes.get('/:id', getInvoiceById);

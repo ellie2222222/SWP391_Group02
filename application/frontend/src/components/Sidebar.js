@@ -26,7 +26,7 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import Button from '@mui/material/Button';
 import useAuth from '../hooks/useAuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Dashboard, Diamond, Done } from '@mui/icons-material';
+import { Dashboard, Diamond } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -203,13 +203,13 @@ export default function Sidebar() {
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>
-                            <ListItem key="Quoted Requests" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/quoted-request'>
+                            <ListItem key="Quote Requests" disablePadding sx={{ display: 'block' }}>
+                                <Link to='/admin/quote-request'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <RequestQuoteIcon fontSize='large' />
                                         </CustomListItemIcon>
-                                        <CustomListItemText primary="Quoted Request" sx={{ opacity: open ? 1 : 0 }} />
+                                        <CustomListItemText primary="Quote Requests" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>
                                 </Link>
                             </ListItem>
@@ -247,7 +247,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'admin' || user.role === 'manager' && (
+                    {(user.role === 'admin' || user.role === 'manager') && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
@@ -259,7 +259,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {user.role === 'sale_staff' || user.role === 'manager' && (
+                    {(user.role === 'sale_staff' || user.role === 'manager') && (
                         <div>
                             <ListItem key="invoices" disablePadding sx={{ display: 'block' }}>
                                 <Link to='/admin/invoices'>

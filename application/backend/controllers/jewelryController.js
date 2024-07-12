@@ -28,18 +28,22 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    let { gemstone_id, material_id, price, material_weight,subgemstone_id, subgemstone_quantity, sale_percentage, type, on_sale } = data;
+    let { gemstone_id, material_id, price, material_weight, subgemstone_id, subgemstone_quantity, sale_percentage, type, on_sale } = data;
     let validationErrors = [];
-    console.log(subgemstone_id)
+    
     if (gemstone_id) gemstone_id = gemstone_id.trim();
     if (material_id) material_id = material_id.trim();
     if (subgemstone_id) subgemstone_id = subgemstone_id.trim();
+    console.log(data)
+
     if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
         validationErrors.push('Invalid gemstone ID');
     }
+    
     if (material_id && !mongoose.Types.ObjectId.isValid(material_id)) {
         validationErrors.push('Invalid material ID');
     }
+
     if (subgemstone_id && !mongoose.Types.ObjectId.isValid(subgemstone_id)) {
         validationErrors.push('Invalid sub gemstone ID');
     }
@@ -156,7 +160,7 @@ const createJewelry = async (req, res) => {
 
         res.status(201).json(populatedJewelry);
     } catch (error) {
-        console.error('Server Error:', error);
+        console.error('Error while creating jewelry', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -164,7 +168,7 @@ const createJewelry = async (req, res) => {
 const updateJewelry = async (req, res) => {
     try {
         let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, on_sale, sale_percentage, available } = req.body;
-        console.log(gemstone_id)
+        
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });

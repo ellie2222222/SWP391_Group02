@@ -12,7 +12,7 @@ import BlogContents from "./pages/BlogContents";
 import BlogCreate from "./pages/BlogCreate";
 import Warranty from './pages/Warranty'; // Import the new page
 import WarrantyList from "./pages/WarrantyList";
-import { AdminRoute, AuthRoute, ManagerOrSaleRoute, UserRoute } from "./routes/routes";
+import { AdminRoute, AuthRoute, UserRoute } from "./routes/routes";
 import useAuth from "./hooks/useAuthContext";
 import Profile from "./pages/Profile";
 import Requests from "./pages/Requests";
@@ -30,8 +30,6 @@ import GoldPrice from "./pages/GoldPrice";
 import Dashboard from "./pages/Dashboard";
 import InvoiceDashboard from "./pages/InvoiceDashboard";
 function App() {
-  const { user } = useAuth()
-
   return (
     <div className="App">
       <Routes>
@@ -60,7 +58,7 @@ function App() {
           <Route path="/admin" element={<JewelryDashboard />} />
           <Route path="/admin/users" element={<UsersDashboard />} />
           <Route path="/admin/requests" element={<RequestDashboard />} />
-          <Route path="/admin/quoted-request" element={<QuotedRequest />}></Route>
+          <Route path="/admin/quote-request" element={<QuotedRequest />} />
           <Route path="/admin/gemstones" element={<Gemstones />}></Route>
           <Route path="/admin/materials" element={<Material />}></Route>
           <Route path="/admin/dashboard" element={<Dashboard />} />

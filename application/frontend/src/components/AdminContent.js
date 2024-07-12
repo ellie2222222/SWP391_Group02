@@ -318,6 +318,7 @@ const AdminContent = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>ID</CustomTableCell>
                                 <CustomTableCell sx={{ fontWeight: "bold"}}>Name</CustomTableCell>
                                 <CustomTableCell sx={{ fontWeight: "bold"}}>Category</CustomTableCell>
                                 <CustomTableCell sx={{ fontWeight: "bold"}}>On Sale</CustomTableCell>
@@ -332,7 +333,8 @@ const AdminContent = () => {
                             {jewelries.length > 0 ? (
                                 jewelries.map((jewelry) => (
                                     <TableRow key={jewelry._id}>
-                                        <CustomTableCell sx={{ fontWeight: "bold"}}>{jewelry.name}</CustomTableCell>
+                                        <CustomTableCell sx={{ fontWeight: "bold"}}>{jewelry._id}</CustomTableCell>
+                                        <CustomTableCell>{jewelry.name}</CustomTableCell>
                                         <CustomTableCell>{jewelry.category}</CustomTableCell>
                                         <CustomTableCell>{jewelry.on_sale === true ? 'Yes' : 'No'}</CustomTableCell>
                                         <CustomTableCell>{jewelry.available === true ? 'Yes' : 'No'}</CustomTableCell>

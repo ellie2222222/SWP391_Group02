@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography, styled, Stack, Pagination } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
-import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -35,11 +35,16 @@ export default function QuotedRequestDashBoard() {
     const [error, setError] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedRequestId, setSelectedRequestId] = useState(null);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const fetchRequests = async () => {
+    const fetchRequests = async (page = 1) => {
         try {
-            const response = await axiosInstance.get('/requests');
+            const response = await axiosInstance.get('/requests?request_status=quote', { params: { page } });
+            
             setRequests(response.data.requests);
+            setTotalPages(response.data.totalPages);
+            console.log(response.data)
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
         }
@@ -49,7 +54,7 @@ export default function QuotedRequestDashBoard() {
         try {
             await axiosInstance.patch(`/requests/${selectedRequestId}`, { request_status: 'accepted' });
             setError('');
-            fetchRequests();
+            fetchRequests(page);
             handleCloseDialog();
             toast.success('Quote approved successfully!');
         } catch (error) {
@@ -58,7 +63,6 @@ export default function QuotedRequestDashBoard() {
             toast.error('Failed to approve the quote.');
         }
     };
-    
 
     const handleOpenDialog = (requestId) => {
         setSelectedRequestId(requestId);
@@ -70,9 +74,14 @@ export default function QuotedRequestDashBoard() {
         setSelectedRequestId(null);
     };
 
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        fetchRequests(value);
+    };
+
     useEffect(() => {
-        fetchRequests();
-    }, []);
+        fetchRequests(page);
+    }, [page]);
 
     return (
         <Container>
@@ -91,7 +100,7 @@ export default function QuotedRequestDashBoard() {
                     </TableHead>
                     <TableBody>
                         {requests.map((request) => (
-                            request.request_status === 'quote' && (
+                            true && (
                                 <TableRow key={request._id}>
                                     <CustomTableCell sx={{ fontWeight: "bold"}}>{request._id}</CustomTableCell>
                                     <CustomTableCell>{request.quote_content}</CustomTableCell>
@@ -107,6 +116,18 @@ export default function QuotedRequestDashBoard() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Box display="flex" justifyContent="center" marginTop="20px">
+                <Stack spacing={2}>
+                    <Pagination
+                        size='large'
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                        showFirstButton
+                        showLastButton
+                    />
+                </Stack>
+            </Box>
             <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
                 <DialogTitle align='center'>Confirm Approval</DialogTitle>
                 <DialogContent>

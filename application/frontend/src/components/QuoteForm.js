@@ -6,12 +6,73 @@ import { styled } from '@mui/system';
 import JewelryForm from './JewelryForm'; // Adjust the import path as needed
 import axiosInstance from '../utils/axiosInstance';
 
+const CustomTextField = styled(TextField)({
+    '& label.Mui-focused': {
+        color: '#b48c72',
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#b48c72',
+    },
+    '& .MuiOutlinedInput-root': {
+        fontSize: "1.3rem",
+        '& fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&:hover fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: '#b48c72',
+        },
+    },
+    "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+});
+
+const CustomFormControl = styled(FormControl)({
+    "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiOutlinedInput-root": {
+        fontSize: "1.3rem",
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+    },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+});
+
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72', // Change text color on hover
         backgroundColor: 'transparent',
@@ -45,23 +106,28 @@ export default function QuoteForm({ initialValues, onSubmit }) {
 
     useEffect(() => {
         if (selectedJewelry || formik.values.production_cost) {
-            const quoteContent = (
-                `${selectedJewelry.gemstone_id.name} * ${selectedJewelry.gemstone_id.carat} carat + ` +
-                `${selectedJewelry.material_id.name} * ${selectedJewelry.material_weight} + ` +
-                `P Cost = ` +
-                `${selectedJewelry.gemstone_id.price} * ${selectedJewelry.gemstone_id.carat} + ` +
-                `${selectedJewelry.material_id.sell_price} * ${selectedJewelry.material_weight} + ` +
-                `${formik.values.production_cost} = ` +
-                `${selectedJewelry.gemstone_id.price * selectedJewelry.gemstone_id.carat + selectedJewelry.material_id.sell_price * selectedJewelry.material_weight + Number(formik.values.production_cost)}`
-            ); 
+            const gemstoneName = selectedJewelry?.gemstone_id?.name || 'Gemstone';
+            const subGemstoneName = selectedJewelry?.subgemstone_id?.name || 'Subgemstone';
+            const gemstonePrice = selectedJewelry?.gemstone_id?.price || 0;
+            const subGemstonePrice = selectedJewelry?.subgemstone_id?.price || 0;
+            const materialName = selectedJewelry?.material_id?.name || 'Material';
+            const materialWeight = selectedJewelry?.material_weight || 0;
+            const materialSellPrice = selectedJewelry?.material_id?.sell_price || 0;
+            const productionCost = Number(formik.values.production_cost) || 0;
+        
+            const totalCost = gemstonePrice + subGemstonePrice + (materialSellPrice * materialWeight) + productionCost;
+        
+            const quoteContent = `
+                ${gemstoneName} + ${subGemstoneName} + ${materialName} * ${materialWeight} mace + Production Cost = ${gemstonePrice} + ${subGemstonePrice} + ${materialSellPrice} * ${materialWeight} + ${productionCost} = ${totalCost}
+            `.trim();
+        
             formik.setFieldValue('quote_content', quoteContent);
         }
-        
-    }, [selectedJewelry, formik.values.production_cost ]);
+    }, [selectedJewelry, formik.values.production_cost]);
 
     useEffect(() => {
         if (selectedJewelry || formik.values.production_cost) {
-            const quoteAmount = Number(formik.values.production_cost) + selectedJewelry.price;
+            const quoteAmount = Number(formik.values.production_cost) + selectedJewelry?.price;
             formik.setFieldValue('quote_amount', quoteAmount);
         }
     }, [selectedJewelry, formik.values.production_cost]);
@@ -70,13 +136,14 @@ export default function QuoteForm({ initialValues, onSubmit }) {
         try {
             let response;
             if (selectedJewelry) {
-                response = await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values); // Adjust the API endpoint as needed
+                response = await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
             } else {
-                response = await axiosInstance.post('/jewelries', values); // Adjust the API endpoint as needed
+                response = await axiosInstance.post('/jewelries', values);
             }
-            setJewelryId(response.data._id); // Set the Jewelry ID from the response
-            formik.setFieldValue('jewelry_id', response.data._id); // Update the formik value
-            setSelectedJewelry(response.data); // Update the selected jewelry state
+
+            setJewelryId(response.data._id);
+            formik.setFieldValue('jewelry_id', response.data._id);
+            setSelectedJewelry(response.data);
             setIsJewelryFormOpen(false);
         } catch (error) {
             console.error('Failed to submit jewelry form', error);
@@ -89,7 +156,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                 Quote
             </Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-                <TextField
+                <CustomTextField
                     name="quote_content"
                     label="Quote Content"
                     variant="outlined"
@@ -99,7 +166,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     error={formik.touched.quote_content && Boolean(formik.errors.quote_content)}
                     helperText={formik.touched.quote_content && formik.errors.quote_content}
                 />
-                <TextField
+                <CustomTextField
                     name="quote_amount"
                     label="Quote Amount"
                     variant="outlined"
@@ -108,10 +175,10 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     onBlur={formik.handleBlur}
                     error={formik.touched.quote_amount && Boolean(formik.errors.quote_amount)}
                     helperText={formik.touched.quote_amount && formik.errors.quote_amount}
-                    readOnly
+                    inputProps={{readOnly: true}}
                 />
-                <FormControl variant="outlined" fullWidth>
-                    <InputLabel id="request_status">Status</InputLabel>
+                <CustomFormControl variant="outlined" fullWidth>
+                    <InputLabel id="request_status">Request Status</InputLabel>
                     <Select
                         name="request_status"
                         value={formik.values.request_status}
@@ -127,8 +194,8 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     {formik.touched.request_status && formik.errors.request_status && (
                         <Typography variant="caption" color="red">{formik.errors.request_status}</Typography>
                     )}
-                </FormControl>
-                <TextField
+                </CustomFormControl>
+                <CustomTextField
                     name="jewelry_id"
                     label="Jewelry ID"
                     variant="outlined"
@@ -142,7 +209,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     }}
                     sx={{ mt: 2 }}
                 />
-                <TextField
+                <CustomTextField
                     name="production_cost"
                     label="Production Cost"
                     variant="outlined"
@@ -167,13 +234,12 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                 </CustomButton1>
             </Box>
             <Dialog open={isJewelryFormOpen} onClose={() => setIsJewelryFormOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle>{selectedJewelry ? 'Update Jewelry' : 'Add Jewelry'}</DialogTitle>
                 <DialogContent>
                     <JewelryForm
                         initialValues={selectedJewelry ? {
                             ...selectedJewelry,
-                            gemstone_id: selectedJewelry.gemstone_id._id,
-                            material_id: selectedJewelry.material_id._id
+                            gemstone_id: selectedJewelry?.gemstone_id?._id,
+                            material_id: selectedJewelry?.material_id?._id
                         } : {
                             name: '',
                             description: '',
@@ -193,7 +259,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setIsJewelryFormOpen(false)} color="primary">
+                    <Button onClick={() => setIsJewelryFormOpen(false)} sx={{fontSize: '1.3rem', color: '#b48c72'}}>
                         Cancel
                     </Button>
                 </DialogActions>

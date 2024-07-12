@@ -6,8 +6,11 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffRoundedIcon from '@mui/icons-material/HighlightOffRounded';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/system';
+import { Link } from '@mui/material';
 
 const LargeTypography = styled(Typography)({
   fontSize: '1.3rem', // Increased font size
@@ -28,9 +31,10 @@ const PaymentStatus = () => {
     let pm;
     if (bankcode === "CC") {
       pm = "credit_card"
-    } 
-    if (bankcode === "SBIS") {
+    } else if (bankcode === "SBIS") {
       pm = "domestic_card"
+    } else {
+      pm = "other"
     }
     setTransactionId(transId);
 
@@ -79,6 +83,12 @@ const PaymentStatus = () => {
               <LargeTypography variant="body1">Transaction ID: {transactionId}</LargeTypography>
               <LargeTypography variant="body1">Status: {orderStatus.return_message}</LargeTypography>
               <LargeTypography variant="body1">Amount: {orderStatus.amount}</LargeTypography>
+              <Link component={RouterLink} to="/profile" underline="none" sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+                <KeyboardBackspaceIcon sx={{ mr: 1, color: 'text.primary' }} />
+                <LargeTypography variant="body1" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                  Back to request list
+                </LargeTypography>
+              </Link>
             </>
           ) : (
             <Typography variant="body1" color="error">
