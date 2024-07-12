@@ -86,9 +86,9 @@ const BlogDetails = () => {
         return (
           <Typography
             key={`header-${index}`}
-            variant="h5"
+            variant="h4"
             component="div"
-            style={{ fontWeight: 'bold', margin: '20px 0' }}
+            style={{ fontWeight: 'bold', fontSize: '2rem',  margin: '20px 0' }}
           >
             {part.trim()}
           </Typography>
@@ -100,7 +100,7 @@ const BlogDetails = () => {
           key={`text-${index}`}
           variant="body1"
           component="div"
-          style={{ whiteSpace: 'pre-line' }}
+          style={{ whiteSpace: 'pre-line', fontSize: '1.7rem' }}
         >
           {part.trim()}
         </Typography>
@@ -131,10 +131,10 @@ const BlogDetails = () => {
         <Box flex={1} mr={4}>
           <Typography variant="h4" component="h1" gutterBottom>{blog.blog_title}</Typography>
           {renderBlogContent(blog.blog_content, blog.blog_images)}
-          <CustomButton1 onClick={() => navigate(-1)}>Go Back</CustomButton1>
+          <CustomButton1 style={{fontSize: '1.25rem'}} onClick={() => navigate(-1)}>Go Back</CustomButton1>
         </Box>
         <Box width="300px">
-          <Typography variant="h5" gutterBottom>Recommended Blogs</Typography>
+          <Typography variant="h4" style={{ fontWeight: 'bold', fontSize: '2rem' }} gutterBottom>Recommended Blogs</Typography>
           <Grid container spacing={2}>
             {blogs.map((recommendedBlog) => (
               <Grid item xs={12} key={recommendedBlog._id}>
@@ -149,10 +149,10 @@ const BlogDetails = () => {
                     style={{ width: '40%', height: '100px', borderTopLeftRadius: '10px', borderBottomLeftRadius: '10px' }}
                   />
                   <CardContent style={{ flex: '1 0 auto' }}>
-                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                    <Typography variant="subtitle2" color="textSecondary" style={{fontSize: '1.15rem' }} gutterBottom>
                       {new Date(recommendedBlog.createdAt).toLocaleDateString()}
                     </Typography>
-                    <Typography gutterBottom variant="h6" component="div" style={{ fontWeight: 'bold', fontSize: '1rem' }}>
+                    <Typography gutterBottom variant="h5" component="div" style={{ fontWeight: 'bold', fontSize: '1.3rem' }}>
                       {recommendedBlog.blog_title}
                     </Typography>
                   </CardContent>
