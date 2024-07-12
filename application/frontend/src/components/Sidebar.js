@@ -247,7 +247,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    {(user.role === 'admin' || user.role === 'manager') && (
+                    { (user.role === 'manager' || user.role === 'admin') && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
