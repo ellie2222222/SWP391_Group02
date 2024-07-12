@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Box, Typography, Card, CardContent, Grid } from '@mui/material';
+import { Container, Box, Typography, Card, CardContent, Grid, Divider } from '@mui/material';
 
 const About = () => {
   return (
@@ -12,6 +12,7 @@ const About = () => {
         <Typography variant="body1" paragraph style={{ fontSize: '1.8rem', marginBottom: '50px' }} >
           We specialize in selling exquisite jewelry and creating handmade pieces tailored to our customer's unique desires. Our mission is to provide high-quality, beautiful jewelry that not only enhances your beauty but also tells your personal story.
         </Typography>
+        <Divider style={{ marginBottom: '50px' }} />
 
         <Grid container spacing={4} alignItems="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12} md={6}>
@@ -26,6 +27,7 @@ const About = () => {
             </Typography>
           </Grid>
         </Grid>
+        <Divider style={{ marginBottom: '50px' }} />
 
         <Grid container spacing={4} alignItems="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12} md={6} order={{ xs: 2, md: 1 }}>
@@ -40,6 +42,7 @@ const About = () => {
             <img src="https://www.jewepiter.com/wp-content/uploads/2023/10/The-Quality-Control-Checklist-for-Jewelry-1.jpeg" alt="Quality Control" style={{ width: '100%', borderRadius: '10px' }} />
           </Grid>
         </Grid>
+        <Divider style={{ marginBottom: '50px' }} />
 
         <Grid container spacing={4} alignItems="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12} md={6}>
@@ -54,6 +57,7 @@ const About = () => {
             </Typography>
           </Grid>
         </Grid>
+        <Divider style={{ marginBottom: '50px' }} />
 
         <Grid container spacing={4} alignItems="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12} md={6} order={{ xs: 2, md: 1 }}>
@@ -74,6 +78,7 @@ const About = () => {
             <img src="https://media.istockphoto.com/id/181596884/photo/jewelry-quality-control.jpg?s=612x612&w=0&k=20&c=yIOyiuvTQJL67Uy0D5Rpfm2RaryyX6WRWAYDO7bezxs=" alt="Benefits" style={{ width: '100%', borderRadius: '10px' }} />
           </Grid>
         </Grid>
+        
 
         <Card variant="outlined" style={{ marginTop: '20px' }}>
           <CardContent>
