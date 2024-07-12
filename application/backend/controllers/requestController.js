@@ -15,19 +15,18 @@ const getRequests = async (req, res) => {
     if (request_status) {
       query.request_status = new RegExp(request_status, 'i'); // Case-insensitive search
     }
-    if (quote_status) {
-      query.quote_status = new RegExp(quote_status, 'i');
-    }
-    if (production_status) {
-      query.production_status = new RegExp(production_status, 'i');
-    }
 
     const skip = (page - 1) * limit;
 
     let requests;
     let totalRequests;
     if (req.role === "sale_staff") {
-      requests = await Request.find({ request_status: "pending" })
+      requests = await Request.find({
+        $or: [
+          { request_status: "pending" },
+          { request_status: "warranty" }
+        ]
+      })
         .populate({
           path: 'user_id',
           select: 'email'
@@ -39,7 +38,34 @@ const getRequests = async (req, res) => {
             { path: 'gemstone_id' }
           ]
         });
-      totalRequests = await Request.countDocuments({ request_status: "pending" });
+    } else if (req.role === "design_staff") {
+      requests = await Request.find({ request_status: "design" })
+        .populate({
+          path: 'user_id',
+          select: 'email'
+        })
+        .populate({
+          path: 'jewelry_id',
+          populate: [
+            { path: 'material_id' },
+            { path: 'gemstone_id' }
+          ]
+        });
+      totalRequests = await Request.countDocuments({ request_status: "design" });
+    } else if (req.role === "production_staff") {
+      requests = await Request.find({ request_status: "production" })
+        .populate({
+          path: 'user_id',
+          select: 'email'
+        })
+        .populate({
+          path: 'jewelry_id',
+          populate: [
+            { path: 'material_id' },
+            { path: 'gemstone_id' }
+          ]
+        });
+      totalRequests = await Request.countDocuments({ request_status: "production" });
     } else {
       requests = await Request.find(query)
         .skip(skip)
