@@ -25,6 +25,7 @@ const CustomTextField = styled(TextField)({
   width: '100%',
   marginBottom: '1rem',
   "& .MuiOutlinedInput-root": {
+    fontSize: '1.2rem',
     "&:hover fieldset": {
       borderColor: "#b48c72",
     },
@@ -33,6 +34,7 @@ const CustomTextField = styled(TextField)({
     },
   },
   "& .MuiInputLabel-root": {
+    fontSize: '1.2rem',
     "&.Mui-focused": {
       color: "#b48c72",
     },
@@ -140,7 +142,7 @@ const Signup = () => {
           {error && <Typography color="error" style={{ marginTop: '16px' }}>{error}</Typography>}
         </form>
         <Typography variant="body2" align="center" style={{ marginTop: '1rem' , fontSize: '1.3rem'}}>
-          Already have an account? <CustomLink to="/login">Sign in</CustomLink>
+          Already have an account? <CustomLink to="/login" style={{ color: '#b48c72', fontWeight: 'bold', fontSize: '1.3rem' }}>Sign in</CustomLink>
         </Typography>
       </FormContainer>
     </CustomContainer>

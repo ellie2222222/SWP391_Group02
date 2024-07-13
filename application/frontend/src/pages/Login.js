@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Grid, Paper, IconButton, InputAdornment } from '@mui/material';
-import { styled } from '@mui/system';
+import { fontSize, styled } from '@mui/system';
 import useAuth from '../hooks/useAuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
@@ -66,6 +66,7 @@ const CustomTextField = styled(TextField)({
   width: '100%',
   marginBottom: '1rem',
   "& .MuiOutlinedInput-root": {
+    fontSize: '1.2rem',
     "&:hover fieldset": {
       borderColor: "#b48c72",
     },
@@ -74,6 +75,7 @@ const CustomTextField = styled(TextField)({
     },
   },
   "& .MuiInputLabel-root": {
+    fontSize: '1.2rem',
     "&.Mui-focused": {
       color: "#b48c72",
     },
@@ -158,7 +160,7 @@ const Login = () => {
             </form>
             <CustomLink style={{fontSize: '1.5rem'}} to="/forgot-password">Forgot Password?</CustomLink>
             <Typography variant="body2" align="center" style={{ marginTop: '1rem' , fontSize: '1.3rem'}}>
-              Don't have an account? <Link to="/signup" style={{ color: '#b48c72', fontWeight: 'bold' }}>Sign up</Link>
+              Don't have an account? <Link to="/signup" style={{ color: '#b48c72', fontWeight: 'bold', fontSize: '1.3rem' }}>Sign up</Link>
             </Typography>
           </FormContainer>
         </Grid>
