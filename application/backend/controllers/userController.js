@@ -26,7 +26,7 @@ const loginUser = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
 
-    res.status(200).json({ token, refreshToken});
+    res.status(200).json({ token, refreshToken });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -175,7 +175,7 @@ const getUser = async (req, res) => {
       return res.status(400).json({ error: "Invalid ID" });
     }
 
-    const user = await User.findOne({_id: id})
+    const user = await User.findOne({ _id: id })
 
     if (!user) {
       return res.status(404).json({ error: "No users found" })
@@ -238,18 +238,43 @@ const resetPassword = async (req, res) => {
   const { password } = req.body;
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    if(err) {
-      return res.json({Status: "Token error"})
+    if (err) {
+      return res.json({ Status: "Token error" })
     } else {
       bcrypt.hash(password, 10)
-      .then(hash => {
-        User.findByIdAndUpdate({_id: id}, {password: hash})
-        .then(u => res.send({Status: "Success"}))
-        .catch(err => res.send({Status: err}))
-      })
-      .catch(err => res.send({Status: err}))
+        .then(hash => {
+          User.findByIdAndUpdate({ _id: id }, { password: hash })
+            .then(u => res.send({ Status: "Success" }))
+            .catch(err => res.send({ Status: err }))
+        })
+        .catch(err => res.send({ Status: err }))
     }
   })
+};
+
+const resetProfilePassword = async (req, res) => {
+  const { id } = req.body;
+  const { oldPassword, password } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).send({ Status: 'User not found' });
+    }
+
+    const match = await bcrypt.compare(oldPassword, user.password);
+    if (!match) {
+      return res.status(400).send({ Status: 'Incorrect old password' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.send({ Status: 'Password updated successfully' });
+  } catch (err) {
+    res.status(500).send({ Status: err.message });
+  }
 };
 
 const refreshToken = async (req, res) => {
@@ -281,4 +306,4 @@ const logout = (req, res) => {
 
 
 
-module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout };
+module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword };

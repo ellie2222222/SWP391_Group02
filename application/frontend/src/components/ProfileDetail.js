@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, Typography, Button, CircularProgress, styled, TextField } from '@mui/material';
+import { Container, Box, Typography, Button, CircularProgress, styled } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
-import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance';
+import ResetPassForm from '../components/ResetPassForm';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -14,7 +14,7 @@ const CustomButton1 = styled(Button)({
     fontSize: '1rem',
     marginTop: '20px',
     '&:hover': {
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
@@ -28,20 +28,19 @@ const ProfileDetail = () => {
     const { id } = useParams();
 
     useEffect(() => {
-        const fetchUserProFile = async () => {
+        const fetchUserProfile = async () => {
             try {
                 const response = await axiosInstance.get(`/users/${id}`);
-                setProfile(response.data)
-                setError('')
+                setProfile(response.data);
+                setError('');
                 setLoading(false);
             } catch (error) {
                 setLoading(false);
-                if (error.response === undefined) setError(error.message);
-                else setError(error.response.data.error)
+                setError(error.response?.data?.error || error.message);
             }
         };
 
-        fetchUserProFile();
+        fetchUserProfile();
     }, [id]);
 
     if (loading) {
@@ -60,6 +59,7 @@ const ProfileDetail = () => {
                 <Typography variant="h5" component="p" marginBottom='20px'>Phone number: {profile ? profile.user.phone_number : 'N/A'}</Typography>
                 <Typography variant="h5" component="p" marginBottom='20px'>Address: {profile ? profile.user.address : 'N/A'}</Typography>
             </Box>
+            <ResetPassForm />
             <Box padding="40px 0">
                 <Typography variant="h5" component="p" marginBottom='20px'>View My Request</Typography>
                 <CustomButton1 variant="contained" color="primary" style={{ marginTop: '20px' }} onClick={() => navigate(`/requests`)}>
@@ -71,4 +71,3 @@ const ProfileDetail = () => {
 };
 
 export default ProfileDetail;
-
