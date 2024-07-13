@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled, IconButton } from '@mui/material';
+import { Box, Typography, styled, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
 import QuoteForm from './QuoteForm';
 
 const CustomButton1 = styled(Button)({
@@ -28,7 +28,7 @@ const DetailDialog = ({ open, onClose, request }) => (
             <Typography variant="p" sx={{ fontSize: '1.3rem' }}>{request?.request_description}</Typography>
         </DialogContent>
         <DialogActions>
-            <Button onClick={onClose} sx={{fontSize: '1.3rem', color: '#b48c72'}}>
+            <Button onClick={onClose} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
                 Close
             </Button>
         </DialogActions>
@@ -40,6 +40,7 @@ export default function SaleStaffDashboard() {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const fetchRequests = async () => {
         try {
@@ -68,6 +69,21 @@ export default function SaleStaffDashboard() {
     const handleDetailClick = (request) => {
         setIsDetailDialogOpen(true);
         setSelectedRequest(request);
+    };
+
+    const handleDeleteClick = (request) => {
+        setSelectedRequest(request);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            await axiosInstance.delete(`/requests/${selectedRequest._id}`);
+            fetchRequests();
+            setIsDeleteDialogOpen(false);
+        } catch (error) {
+            console.error("There was an error deleting the request!", error);
+        }
     };
 
     useEffect(() => {
@@ -103,6 +119,9 @@ export default function SaleStaffDashboard() {
                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>
                                             <Add fontSize="large" sx={{ color: '#b48c72' }} />
                                         </IconButton>
+                                        <IconButton color="secondary" onClick={() => handleDeleteClick(request)}>
+                                            <Delete fontSize="large" sx={{ color: '#b48c72' }} />
+                                        </IconButton>
                                     </CustomTableCell>
                                 </TableRow>
                             )
@@ -110,7 +129,11 @@ export default function SaleStaffDashboard() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {/* Detail Dialog */}
             <DetailDialog open={isDetailDialogOpen} onClose={() => setIsDetailDialogOpen(false)} request={selectedRequest} />
+
+            {/* Edit Dialog */}
             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                 <DialogContent>
                     <QuoteForm
@@ -119,9 +142,25 @@ export default function SaleStaffDashboard() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setIsDialogOpen(false)} sx={{fontSize: '1.3rem', color: '#b48c72'}}>
+                    <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
                         Cancel
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" sx={{fontSize: '1.3rem', color: '#b48c72'}}>Are you sure you want to delete this request?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <CustomButton1 onClick={() => setIsDeleteDialogOpen(false)}>
+                        Cancel
+                    </CustomButton1>
+                    <CustomButton1 onClick={handleDeleteConfirm}>
+                        Delete
+                    </CustomButton1>
                 </DialogActions>
             </Dialog>
         </Container>

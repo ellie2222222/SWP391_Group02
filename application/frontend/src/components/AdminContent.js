@@ -89,6 +89,7 @@ const AdminContent = () => {
     const [total, setTotal] = useState(0);
     const [selectedJewelry, setSelectedJewelry] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [type, setType] = useState("");
@@ -173,6 +174,16 @@ const AdminContent = () => {
         setIsDialogOpen(true);
     };
 
+    const handleDetailsClick = (jewelry) => {
+        setSelectedJewelry(jewelry);
+        setIsDetailsDialogOpen(true);
+    };
+
+    const handleCloseDetailsDialog = () => {
+        setIsDetailsDialogOpen(false);
+        setSelectedJewelry(null);
+    };
+
     const handleDeleteClick = async (id) => {
         try {
             await axiosInstance.delete(`/jewelries/${id}`);
@@ -221,7 +232,7 @@ const AdminContent = () => {
                                 endAdornment: (
                                     <InputAdornment position="end">
                                         <StyledIconButton color="inherit" onClick={handleSearchClick}>
-                                            <Search fontSize="large"/>
+                                            <Search fontSize="large" />
                                         </StyledIconButton>
                                     </InputAdornment>
                                 ),
@@ -305,7 +316,7 @@ const AdminContent = () => {
                 </Box>
 
                 <CustomButton1
-                    startIcon={loading ? <CircularProgress size={20} /> : <Add fontSize='large'/>}
+                    startIcon={loading ? <CircularProgress size={20} /> : <Add fontSize='large' />}
                     variant="contained"
                     color="primary"
                     onClick={handleAddClick}
@@ -318,28 +329,24 @@ const AdminContent = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <CustomTableCell sx={{ fontWeight: "bold"}}>ID</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}}>Name</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}}>Category</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}}>On Sale</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}}>Available</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}}>Type</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}}>Price</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}} align='center'>Images</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: "bold"}} align='center'>Actions</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold" }}>ID</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold" }}>Name</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold" }}>Price</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Details</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Images</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Actions</CustomTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {jewelries.length > 0 ? (
                                 jewelries.map((jewelry) => (
                                     <TableRow key={jewelry._id}>
-                                        <CustomTableCell sx={{ fontWeight: "bold"}}>{jewelry._id}</CustomTableCell>
+                                        <CustomTableCell sx={{ fontWeight: "bold" }}>{jewelry._id}</CustomTableCell>
                                         <CustomTableCell>{jewelry.name}</CustomTableCell>
-                                        <CustomTableCell>{jewelry.category}</CustomTableCell>
-                                        <CustomTableCell>{jewelry.on_sale === true ? 'Yes' : 'No'}</CustomTableCell>
-                                        <CustomTableCell>{jewelry.available === true ? 'Yes' : 'No'}</CustomTableCell>
-                                        <CustomTableCell>{jewelry.type}</CustomTableCell>
                                         <CustomTableCell>{jewelry.price && jewelry.price.toLocaleString() + "₫"}</CustomTableCell>
+                                        <CustomTableCell>
+                                            <CustomButton1 onClick={() => handleDetailsClick(jewelry)}>Details</CustomButton1>
+                                        </CustomTableCell>
                                         <TableCell>
                                             {jewelry.images[0] && (
                                                 <CardMedia
@@ -391,6 +398,27 @@ const AdminContent = () => {
                     <DialogActions>
                         <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: "1.3rem", color: "#b48c72" }} disabled={loading}>
                             Cancel
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog open={isDetailsDialogOpen} onClose={handleCloseDetailsDialog} fullWidth>
+                    <DialogTitle align='center' variant='h5'>Jewelry Details</DialogTitle>
+                    <DialogContent>
+                        {selectedJewelry && (
+                            <Box>
+                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Description: {selectedJewelry.description}</Typography>
+                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Price: {selectedJewelry.price}</Typography>
+                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Category: {selectedJewelry.category}</Typography>
+                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Type: {selectedJewelry.type}</Typography>
+                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>On Sale: {selectedJewelry.on_sale ? 'Yes' : 'No'}</Typography>
+                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Available: {selectedJewelry.available ? 'Yes' : 'No'}</Typography>
+                            </Box>
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDetailsDialog} sx={{ color: '#b48c72', fontSize: '1.3rem'}}>
+                            Close
                         </Button>
                     </DialogActions>
                 </Dialog>

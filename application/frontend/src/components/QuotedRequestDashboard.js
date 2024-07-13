@@ -94,24 +94,20 @@ export default function QuotedRequestDashBoard() {
                             <CustomTableCell sx={{ fontWeight: "bold"}}>Quote Content</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: "bold"}}>Quote Amount</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: "bold"}}>Request Status</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold"}}>Product Type</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: "bold"}} align='center'>Actions</CustomTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {requests.map((request) => (
-                            true && (
-                                <TableRow key={request._id}>
-                                    <CustomTableCell sx={{ fontWeight: "bold"}}>{request._id}</CustomTableCell>
-                                    <CustomTableCell>{request.quote_content}</CustomTableCell>
-                                    <CustomTableCell>{request.quote_amount}</CustomTableCell>
-                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
-                                    <CustomTableCell>{request.jewelry_id ? request.jewelry_id.type : 'N/A'}</CustomTableCell>
-                                    <CustomTableCell>
-                                        <CustomButton1 onClick={() => handleOpenDialog(request._id)}>Approve Quote</CustomButton1>
-                                    </CustomTableCell>
-                                </TableRow>
-                            )
+                            <TableRow key={request._id}>
+                                <CustomTableCell sx={{ fontWeight: "bold"}}>{request._id}</CustomTableCell>
+                                <CustomTableCell>{request.quote_content}</CustomTableCell>
+                                <CustomTableCell>{request.quote_amount}</CustomTableCell>
+                                <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
+                                <CustomTableCell>
+                                    <CustomButton1 onClick={() => handleOpenDialog(request._id)}>Approve Quote</CustomButton1>
+                                </CustomTableCell>
+                            </TableRow>
                         ))}
                     </TableBody>
                 </Table>

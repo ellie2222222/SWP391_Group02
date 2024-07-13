@@ -50,7 +50,7 @@ const CustomButton = styled(Button)({
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
@@ -191,10 +191,8 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
 
             try {
                 await onSubmit(formData);
-                toast.success(`${initialValues._id ? 'Updated' : 'Added'} successfully!`);
                 setLoading(false);
             } catch (error) {
-                toast.error('Error submitting form');
                 setLoading(false);
             }
         },

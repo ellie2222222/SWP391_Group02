@@ -186,7 +186,7 @@ export default function Sidebar() {
                                     <CustomListItemIcon>
                                         <ShoppingCartIcon fontSize='large' />
                                     </CustomListItemIcon>
-                                    <CustomListItemText primary="My Requests" sx={{ opacity: open ? 1 : 0 }} />
+                                    <CustomListItemText primary="Customer Requests" sx={{ opacity: open ? 1 : 0 }} />
                                 </CustomListItemButton>
                             </Link>
                         </ListItem>
