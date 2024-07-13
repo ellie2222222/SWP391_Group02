@@ -380,7 +380,7 @@ const createOrderRequest = async (req, res) => {
       user_id: _id,
       request_description: 'order request',
       jewelry_id,
-      request_status: 'payment',
+      request_status: 'pending',
       quote_content: null,
       quote_amount: null,
       quote_status: null,

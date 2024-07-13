@@ -171,7 +171,7 @@ const JewelryDetails = () => {
               </Box>
             </Box>
             <CustomButton variant="contained" onClick={handleClickOpen}>
-              ORDER NOW
+              CREATE REQUEST NOW
             </CustomButton>
             <LargeTypography variant="body1" component="h6" align="center">
               Need some help? <PhoneIcon /> 1900-xxxx

@@ -103,12 +103,7 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
             production_status: Yup.string(),
         }),
         onSubmit: async (values) => {
-            try {
-                await onSubmit(values);
-                toast.success('Form submitted successfully!');
-            } catch (error) {
-                toast.error('Error submitting form');
-            }
+            await onSubmit(values);
         }
     });
 
