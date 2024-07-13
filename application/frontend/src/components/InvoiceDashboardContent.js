@@ -103,10 +103,7 @@ const InvoiceDashboardContent = () => {
             const response = await axiosInstance.get('/invoices', {
                 params: {
                     ...Object.fromEntries(searchParams),
-                    payment_method: paymentMethod,
-                    payment_gateway: paymentGateway,
-                    sortBy,
-                    sortOrder,
+                   
                 },
             });
             setInvoices(response.data.invoices);
