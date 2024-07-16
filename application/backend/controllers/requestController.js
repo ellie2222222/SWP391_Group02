@@ -404,6 +404,126 @@ const createOrderRequest = async (req, res) => {
   }
 };
 
+// User feedback quote
+const userFeedbackQuote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_quote_feedback } = req.body;
+
+    // Validate request ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    // Retrieve the existing request
+    let existingRequest = await Request.findById(id);
+    if (!existingRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    // Check if user_quote_feedback is provided
+    if (!user_quote_feedback) {
+      return res.status(400).json({ error: "Feedback content is required" });
+    }
+
+    // Update the user feedback for quote
+    const updatedRequest = await Request.findByIdAndUpdate(
+      id,
+      { $push: { user_feedback_quote: user_quote_feedback } }, // Ensure this matches your schema field name
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    res.status(200).json({ message: "Feedback updated successfully", updatedRequest });
+  } catch (error) {
+    console.error('Error updating request:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Manager feedback quote
+const managerFeedbackQuote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { manager_quote_feedback } = req.body;
+
+    // Validate request ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    // Retrieve the existing request
+    let existingRequest = await Request.findById(id);
+    if (!existingRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    // Check if manager_quote_feedback is provided
+    if (!manager_quote_feedback) {
+      return res.status(400).json({ error: "Feedback content is required" });
+    }
+
+    // Update the manager feedback for quote
+    const updatedRequest = await Request.findByIdAndUpdate(
+      id,
+      { $push: { manager_feedback_quote: manager_quote_feedback } }, // Ensure this matches your schema field name
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    res.status(200).json({ message: "Feedback updated successfully", updatedRequest });
+  } catch (error) {
+    console.error('Error updating request:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// User feedback design
+const userFeedbackDesign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_design_feedback } = req.body;
+
+    // Validate request ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    // Retrieve the existing request
+    let existingRequest = await Request.findById(id);
+    if (!existingRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    // Check if user_design_feedback is provided
+    if (!user_design_feedback) {
+      return res.status(400).json({ error: "Feedback content is required" });
+    }
+
+    // Update the user feedback for design
+    const updatedRequest = await Request.findByIdAndUpdate(
+      id,
+      { $push: { user_feedback_design: user_design_feedback } }, // Ensure this matches your schema field name
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedRequest) {
+      return res.status(404).json({ error: "No such request" });
+    }
+
+    res.status(200).json({ message: "Feedback updated successfully", updatedRequest });
+  } catch (error) {
+    console.error('Error updating request:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getRequests,
   getRequest,
@@ -411,5 +531,8 @@ module.exports = {
   getUserRequests,
   getUserRequest,
   updateRequest,
-  createOrderRequest
+  createOrderRequest,
+  userFeedbackQuote,
+  userFeedbackDesign,
+  managerFeedbackQuote
 };

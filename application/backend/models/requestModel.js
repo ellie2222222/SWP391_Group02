@@ -54,7 +54,16 @@ const requestSchema = new Schema( {
     },
     images_public_ids: [{
         type: String
-    }],
+    },],
+    user_feedback_quote: {
+        type: Array
+    },
+    user_feedback_design: {
+        type: Array
+    },
+    manager_feedback_quote: {
+        type: Array
+    },
     //waranty, design,
 }, {timestamps: true})
 
