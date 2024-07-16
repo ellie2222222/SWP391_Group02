@@ -93,7 +93,6 @@ const AdminContent = () => {
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [type, setType] = useState("");
-    const [onSale, setOnSale] = useState("");
     const [sortOrder, setSortOrder] = useState("");
     const [available, setAvailable] = useState("");
     const [page, setPage] = useState(1);
@@ -133,7 +132,6 @@ const AdminContent = () => {
 
     useEffect(() => {
         setSearch(searchParams.get('name') || '');
-        setOnSale(searchParams.get('on_sale') || '');
         setCategory(searchParams.get('category') || '');
         setSortOrder(searchParams.get('sortByPrice') || '');
         setAvailable(searchParams.get('available') || '');
@@ -188,10 +186,18 @@ const AdminContent = () => {
         try {
             await axiosInstance.delete(`/jewelries/${id}`);
             fetchJewelries();
-            toast.success('Jewelry item deleted successfully');
+            toast.success('Jewelry item deleted successfully', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } catch (error) {
             console.error('Error deleting jewelry:', error);
-            toast.error('Failed to delete jewelry item');
+            toast.error('Failed to delete jewelry item', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         }
     };
 
@@ -200,10 +206,18 @@ const AdminContent = () => {
             setLoading(true);
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
-                toast.success('Jewelry item updated successfully');
+                toast.success('Jewelry item updated successfully', {
+                    autoClose: 5000, // Auto close after 5 seconds
+                    closeOnClick: true,
+                    draggable: true,
+                });
             } else {
                 await axiosInstance.post('/jewelries', values);
-                toast.success('Jewelry item added successfully');
+                toast.success('Jewelry item added successfully', {
+                    autoClose: 5000, // Auto close after 5 seconds
+                    closeOnClick: true,
+                    draggable: true,
+                });
             }
             fetchJewelries();
             setIsDialogOpen(false);
@@ -241,19 +255,6 @@ const AdminContent = () => {
                     </Box>
                     <Box display="flex">
                         <CustomFormControl>
-                            <InputLabel id="on_sale-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
-                            <Select
-                                labelId='on_sale-label'
-                                label="On Sale"
-                                value={onSale}
-                                onChange={(event) => handleFilterChange('on_sale', event.target.value)}
-                            >
-                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
-                                <CustomMenuItem value="false">Not On Sale</CustomMenuItem>
-                                <CustomMenuItem value="true">On Sale</CustomMenuItem>
-                            </Select>
-                        </CustomFormControl>
-                        <CustomFormControl style={{ marginLeft: 20 }}>
                             <InputLabel id="category-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
                             <Select
                                 labelId='category-label'
@@ -393,7 +394,7 @@ const AdminContent = () => {
 
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <DialogContent>
-                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', on_sale: false, sale_percentage: 0, images: [], available: false, subgemstone_id: '', subgemstone_quantity: 0 }} onSubmit={handleSubmit} />
+                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', images: [], available: false, subgemstone_id: '', subgemstone_quantity: 0 }} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: "1.3rem", color: "#b48c72" }} disabled={loading}>
@@ -411,7 +412,6 @@ const AdminContent = () => {
                                 <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Price: {selectedJewelry.price}</Typography>
                                 <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Category: {selectedJewelry.category}</Typography>
                                 <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Type: {selectedJewelry.type}</Typography>
-                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>On Sale: {selectedJewelry.on_sale ? 'Yes' : 'No'}</Typography>
                                 <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Available: {selectedJewelry.available ? 'Yes' : 'No'}</Typography>
                             </Box>
                         )}

@@ -12,6 +12,15 @@ const transactionSchema = new Schema({
         ref: 'Request',
         required: true
     },
+    amount_paid: {
+        type: Number,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true,
+        enum: ['deposit', 'final']
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

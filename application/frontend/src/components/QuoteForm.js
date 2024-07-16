@@ -250,8 +250,6 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                             material_weight: 0,
                             category: '',
                             type: '',
-                            on_sale: false,
-                            sale_percentage: 0,
                             images: [],
                             available: false,
                         }}

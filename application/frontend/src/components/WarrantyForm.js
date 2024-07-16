@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
-import { Container, Button, TextField, MenuItem, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
+import { Container, Button, TextField, MenuItem, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress, Typography } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from 'yup';
@@ -13,12 +13,51 @@ const CustomButton1 = styled(Button)({
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
+
+const CustomTextField = styled(TextField)({
+    '& label.Mui-focused': {
+        color: '#b48c72',
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#b48c72',
+    },
+    '& .MuiOutlinedInput-root': {
+        fontSize: "1.3rem",
+        '& fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&:hover fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: '#b48c72',
+        },
+    },
+    "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+});
+
+const CustomMenuItem = styled(MenuItem)({
+    fontSize: '1.3rem',
+})
 
 const WarrantyForm = ({ initialValues, onSubmit }) => {
     const [loading, setLoading] = useState(false);
@@ -29,13 +68,18 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
     useEffect(() => {
         const fetchInvoices = async () => {
             try {
-                const response = await axiosInstance.get('/invoices');
-                const invoice = response.data.invoices.find(invoice => invoice.transaction_id.request_id._id === initialValues._id);
+                const response = await axiosInstance.get(`/invoices/requests/${initialValues._id}`);
+                const invoice = response.data.invoice
                 if (invoice) {
                     setWarrantyStartDate(format(parseISO(invoice.createdAt), 'yyyy-MM-dd'));
                 }
             } catch (error) {
-                toast.error('Error fetching invoice');
+                console.error('Error while fetching invoice', error);
+                toast.error('Error while fetching invoice', {
+                    autoClose: 5000, // Auto close after 5 seconds
+                    closeOnClick: true,
+                    draggable: true,
+                });
             }
         };
 
@@ -47,7 +91,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
             warranty_start_date: warrantyStartDate || '',
             warranty_end_date: initialValues.warranty_end_date ? format(parseISO(initialValues.warranty_end_date), 'yyyy-MM-dd') : '',
             request_status: initialValues.request_status || '',
-            warranty_content: `${initialValues.jewelry_id._id} ${initialValues.jewelry_id.name}` || ''
+            warranty_content: initialValues.warranty_content || '',
         },
         enableReinitialize: true,
         validationSchema: Yup.object({
@@ -67,14 +111,9 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
                 warranty_start_date: format(parseISO(values.warranty_start_date), 'yyyy-MM-dd'),
                 warranty_end_date: format(parseISO(values.warranty_end_date), 'yyyy-MM-dd'),
             };
-            try {
-                await onSubmit(formattedValues);
-                toast.success('Form submitted successfully');
-            } catch (error) {
-                toast.error('Error submitting form');
-            } finally {
-                setLoading(false);
-            }
+            
+            await onSubmit(formattedValues);
+            setLoading(false);
         },
     });
 
@@ -88,8 +127,9 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
 
     return (
         <Container>
+            <Typography variant='h4' align='center'>Warranty Form</Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-                <TextField
+                <CustomTextField
                     fullWidth
                     id="warranty_start_date"
                     name="warranty_start_date"
@@ -107,7 +147,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
                     helperText={formik.touched.warranty_start_date && formik.errors.warranty_start_date}
                 />
 
-                <TextField
+                <CustomTextField
                     fullWidth
                     id="warranty_end_date"
                     name="warranty_end_date"
@@ -127,25 +167,18 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
                     helperText={formik.touched.warranty_end_date && formik.errors.warranty_end_date}
                 />
 
-                <TextField
+                <CustomTextField
                     fullWidth
-                    variant="filled"
                     id="warranty_content"
                     name="warranty_content"
                     label="Warranty Content"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    InputProps={{
-                        readOnly: true,
-                    }}
                     value={formik.values.warranty_content}
                     onChange={formik.handleChange}
                     error={formik.touched.warranty_content && Boolean(formik.errors.warranty_content)}
                     helperText={formik.touched.warranty_content && formik.errors.warranty_content}
                 />
 
-                <TextField
+                <CustomTextField
                     fullWidth
                     id="request_status"
                     name="request_status"
@@ -156,9 +189,9 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                     helperText={formik.touched.request_status && formik.errors.request_status}
                 >
-                    <MenuItem value="warranty">Warranty</MenuItem>
-                    <MenuItem value="complete">Complete</MenuItem>
-                </TextField>
+                    <CustomMenuItem value="warranty">Warranty</CustomMenuItem>
+                    <CustomMenuItem value="completed">Completed</CustomMenuItem>
+                </CustomTextField>
 
                 <CustomButton1 variant="contained" onClick={handleClickOpen} disabled={loading}>
                     {loading ? <CircularProgress size={24} /> : 'Submit'}

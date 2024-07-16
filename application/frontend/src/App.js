@@ -30,6 +30,8 @@ import GoldPrice from "./pages/GoldPrice";
 import Dashboard from "./pages/Dashboard";
 import InvoiceDashboard from "./pages/InvoiceDashboard";
 import WarrantyDashboard from "./pages/WarrantyDashboard";
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
     <div className="App">

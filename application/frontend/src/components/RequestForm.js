@@ -95,12 +95,9 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
             request_status: Yup.string().required("Required."),
             quote_amount: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
             quote_content: Yup.string(),
-            quote_status: Yup.string(),
-            design_status: Yup.string(),
             production_start_date: Yup.date(),
             production_end_date: Yup.date(),
             production_cost: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
-            production_status: Yup.string(),
         }),
         onSubmit: async (values) => {
             await onSubmit(values);
@@ -150,10 +147,12 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                         <CustomMenuItem value="pending">Pending</CustomMenuItem>
                         <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
                         <CustomMenuItem value="completed">Completed</CustomMenuItem>
-                        <CustomMenuItem value="design">Design</CustomMenuItem>
                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
+                        <CustomMenuItem value="deposit">Deposit</CustomMenuItem>
+                        <CustomMenuItem value="design">Design</CustomMenuItem>
                         <CustomMenuItem value="production">Production</CustomMenuItem>
                         <CustomMenuItem value="payment">Payment</CustomMenuItem>
+                        <CustomMenuItem value="warranty">Warranty</CustomMenuItem>
                         <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
                     </Select>
                     {formik.touched.request_status && formik.errors.request_status && (
@@ -183,45 +182,6 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     helperText={formik.touched.quote_content && formik.errors.quote_content}
                     InputProps={{ readOnly: role !== 'manager' && role !== 'sale_staff' }}
                 />
-                <CustomFormControl variant="outlined" fullWidth>
-                    <InputLabel id="quote-status-label">Quote Status</InputLabel>
-                    <Select
-                        labelId="quote-status-label"
-                        name="quote_status"
-                        value={formik.values.quote_status}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        label="Quote Status"
-                        error={formik.touched.quote_status && Boolean(formik.errors.quote_status)}
-                        readOnly={role !== 'manager'}
-                    >
-                        <CustomMenuItem value="pending">Pending</CustomMenuItem>
-                        <CustomMenuItem value="approved">Approved</CustomMenuItem>
-                        <CustomMenuItem value="rejected">Rejected</CustomMenuItem>
-                    </Select>
-                    {formik.touched.quote_status && formik.errors.quote_status && (
-                        <Typography variant="caption" color="red">{formik.errors.quote_status}</Typography>
-                    )}
-                </CustomFormControl>
-                <CustomFormControl variant="outlined" fullWidth>
-                    <InputLabel id="design-status-label">Design Status</InputLabel>
-                    <Select
-                        labelId="design-status-label"
-                        name="design_status"
-                        value={formik.values.design_status}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        label="Design Status"
-                        error={formik.touched.design_status && Boolean(formik.errors.design_status)}
-                        readOnly={role !== 'manager' && role !== 'design_staff' }
-                    >
-                        <CustomMenuItem value="ongoing">Ongoing</CustomMenuItem>
-                        <CustomMenuItem value="completed">Completed</CustomMenuItem>
-                    </Select>
-                    {formik.touched.quote_status && formik.errors.quote_status && (
-                        <Typography variant="caption" color="red">{formik.errors.quote_status}</Typography>
-                    )}
-                </CustomFormControl>
                 <CustomTextField
                     name="production_start_date"
                     label="Production Start Date"
@@ -260,25 +220,6 @@ const RequestForm = ({ initialValues, onSubmit, role }) => {
                     helperText={formik.touched.production_cost && formik.errors.production_cost}
                     InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' }}
                 />
-                <CustomFormControl variant="outlined" fullWidth>
-                    <InputLabel id="production-status-label">Production Status</InputLabel>
-                    <Select
-                        labelId="production-status-label"
-                        name="production_status"
-                        value={formik.values.production_status}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        label="Production Status"
-                        error={formik.touched.production_status && Boolean(formik.errors.production_status)}
-                        readOnly={ role !== 'manager' && role !== 'production_staff' }
-                    >
-                        <CustomMenuItem value="ongoing">Ongoing</CustomMenuItem>
-                        <CustomMenuItem value="completed">Completed</CustomMenuItem>
-                    </Select>
-                    {formik.touched.production_status && formik.errors.production_status && (
-                        <Typography variant="caption" color="red">{formik.errors.production_status}</Typography>
-                    )}
-                </CustomFormControl>
                 <CustomButton1 type="submit" variant="contained" sx={{ mt: 2 }}>
                     Submit
                 </CustomButton1>

@@ -7,7 +7,7 @@ const { cloudinary } = require('../cloudinary');
 
 // get all requests
 const getRequests = async (req, res) => {
-  const { request_status, quote_status, production_status, page = 1, limit = 10 } = req.query;
+  const { request_status, page = 1, limit = 10 } = req.query;
 
   try {
     // Construct query object
@@ -192,15 +192,16 @@ const createRequest = async (req, res) => {
     quote_content: null,
     quote_amount: null,
     quote_status: null,
-    design_status: null,
     production_start_date: null,
     production_end_date: null,
     production_cost: null,
-    production_status: null,
     endedAt: null,
+    design_images: [],
     warranty_content: null,
     warranty_start_date: null,
     warranty_end_date: null,
+    deposit_paid: false,
+    final_paid: false
   };
 
   // Add to the database
@@ -259,7 +260,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'warranty', 'payment', 'cancelled', 'user_accepted'];
+    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design', 'production', 'warranty', 'payment', 'cancelled', 'user_accepted'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }
@@ -348,9 +349,6 @@ const updateRequest = async (req, res) => {
       return res.status(404).json({ error: "No such request" });
     }
 
-    // Continuously check for status transitions
-
-
     res.status(200).json({ message: "Update successfully", updatedRequest });
   } catch (error) {
     console.error('Error updating request:', error);
@@ -384,15 +382,16 @@ const createOrderRequest = async (req, res) => {
       quote_content: null,
       quote_amount: null,
       quote_status: null,
-      design_status: null,
       production_start_date: null,
       production_end_date: null,
       production_cost: null,
-      production_status: null,
       endedAt: null,
       warranty_content: null,
       warranty_start_date: null,
       warranty_end_date: null,
+      design_images: [],
+      deposit_paid: null,
+      final_paid: null,
     };
 
     // Add to the database

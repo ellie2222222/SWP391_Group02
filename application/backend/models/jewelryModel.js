@@ -45,22 +45,11 @@ const jewelrySchema = new Schema( {
         enum: ["Sample", "Custom"],
         required: true
     },
-    on_sale: {
-        type: Boolean,
-        required: true,
-        default: false
-    },
-    sale_percentage: {
-        type: Number,
-        required: true,
-        default: 0
-    },
     available: {
         type: Boolean,
         required: true,
         default: true
     },
-    //fix
     images: [{
         type: String
     }],

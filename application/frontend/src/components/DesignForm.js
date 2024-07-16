@@ -13,10 +13,28 @@ const CustomButton1 = styled(Button)({
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
+    },
+});
+
+const CustomFormControl = styled(FormControl)({
+    "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
     },
 });
 
@@ -62,34 +80,19 @@ export default function DesignForm({ initialValues, onSubmit }) {
                 formData.append('removedImages', image);
             });
 
-            formData.append('gemstone_id', initialValues.jewelry_id.gemstone_id._id);
+            formData.append('gemstone_id', values.gemstone_id);
             formData.append('material_id', initialValues.jewelry_id.material_id._id);
+            formData.append('subgemstone_id', values.subgemstone_id);
+            formData.append('subgemstone_quantity', values.subgemstone_quantity);
+
             Object.keys(initialValues.jewelry_id).forEach(key => {
-                if (key !== 'images' && key !== 'gemstone_id' && key !== 'material_id') {
+                if (key !== 'images' && key !== 'gemstone_id' && key !== 'material_id' && key !== 'subgemstone_id' && key !== 'subgemstone_quantity') {
                     formData.append(key, initialValues.jewelry_id[key]);
                 }
             });
 
-            try {
-                // Patch images and other jewelry data
-                await axiosInstance.patch(`/jewelries/${initialValues.jewelry_id._id}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
-                // Patch status
-                await axiosInstance.patch(`/requests/${initialValues._id}`, {
-                    request_status: values.request_status,
-                });
-
-                toast.success('Form submitted successfully');
-                setLoading(false);
-                onSubmit();
-            } catch (error) {
-                toast.error('Error submitting form');
-                setLoading(false);
-            }
+            onSubmit(initialValues, formData);
+            setLoading(false);
         },
     });
 
@@ -122,10 +125,10 @@ export default function DesignForm({ initialValues, onSubmit }) {
 
     return (
         <Container>
+            <Typography variant='h4' align='center' gutterBottom>Design Form</Typography>
             <form onSubmit={formik.handleSubmit}>
                 <CustomButton1 variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '1em', alignItems: 'center' }}>
-                    <AddPhotoAlternateIcon />
-                    <Typography variant='body1'>Upload Images</Typography>
+                    <AddPhotoAlternateIcon fontSize='large'/> Upload Images
                     <input
                         type="file"
                         hidden
@@ -135,7 +138,7 @@ export default function DesignForm({ initialValues, onSubmit }) {
                 </CustomButton1>
                 <Grid container spacing={2}>
                     {images.map((image, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
+                        <Grid item xs={12} sm={6} md={4} key={index}>
                             <CardMedia
                                 component="img"
                                 alt="Jewelry"
@@ -149,10 +152,11 @@ export default function DesignForm({ initialValues, onSubmit }) {
                     ))}
                 </Grid>
                 <Box sx={{ marginTop: 2 }}>
-                    <FormControl fullWidth>
-                        <InputLabel>Request Status</InputLabel>
+                    <CustomFormControl fullWidth>
+                        <InputLabel id='request_status-label'>Request Status</InputLabel>
                         <Select
-                            labelId="status-label"
+                            labelId="request_status-label"
+                            label="Request Status"
                             id="request_status"
                             name="request_status"
                             value={formik.values.request_status}
@@ -166,7 +170,7 @@ export default function DesignForm({ initialValues, onSubmit }) {
                         {formik.touched.request_status && formik.errors.request_status && (
                             <Typography color="error">{formik.errors.request_status}</Typography>
                         )}
-                    </FormControl>
+                    </CustomFormControl>
                 </Box>
                 <Box sx={{ marginTop: 2 }}>
                     <CustomButton1 variant="contained" onClick={handleClickOpen} disabled={loading}>

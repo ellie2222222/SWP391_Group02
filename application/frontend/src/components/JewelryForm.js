@@ -113,7 +113,6 @@ const CustomMenuItem = styled(MenuItem)({
 })
 
 const JewelryForm = ({ initialValues, onSubmit }) => {
-  const { user } = useAuth();
   const [selectedImages, setSelectedImages] = useState(initialValues.images || []);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [removedImages, setRemovedImages] = useState([]);
@@ -170,8 +169,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
       material_weight: Yup.number().required("Required.").typeError("Must be a number"),
       category: Yup.string().required("Required."),
       type: Yup.string().required("Required."),
-      on_sale: Yup.boolean(),
-      sale_percentage: Yup.number().typeError("Must be a number"),
       available: Yup.boolean(),
     }),
     onSubmit: async (values) => {
@@ -516,35 +513,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             }
             label="Available"
           />
-          <CustomFormControlLabel
-            control={
-              <CustomSwitch
-                name="on_sale"
-                checked={formik.values.on_sale}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-            }
-            label="On Sale"
-          />
-          {formik.values.on_sale && (
-            <CustomTextField
-              name="sale_percentage"
-              label="Sale Percentage"
-              variant="outlined"
-              value={formik.values.sale_percentage}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.sale_percentage &&
-                Boolean(formik.errors.sale_percentage)
-              }
-              helperText={
-                formik.touched.sale_percentage &&
-                formik.errors.sale_percentage
-              }
-            />
-          )}
           <Box mt={2}>
             <Typography variant="h6" gutterBottom>
               Images

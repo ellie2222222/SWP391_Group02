@@ -9,6 +9,7 @@ import SaleStaffDashboard from './SaleStaffDashboard';
 import ProductionStaffDashboard from './ProductionStaffDashboard';
 import DesignStaffDashboard from './DesignStaffDashboard';
 import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -133,10 +134,18 @@ const RequestDashboardContent = () => {
             }
             fetchRequests();
             handleCloseAllDialogs();
-            toast.success('Request saved successfully!');
+            toast.success('Request saved successfully!', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } catch (error) {
             console.error("There was an error saving the request!", error);
-            toast.error(error.response?.data?.error || error.message);
+            toast.error(error.response?.data?.error || error.message, {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } finally {
             setLoading(false);
         }
@@ -191,12 +200,11 @@ const RequestDashboardContent = () => {
                                         <CustomMenuItem value="pending">Pending</CustomMenuItem>
                                         <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
                                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
+                                        <CustomMenuItem value="deposit">Deposit</CustomMenuItem>
                                         <CustomMenuItem value="design">Design</CustomMenuItem>
                                         <CustomMenuItem value="production">Production</CustomMenuItem>
                                         <CustomMenuItem value="payment">Payment</CustomMenuItem>
                                         <CustomMenuItem value="warranty">Warranty</CustomMenuItem>
-                                        <CustomMenuItem value="approved">Approved</CustomMenuItem>
-                                        <CustomMenuItem value="rejected">Rejected</CustomMenuItem>
                                     </Select>
                                 </CustomFormControl>
                             </Box>
@@ -251,7 +259,7 @@ const RequestDashboardContent = () => {
                                         {requests.length === 0 && (
                                             <TableRow>
                                                 <TableCell align='center' colSpan={9}>
-                                                    <Typography variant="h6">No products found</Typography>
+                                                    <Typography variant="h6">No requests found</Typography>
                                                 </TableCell>
                                             </TableRow>
                                         )}
@@ -335,7 +343,6 @@ const RequestDashboardContent = () => {
                 <DialogContent>
                     <LargeTypography>Quote Amount: {(selectedRequest && selectedRequest.quote_amount) ? selectedRequest.quote_amount : 'N/A'}</LargeTypography>
                     <LargeTypography>Quote Content: {(selectedRequest && selectedRequest.quote_content) ? selectedRequest.quote_content : 'N/A'}</LargeTypography>
-                    <LargeTypography>Quote Status: {(selectedRequest && selectedRequest.quote_status) ? selectedRequest.quote_status : 'N/A'}</LargeTypography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>
@@ -346,12 +353,6 @@ const RequestDashboardContent = () => {
             <Dialog open={isDesignDetailDialogOpen} onClose={handleCloseAllDialogs}>
                 <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Design Detail</DialogTitle>
                 <DialogContent>
-                    {selectedRequest && selectedRequest.design_status === 'ongoing' && (
-                        <CustomButton1 color="primary" onClick={() => { }}>
-                            Add Design
-                        </CustomButton1>
-                    )}
-                    <LargeTypography>Design Status: {(selectedRequest && selectedRequest.design_status) ? selectedRequest.design_status : 'N/A'}</LargeTypography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>
@@ -365,7 +366,6 @@ const RequestDashboardContent = () => {
                     <LargeTypography>Production Start Date: {(selectedRequest && selectedRequest.production_start_date) ? new Date(selectedRequest.production_start_date).toLocaleDateString() : 'N/A'}</LargeTypography>
                     <LargeTypography>Production End Date: {(selectedRequest && selectedRequest.production_end_date) ? new Date(selectedRequest.production_end_date).toLocaleDateString() : 'N/A'}</LargeTypography>
                     <LargeTypography>Production Cost: {(selectedRequest && selectedRequest.production_cost) ? selectedRequest.production_cost : 'N/A'}</LargeTypography>
-                    <LargeTypography>Production Status: {(selectedRequest && selectedRequest.production_status) ? selectedRequest.production_status : 'N/A'}</LargeTypography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>

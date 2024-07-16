@@ -12,12 +12,51 @@ const CustomButton1 = styled(Button)({
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
     },
 });
+
+const CustomTextField = styled(TextField)({
+    '& label.Mui-focused': {
+        color: '#b48c72',
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#b48c72',
+    },
+    '& .MuiOutlinedInput-root': {
+        fontSize: "1.3rem",
+        '& fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&:hover fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: '#b48c72',
+        },
+    },
+    "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+});
+
+const CustomMenuItem = styled(MenuItem)({
+    fontSize: '1.3rem',
+})
 
 const ProductionForm = ({ initialValues, onSubmit }) => {
     const [loading, setLoading] = useState(false);
@@ -50,14 +89,9 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                 production_start_date: format(parseISO(values.production_start_date), 'yyyy-MM-dd'),
                 production_end_date: format(parseISO(values.production_end_date), 'yyyy-MM-dd'),
             };
-            try {
-                await onSubmit(formattedValues);
-                toast.success('Form submitted successfully');
-            } catch (error) {
-                toast.error('Error submitting form');
-            } finally {
-                setLoading(false);
-            }
+            
+            await onSubmit(formattedValues);
+            setLoading(false);
         },
     });
 
@@ -71,8 +105,9 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
 
     return (
         <Container>
+            <Typography align='center' variant='h4' gutterBottom>Production Form</Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-                <TextField
+                <CustomTextField
                     fullWidth
                     id="production_start_date"
                     name="production_start_date"
@@ -92,7 +127,7 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                     helperText={formik.touched.production_start_date && formik.errors.production_start_date}
                 />
 
-                <TextField
+                <CustomTextField
                     fullWidth
                     id="production_end_date"
                     name="production_end_date"
@@ -112,7 +147,7 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                     helperText={formik.touched.production_end_date && formik.errors.production_end_date}
                 />
 
-                <TextField
+                <CustomTextField
                     fullWidth
                     id="request_status"
                     name="request_status"
@@ -123,10 +158,10 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                     error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                     helperText={formik.touched.request_status && formik.errors.request_status}
                 >
-                    <MenuItem value="production">Production</MenuItem>
-                    <MenuItem value="Payment">Payment</MenuItem>
-                    <MenuItem value="cancelled">Cancelled</MenuItem>
-                </TextField>
+                    <CustomMenuItem value="production">Production</CustomMenuItem>
+                    <CustomMenuItem value="payment">Payment</CustomMenuItem>
+                    <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
+                </CustomTextField>
 
                 <CustomButton1 variant="contained" onClick={handleClickOpen} disabled={loading}>
                     {loading ? <CircularProgress size={24} /> : 'Submit'}
@@ -138,7 +173,7 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                 aria-labelledby="confirm-dialog-title"
                 aria-describedby="confirm-dialog-description"
             >
-                <DialogTitle id="confirm-dialog-title">{"Confirm Submission"}</DialogTitle>
+                <DialogTitle id="confirm-dialog-title">Confirm Submission</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="confirm-dialog-description">
                         Are you sure you want to submit this form?
@@ -153,7 +188,6 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
                     </CustomButton1>
                 </DialogActions>
             </Dialog>
-            <ToastContainer />
         </Container>
     );
 };

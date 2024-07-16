@@ -83,7 +83,6 @@ const JewelryList = () => {
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [onSale, setOnSale] = useState("");
   const [category, setCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("");
   const [page, setPage] = useState(1);
@@ -135,7 +134,6 @@ const JewelryList = () => {
   // Update state with query params on component mount
   useEffect(() => {
     setSearch(searchParams.get('name') || "");
-    setOnSale(searchParams.get('on_sale') || "");
     setCategory(searchParams.get('category') || "");
     setSortOrder(searchParams.get('sortByPrice') || "");
     setPage(parseInt(searchParams.get('page') || '1', 10));
@@ -201,22 +199,8 @@ const JewelryList = () => {
           </Box>
           {/* Filters */}
           <Box display="flex">
-            {/* On Sale Filter */}
-            <CustomFormControl>
-              <InputLabel id="on_sale-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>On Sale</InputLabel>
-              <Select
-                labelId='on_sale_label'
-                label='On Sale'
-                value={onSale}
-                onChange={(event) => handleFilterChange('on_sale', event.target.value)}
-              >
-                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
-                <CustomMenuItem value="false">Not On Sale</CustomMenuItem>
-                <CustomMenuItem value="true">On Sale</CustomMenuItem>
-              </Select>
-            </CustomFormControl>
             {/* Category Filter */}
-            <CustomFormControl style={{ marginLeft: 20 }}>
+            <CustomFormControl>
               <InputLabel id="category-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Category</InputLabel>
               <Select
                 labelId='category-label'
@@ -272,20 +256,9 @@ const JewelryList = () => {
                     <Typography variant="h5" color="text.secondary" mb={2}>
                       {product._id}
                     </Typography>
-                    {product.on_sale ? (
-                      <>
-                        <Typography variant="h4" sx={{ color: 'red', fontWeight: '300', mr: 1, display: 'inline-block' }}>
-                          {(product.price - (product.price * (product.sale_percentage / 100))).toLocaleString()}₫
-                        </Typography>
-                        <Typography variant="h5" sx={{ textDecoration: 'line-through', fontWeight: '300', display: 'inline-block' }}>
-                          {product.price.toLocaleString()}₫
-                        </Typography>
-                      </>
-                    ) : (
-                      <Typography variant="h4" component="p" sx={{ color: 'red', fontWeight: '300' }}>
-                        {product.price.toLocaleString()}₫
-                      </Typography>
-                    )}
+                    <Typography variant="h4" component="p" sx={{ color: 'red', fontWeight: '300' }}>
+                      {product.price.toLocaleString()}₫
+                    </Typography>
                   <CustomButton1 onClick={() => navigate(`/products/${product._id}`)}>
                     Details
                   </CustomButton1>

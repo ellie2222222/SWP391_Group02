@@ -1,8 +1,8 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
-const requestSchema = new Schema( {
+const requestSchema = new Schema({
     user_id: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User', 
@@ -10,7 +10,7 @@ const requestSchema = new Schema( {
     },
     jewelry_id: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Jewelry',
+        ref: 'Jewelry'
     },
     request_description: {
         type: String,
@@ -19,7 +19,7 @@ const requestSchema = new Schema( {
     request_status: {
         type: String,
         required: true,
-        enum: ['pending', 'accepted', 'completed', 'quote', 'design', 'production', 'warranty', 'payment', 'cancelled','rejected_quote'],
+        enum: ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design', 'production', 'warranty', 'payment', 'cancelled', 'rejected_quote'],
         default: 'pending'
     },
     quote_content: {
@@ -41,21 +41,28 @@ const requestSchema = new Schema( {
         type: Date
     },
     design_images: [{
-        type: String,
+        type: String
     }],
     warranty_content: {
-        type: String,
+        type: String
     },
     warranty_start_date: {
-        type: Date,
+        type: Date
     },
     warranty_end_date: {
-        type: Date,
+        type: Date
     },
     images_public_ids: [{
         type: String
     }],
-    //waranty, design,
-}, {timestamps: true})
+    deposit_paid: {
+        type: Boolean,
+        default: false
+    },
+    final_paid: {
+        type: Boolean,
+        default: false
+    }
+}, { timestamps: true });
 
-module.exports = mongoose.model('Request', requestSchema)
+module.exports = mongoose.model('Request', requestSchema);

@@ -11,6 +11,8 @@ import { useParams } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/system';
 import { Link } from '@mui/material';
+import useAuth from '../hooks/useAuthContext';
+import { jwtDecode } from 'jwt-decode';
 
 const LargeTypography = styled(Typography)({
   fontSize: '1.3rem', // Increased font size
@@ -21,8 +23,8 @@ const PaymentStatus = () => {
   const [transactionId, setTransactionId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { id } = useParams();
   const urlParams = new URLSearchParams(window.location.search);
+  const { user } = useAuth();
 
   const getPaymentStatus = async () => {
     const transId = urlParams.get('apptransid');
@@ -83,9 +85,9 @@ const PaymentStatus = () => {
               <LargeTypography variant="body1">Transaction ID: {transactionId}</LargeTypography>
               <LargeTypography variant="body1">Status: {orderStatus.return_message}</LargeTypography>
               <LargeTypography variant="body1">Amount: {orderStatus.amount}</LargeTypography>
-              <Link component={RouterLink} to="/profile" underline="none" sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                <KeyboardBackspaceIcon sx={{ mr: 1, color: 'text.primary' }} />
-                <LargeTypography variant="body1" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+              <Link component={RouterLink} to={`/requests`} underline="none" sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
+                <KeyboardBackspaceIcon sx={{ mr: 1, color: '#b48c72' }} />
+                <LargeTypography variant="body1" sx={{ fontWeight: 'bold', color: '#b48c72' }}>
                   Back to request list
                 </LargeTypography>
               </Link>

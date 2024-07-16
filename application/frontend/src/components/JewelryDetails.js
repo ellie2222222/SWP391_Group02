@@ -2,13 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Link as RouterLink } from 'react-router-dom';
 import {
-  Link, Container, Box, Typography, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, styled,
-  Grid, TableCell, TableRow,
+  Link,
+  Container,
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  styled,
+  Grid,
+  TableCell,
+  TableRow,
   TableBody,
   TableHead,
   Table,
   Paper,
   TableContainer,
+  Icon,
 } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
@@ -24,7 +38,7 @@ const CustomButton = styled(Button)({
   backgroundColor: '#b48c72',
   color: '#fff',
   width: '100%',
-  fontSize: '1rem',
+  fontSize: '1.3rem',
   '&:hover': {
     color: '#b48c72',
     backgroundColor: 'transparent',
@@ -60,7 +74,6 @@ const JewelryDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -88,12 +101,10 @@ const JewelryDetails = () => {
 
     try {
       await axiosInstance.post('/requests/order-requests', { jewelry_id: id });
-      setError('');
       setOpen(false);
       toast.success('Order created successfully!', { autoClose: 3000 });
     } catch (error) {
       console.error('Error while creating order information!', error);
-      setError(error.response ? error.response.data.error : error.message);
       toast.error('Failed to create order. Please try again later.', { autoClose: 3000 });
     }
   };
@@ -117,7 +128,7 @@ const JewelryDetails = () => {
   if (!product) {
     return (
       <CenteredBox>
-        <Typography variant="h5" gutterBottom>Product not found</Typography>
+        <Typography variant="h3" gutterBottom>Product not found</Typography>
         <CustomButton component={RouterLink} to="/products">
           Go back to product list
         </CustomButton>
@@ -144,20 +155,9 @@ const JewelryDetails = () => {
             <LargeTypography variant="body1" sx={{ pb: 1, borderBottom: '1px solid #ccc' }}>{product.description}</LargeTypography>
           </Box>
           <Box>
-            {product.on_sale ? (
-              <>
-                <Typography variant="h5" sx={{ textDecoration: 'line-through', fontWeight: '300' }}>
-                  {product.price.toLocaleString()}₫
-                </Typography>
-                <Typography variant="h2" sx={{ color: 'red', fontWeight: '300', mr: 1 }}>
-                  {(product.price - (product.price * (product.sale_percentage / 100))).toLocaleString()}₫
-                </Typography>
-              </>
-            ) : (
-              <Typography variant="h2" component="p" sx={{ color: 'red', fontWeight: '300' }}>
-                {product.price.toLocaleString()}₫
-              </Typography>
-            )}
+            <Typography variant="h2" component="p" sx={{ color: 'red', fontWeight: '300' }}>
+              {product.price.toLocaleString()}₫
+            </Typography>
           </Box>
           <Box display="flex" flexDirection="column" gap="1em" sx={{ pt: 1, borderTop: '1px solid #ccc' }}>
             <Box display="flex" gap="1em">
@@ -173,9 +173,17 @@ const JewelryDetails = () => {
             <CustomButton variant="contained" onClick={handleClickOpen}>
               CREATE REQUEST NOW
             </CustomButton>
-            <LargeTypography variant="body1" component="h6" align="center">
-              Need some help? <PhoneIcon /> 1900-xxxx
-            </LargeTypography>
+            <Box display="flex" alignItems="center" justifyContent="center" gap='0.5rem'>
+              <LargeTypography>
+                Need some help?
+              </LargeTypography>
+              <Icon>
+                <PhoneIcon />
+              </Icon>
+              <LargeTypography>
+                1900-xxxx
+              </LargeTypography>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -291,7 +299,7 @@ const JewelryDetails = () => {
         <StyledDialogTitle id="alert-dialog-title">Confirm Order</StyledDialogTitle>
         <DialogContent>
           <StyledDialogContentText id="alert-dialog-description">
-            Are you sure you want to place this order?
+            Are you sure you want to create a request using this sample?
           </StyledDialogContentText>
         </DialogContent>
         <DialogActions>

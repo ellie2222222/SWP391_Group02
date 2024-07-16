@@ -12,23 +12,30 @@ const createInvoice = async (req, res) => {
     const { transaction_id, payment_method, payment_gateway, total_amount } = req.body;
 
     try {
-        // Find the transaction by ID
-        const transaction = await Transaction.findById(transaction_id);
+        // Find the transaction by ID and populate the request_id
+        const transaction = await Transaction.findById(transaction_id).populate('request_id');
         if (!transaction) {
             return res.status(404).json({ error: 'Transaction not found' });
         }
-        const requestId = transaction.request_id
+        const requestId = transaction.request_id;
 
-        // Find all invoices and populate the transaction_id to get the request_id
-        const invoices = await Invoice.find().populate({
-            path: 'transaction_id',
-            select: 'request_id'
+        // Check if an invoice transaction of the same type already exists for this request
+        const existingDepositInvoice = await Invoice.exists({
+            transaction_id,
+            type: 'deposit',
+            'transaction_id.request_id.deposit_paid': true,
         });
+        if (existingDepositInvoice) {
+            return res.status(200).json({ message: 'The request already has an invoice of type deposit' });
+        }
 
-        // Check if any invoice's populated request_id matches the request_id from req.body
-        const exists = invoices.some(invoice => invoice.transaction_id.request_id.toString() === requestId.toString());
-        if (exists) {
-            return res.status(200).json({ message: 'exist' });
+        const existingFinalInvoice = await Invoice.exists({
+            transaction_id,
+            type: 'final',
+            'transaction_id.request_id.final_paid': true,
+        });
+        if (existingFinalInvoice) {
+            return res.status(200).json({ message: 'The request already has an invoice of type final' });
         }
 
         // Check if total_amount is valid
@@ -36,11 +43,21 @@ const createInvoice = async (req, res) => {
             return res.status(400).json({ error: 'Total amount must be a positive number.' });
         }
 
-        let updatedRequest = await Request.findByIdAndUpdate(
-            requestId,
-            { $set: { request_status: 'warranty' } },
-            { new: true, runValidators: true }
-        );
+        // Update the request status based on the invoice type
+        let updatedRequest;
+        if (transaction.type === 'deposit') {
+            updatedRequest = await Request.findByIdAndUpdate(
+                requestId,
+                { $set: { deposit_paid: true, request_status: 'design' } },
+                { new: true, runValidators: true }
+            );
+        } else if (transaction.type === 'final') {
+            updatedRequest = await Request.findByIdAndUpdate(
+                requestId,
+                { $set: { final_paid: true, request_status: 'warranty' } },
+                { new: true, runValidators: true }
+            );
+        }
 
         // Create the invoice
         const invoice = new Invoice({ transaction_id, payment_method, payment_gateway, total_amount });
@@ -53,6 +70,7 @@ const createInvoice = async (req, res) => {
     }
 };
 
+
 // Get an Invoice by ID
 const getInvoiceById = async (req, res) => {
     const { id } = req.params;
@@ -63,12 +81,43 @@ const getInvoiceById = async (req, res) => {
 
     try {
         const invoice = await Invoice.findById(id).populate('jewelry_id');
+
         if (!invoice) {
             return res.status(404).json({ message: 'Invoice not found' });
         }
-        res.json(invoice);
+
+        res.json({ invoice });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ error: 'Error while retrieving invoice' });
+    }
+};
+
+// Get an Invoice by Request ID
+const getInvoiceByRequestId = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const transaction = await Transaction.findOne({
+            request_id: id,
+            type: 'final'
+        });
+
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+
+        const invoice = await Invoice.findOne({
+            transaction_id: transaction._id
+        });
+
+        if (!invoice) {
+            return res.status(404).json({ message: 'Invoice not found' });
+        }
+
+        res.json({ invoice });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error while retrieving invoice' });
     }
 };
 
@@ -174,4 +223,5 @@ module.exports = {
     getAllInvoices,
     updateInvoiceById,
     deleteInvoiceById,
+    getInvoiceByRequestId,
 };

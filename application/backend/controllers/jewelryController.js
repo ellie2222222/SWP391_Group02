@@ -6,7 +6,7 @@ const { cloudinary } = require('../cloudinary');
 // Helper functions for validation
 const validateEmptyFields = (data) => {
     const {
-        name, description, material_id, material_weight, price, category, type, on_sale, sale_percentage, available
+        name, description, material_id, material_weight, price, category, type, available
     } = data;
     let emptyFields = [];
 
@@ -17,8 +17,6 @@ const validateEmptyFields = (data) => {
     if (!category) emptyFields.push('category');
     if (!type) emptyFields.push('type');
     if (type && type === 'Sample' && !price) emptyFields.push('price');
-    if (!on_sale) emptyFields.push('on_sale');
-    if (!sale_percentage) emptyFields.push('sale_percentage');
     if (!material_id) emptyFields.push('material_id');
     if (emptyFields.length > 0) {
         return "Please fill in the required fields";
@@ -28,15 +26,14 @@ const validateEmptyFields = (data) => {
 };
 
 const validateInputData = (data) => {
-    let { gemstone_id, material_id, price, material_weight, subgemstone_id, subgemstone_quantity, sale_percentage, type, on_sale } = data;
+    let { gemstone_id, material_id, price, material_weight, subgemstone_id, subgemstone_quantity, type } = data;
     let validationErrors = [];
-    
-    if (gemstone_id) gemstone_id = gemstone_id.trim();
-    if (material_id) material_id = material_id.trim();
-    if (subgemstone_id) subgemstone_id = subgemstone_id.trim();
-    console.log(data)
 
-    if (gemstone_id && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
+    if (gemstone_id !== null || gemstone_id !== undefined || gemstone_id !== '') gemstone_id = gemstone_id.trim();
+    if (material_id) material_id = material_id.trim();
+    if (subgemstone_id !== null || subgemstone_id !== undefined || subgemstone_id !== '') subgemstone_id = subgemstone_id.trim();
+
+    if (gemstone_id && gemstone_id !== '' && gemstone_id !== 'undefined' && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
         validationErrors.push('Invalid gemstone ID');
     }
     
@@ -44,14 +41,12 @@ const validateInputData = (data) => {
         validationErrors.push('Invalid material ID');
     }
 
-    if (subgemstone_id && !mongoose.Types.ObjectId.isValid(subgemstone_id)) {
+    if (subgemstone_id && subgemstone_id !== '' && subgemstone_id !== 'undefined' && !mongoose.Types.ObjectId.isValid(subgemstone_id)) {
         validationErrors.push('Invalid sub gemstone ID');
     }
 
     price = parseFloat(price);
     material_weight = parseFloat(material_weight);
-    sale_percentage = parseFloat(sale_percentage);
-    if (subgemstone_quantity) subgemstone_quantity = parseFloat(subgemstone_quantity);
 
     if (price != null && (!Number.isFinite(price) || price <= 0)) {
         validationErrors.push('Price must be a positive number');
@@ -59,17 +54,8 @@ const validateInputData = (data) => {
     if (material_weight != null && (!Number.isFinite(material_weight) || material_weight <= 0)) {
         validationErrors.push('Material weight must be a positive number');
     }
-    if (subgemstone_quantity != null && (!Number.isInteger(subgemstone_quantity) || subgemstone_quantity < 0)) {
+    if (subgemstone_quantity != null && subgemstone_quantity !== 'undefined' && (!Number.isInteger(subgemstone_quantity) || subgemstone_quantity < 0)) {
         validationErrors.push('Sub gemstone quantity must be a positive number');
-    }
-    if (on_sale === 'false') {
-        sale_percentage = 0;
-    }
-    if (on_sale === 'true' && sale_percentage <= 0) {
-        validationErrors.push('Sale percentage must not be 0 when it is on sale');
-    }
-    if (sale_percentage != null && (!Number.isFinite(sale_percentage) || sale_percentage < 0 || sale_percentage > 100)) {
-        validationErrors.push('Sale percentage must be a positive number between 0 and 100');
     }
 
     const allowedType = ['Custom', 'Sample'];
@@ -82,11 +68,8 @@ const validateInputData = (data) => {
 
 const createJewelry = async (req, res) => {
     try {
-        let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, on_sale, sale_percentage, available } = req.body;
+        let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, available } = req.body;
 
-        if (gemstone_id) gemstone_id = gemstone_id.trim();
-        if (material_id) material_id = material_id.trim();
-        if (subgemstone_id) subgemstone_id = subgemstone_id.trim();
         const emptyFieldsError = validateEmptyFields(req.body);
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
@@ -95,10 +78,6 @@ const createJewelry = async (req, res) => {
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
-        }
-
-        if (on_sale === 'false') {
-            sale_percentage = 0;
         }
 
         const images = [];
@@ -130,15 +109,11 @@ const createJewelry = async (req, res) => {
             name,
             description,
             price,
-            // gemstone_id,
             material_id,
             material_weight,
-            //subgemstone_id,
             subgemstone_quantity,
             category,
             type,
-            on_sale,
-            sale_percentage,
             available,
             images,
             image_public_ids
@@ -167,15 +142,11 @@ const createJewelry = async (req, res) => {
 
 const updateJewelry = async (req, res) => {
     try {
-        let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, on_sale, sale_percentage, available } = req.body;
+        let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, available } = req.body;
         
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
-        }
-
-        if (on_sale === 'false') {
-            sale_percentage = 0;
         }
 
         const existingJewelry = await Jewelry.findById(req.params.id);
@@ -187,15 +158,13 @@ const updateJewelry = async (req, res) => {
         if (name) updateData.name = name;
         if (description) updateData.description = description;
         if (price) updateData.price = price;
-        if (gemstone_id) updateData.gemstone_id = gemstone_id ? gemstone_id.trim() : null;
+        if (gemstone_id && gemstone_id !== 'undefined') updateData.gemstone_id = gemstone_id ? gemstone_id.trim() : null;
         if (material_id) updateData.material_id = material_id ? material_id.trim() : null;
         if (material_weight) updateData.material_weight = material_weight;
-        if (subgemstone_id) updateData.subgemstone_id = subgemstone_id ? subgemstone_id.trim() : null;
-        if (subgemstone_quantity) updateData.subgemstone_quantity = subgemstone_quantity;
+        if (subgemstone_id && subgemstone_id !== 'undefined') updateData.subgemstone_id = subgemstone_id ? subgemstone_id.trim() : null;
+        if (subgemstone_quantity && subgemstone_quantity !== 'undefined') updateData.subgemstone_quantity = subgemstone_quantity;
         if (category) updateData.category = category;
         if (type) updateData.type = type;
-        if (on_sale) updateData.on_sale = on_sale;
-        if (sale_percentage) updateData.sale_percentage = sale_percentage;
         if (available) updateData.available = available;
 
         // Initialize updateData.images and updateData.image_public_ids as arrays
@@ -247,7 +216,7 @@ const updateJewelry = async (req, res) => {
 };
 
 const getJewelries = async (req, res) => {
-    const { name, available, category, type, on_sale, sortByPrice, sortBySalePercentage, sortByName, page = 1, limit = 12 } = req.query;
+    const { name, available, category, type, sortByPrice, sortByName, page = 1, limit = 12 } = req.query;
 
     try {
         let query = {};
@@ -260,9 +229,6 @@ const getJewelries = async (req, res) => {
         if (type) {
             query.type = new RegExp(type, 'i');
         }
-        if (on_sale !== undefined && on_sale !== '') {
-            query.on_sale = on_sale === 'true'; // Convert string to boolean
-        }
         if (available !== undefined && available !== '') {
             query.available = available === 'true';
         }
@@ -273,13 +239,6 @@ const getJewelries = async (req, res) => {
                 sort.price = 1; // ascending
             } else if (sortByPrice === 'desc') {
                 sort.price = -1; // descending
-            }
-        }
-        if (sortBySalePercentage) {
-            if (sortBySalePercentage === 'asc') {
-                sort.sale_percentage = 1; // ascending
-            } else if (sortBySalePercentage === 'desc') {
-                sort.sale_percentage = -1; // descending
             }
         }
         if (sortByName) {

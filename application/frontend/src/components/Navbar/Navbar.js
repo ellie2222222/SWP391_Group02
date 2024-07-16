@@ -220,11 +220,6 @@ const Navbar = () => {
                 </Link>
               </Grid>
               <Grid item xs>
-                <Link to="/products?on_sale=true&page=1">
-                  <CustomButton>Sales</CustomButton>
-                </Link>
-              </Grid>
-              <Grid item xs>
                 <Box
                   sx={{
                     position: "relative",
