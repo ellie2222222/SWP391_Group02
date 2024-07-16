@@ -62,7 +62,16 @@ const requestSchema = new Schema({
     final_paid: {
         type: Boolean,
         default: false
-    }
-}, { timestamps: true });
+    },
+    user_feedback_quote: {
+        type: Array
+    },
+    user_feedback_design: {
+        type: Array
+    },
+    manager_feedback_quote: {
+        type: Array
+    },
+}, {timestamps: true})
 
 module.exports = mongoose.model('Request', requestSchema);
