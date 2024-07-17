@@ -25,7 +25,7 @@ const CustomTextField = styled(TextField)({
   width: '100%',
   marginBottom: '1rem',
   "& .MuiOutlinedInput-root": {
-    fontSize: '1.2rem',
+    fontSize: '1.3rem',
     "&:hover fieldset": {
       borderColor: "#b48c72",
     },
@@ -34,7 +34,7 @@ const CustomTextField = styled(TextField)({
     },
   },
   "& .MuiInputLabel-root": {
-    fontSize: '1.2rem',
+    fontSize: '1.3rem',
     "&.Mui-focused": {
       color: "#b48c72",
     },
@@ -49,7 +49,7 @@ const CustomButton = styled(Button)({
   '&:hover': {
     backgroundColor: '#8e735c',
   },
-  fontSize: '1rem',
+  fontSize: '1.3rem',
 });
 
 const CustomLink = styled(Link)({
@@ -90,8 +90,13 @@ const Signup = () => {
 
   return (
     <CustomContainer container>
+      <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Typography variant="h4" sx={{ position: 'absolute', top: 10, left: 10 }}>
+          Home
+        </Typography>
+      </Link>
       <FormContainer item>
-        <Typography variant="h4" align="center" style={{fontSize: '2.2rem', fontWeight: 'bold'}} gutterBottom>
+        <Typography variant="h4" align="center" style={{ fontSize: '2.2rem', fontWeight: 'bold' }} gutterBottom>
           Sign Up
         </Typography>
         <form onSubmit={handleSubmit}>
@@ -141,7 +146,7 @@ const Signup = () => {
           </CustomButton>
           {error && <Typography color="error" style={{ marginTop: '16px' }}>{error}</Typography>}
         </form>
-        <Typography variant="body2" align="center" style={{ marginTop: '1rem' , fontSize: '1.3rem'}}>
+        <Typography variant="body2" align="center" style={{ marginTop: '1rem', fontSize: '1.3rem' }}>
           Already have an account? <CustomLink to="/login" style={{ color: '#b48c72', fontWeight: 'bold', fontSize: '1.3rem' }}>Sign in</CustomLink>
         </Typography>
       </FormContainer>

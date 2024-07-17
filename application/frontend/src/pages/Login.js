@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box, Grid, Paper, IconButton, InputAdornment } from '@mui/material';
-import { fontSize, styled } from '@mui/system';
+import { styled } from '@mui/system';
 import useAuth from '../hooks/useAuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
@@ -37,7 +37,7 @@ const CustomButton = styled(Button)({
   '&:hover': {
     backgroundColor: '#8e735c',
   },
-  fontSize: '1rem',
+  fontSize: '1.3rem',
 });
 
 const CustomTypography = styled(Typography)({
@@ -66,7 +66,7 @@ const CustomTextField = styled(TextField)({
   width: '100%',
   marginBottom: '1rem',
   "& .MuiOutlinedInput-root": {
-    fontSize: '1.2rem',
+    fontSize: '1.3rem',
     "&:hover fieldset": {
       borderColor: "#b48c72",
     },
@@ -75,7 +75,7 @@ const CustomTextField = styled(TextField)({
     },
   },
   "& .MuiInputLabel-root": {
-    fontSize: '1.2rem',
+    fontSize: '1.3rem',
     "&.Mui-focused": {
       color: "#b48c72",
     },
@@ -114,14 +114,19 @@ const Login = () => {
   }
 
   return (
-    <CustomContainer maxWidth={false}>
-      <Grid container style={{ height: '100vh', margin: 0, padding: 0 }}>
-        <Grid item xs={12} md={5} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingLeft: 150, margin: 0 }}>
-          <FormContainer elevation={3} style={{ height: '100%' }}>
-            <CustomTypography variant="h6" align="center" style={{fontSize: '2.1rem'}}>
+    <CustomContainer maxWidth={false} sx={{ position: 'relative' }}>
+      <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Typography variant="h4" sx={{ position: 'absolute', top: 10, left: 10 }}>
+          Home
+        </Typography>
+      </Link>
+      <Grid container style={{ height: '100vh', margin: 0, padding: 0 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingLeft: { md: 10, xs: 2 }, margin: 0, height: '400px' }}>
+          <FormContainer elevation={3} sx={{ height: '100%' }}>
+            <CustomTypography variant="h6" align="center" sx={{ fontSize: '2.1rem' }}>
               WELCOME TO OUR JEWELRY SHOP
             </CustomTypography>
-            <SubtitleTypography variant="subtitle1" align="center" style={{fontSize: '1.5rem'}}>
+            <SubtitleTypography variant="subtitle1" align="center" sx={{ fontSize: '1.5rem' }}>
               Let's get started with our jewelry shop
             </SubtitleTypography>
             <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -153,18 +158,18 @@ const Login = () => {
                 LOGIN
               </CustomButton>
               {error && (
-                <Typography color="error" align="center" style={{ marginTop: '1rem', fontSize: '1rem' }}>
+                <Typography color="error" align="center" sx={{ marginTop: '1rem', fontSize: '1rem' }}>
                   {error}
                 </Typography>
               )}
             </form>
-            <CustomLink style={{fontSize: '1.5rem'}} to="/forgot-password">Forgot Password?</CustomLink>
-            <Typography variant="body2" align="center" style={{ marginTop: '1rem' , fontSize: '1.3rem'}}>
+            <CustomLink sx={{ fontSize: '1.5rem' }} to="/forgot-password">Forgot Password?</CustomLink>
+            <Typography variant="body2" align="center" sx={{ marginTop: '1rem', fontSize: '1.3rem' }}>
               Don't have an account? <Link to="/signup" style={{ color: '#b48c72', fontWeight: 'bold', fontSize: '1.3rem' }}>Sign up</Link>
             </Typography>
           </FormContainer>
         </Grid>
-        <Grid item xs={12} md={7} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingRight: 150, margin: 0 }}>
+        <Grid item xs={12} md={7} sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center', alignItems: 'center', paddingRight: { md: 10, xs: 0 }, margin: 0 }}>
           <Box
             component="img"
             src="https://hips.hearstapps.com/hmg-prod/images/treasure-royalty-free-image-1689115852.jpg?crop=0.66667xw:1xh;center,top&resize=1200:*"

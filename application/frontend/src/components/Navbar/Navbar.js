@@ -8,7 +8,7 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import { styled } from "@mui/system";
+import { border, borderRadius, styled } from "@mui/system";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -28,6 +28,7 @@ import { Typography } from "@mui/material";
 import ArticleIcon from '@mui/icons-material/Article';
 import SellIcon from '@mui/icons-material/Sell';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import { Search } from '@mui/icons-material';
 
 const CustomAppBar = styled(AppBar)({
   backgroundColor: "#fff",
@@ -80,12 +81,34 @@ const CustomIconButton = styled(IconButton)({
 });
 
 const CustomTextField = styled(TextField)({
-  width: "200px",
-  borderRadius: "30px",
+  width: '100%',
   variant: "outlined",
   padding: "0",
-  "& fieldset": {
-    borderRadius: "30px",
+  borderRadius: '30px',
+  "&  fieldset": {
+    borderRadius: '30px',
+  },
+  "& .MuiOutlinedInput-root": {
+      fontSize: '1.3rem',
+      "&:hover fieldset": {
+          borderColor: "#b48c72",
+      },
+      "&.Mui-focused fieldset": {
+          borderColor: "#b48c72",
+      },
+  },
+  "& .MuiInputLabel-root": {
+      fontSize: '1.3rem',
+      "&.Mui-focused": {
+          color: "#b48c72",
+      },
+  },
+});
+
+const StyledIconButton = styled(IconButton)({
+  color: '#b48c72',
+  '&:hover': {
+      color: '#8e735c',
   },
 });
 
@@ -119,6 +142,12 @@ const Navbar = () => {
 
   const handleServiceToggle = () => {
     setServiceOpen(!serviceOpen);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      navigate(`/products?name=${search}`)
+    }
   };
 
   const handleLogOut = () => {
@@ -170,11 +199,18 @@ const Navbar = () => {
                   </CustomLink>
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
-                  <ListItemText primary="Sales" />
+                  <CustomLink to="/warranty-policy">
+                    <ListItemText primary="Warranty Policy" />
+                  </CustomLink>
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
-                  <CustomLink to="">
-                    <ListItemText primary="Service" />
+                  <CustomLink to="/exchange-policy">
+                    <ListItemText primary="Exchange Policy" />
+                  </CustomLink>
+                </CustomListItem>
+                <CustomListItem button onClick={handleDrawerClose}>
+                  <CustomLink to="/gold-price">
+                    <ListItemText primary="Gold Price Today" />
                   </CustomLink>
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
@@ -187,11 +223,42 @@ const Navbar = () => {
                     <SearchIcon style={{ fontSize: "1.6rem" }} />
                   </ListItemIcon>
                 </CustomListItem>
-                <CustomListItem button onClick={handleDrawerClose}>
-                  <ListItemIcon>
-                    <AccountCircleIcon style={{ fontSize: "1.6rem" }} />
-                  </ListItemIcon>
-                </CustomListItem>
+                {user ? (
+                  <>
+                    <CustomIconButton color="inherit" onClick={handleMenuOpen}>
+                      <AccountCircleIcon fontSize="2.6rem" />
+                    </CustomIconButton>
+                    {allowRole.includes(user.role) ? (
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                      >
+                        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+                        <MenuItem component={Link} to={`/admin`} onClick={handleMenuClose}>
+                          Dashboard
+                        </MenuItem>
+                      </Menu>
+                    ) : (
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose}
+                      >
+                        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+                        <MenuItem component={Link} to={`/profile/${user._id}`} onClick={handleMenuClose}>
+                          Profile
+                        </MenuItem>
+                      </Menu>
+                    )}
+                  </>
+                ) : (
+                  <Link to="/login">
+                    <CustomIconButton color="inherit">
+                      <AccountCircleIcon fontSize="2.6rem" />
+                    </CustomIconButton>
+                  </Link>
+                )}
               </List>
             </Drawer>
           </>
@@ -284,15 +351,14 @@ const Navbar = () => {
                 size="normal"
                 label="Search..."
                 value={search}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                }}
+                onChange={(event) => setSearch(event.target.value)}
+                onKeyDown={handleKeyDown}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <CustomIconButton color="inherit">
-                        <SearchIcon fontSize="2.6rem" />
-                      </CustomIconButton>
+                      <StyledIconButton color="inherit" onClick={() => navigate(`/products?name=${search}`)}>
+                        <Search fontSize="large" />
+                      </StyledIconButton>
                     </InputAdornment>
                   ),
                 }}

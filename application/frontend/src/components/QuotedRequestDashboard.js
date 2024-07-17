@@ -44,7 +44,6 @@ export default function QuotedRequestDashBoard() {
             
             setRequests(response.data.requests);
             setTotalPages(response.data.totalPages);
-            console.log(response.data)
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
         }

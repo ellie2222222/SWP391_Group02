@@ -280,8 +280,6 @@ const resetProfilePassword = async (req, res) => {
 const refreshToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
-  console.log("refresh:", refreshToken);
-
   if (!refreshToken) return res.sendStatus(401);
 
   jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
@@ -291,10 +289,6 @@ const refreshToken = async (req, res) => {
     // const currentTime = new Date().toLocaleString(); // Get current time
 
     res.json({ token, existToken: true });
-    // console.log("access:", token);
-    // // Log token creation time and expiration
-    // console.log(`Token created at: ${currentTime}`);
-    // console.log(`Token expires at: ${new Date(decoded.exp * 1000).toLocaleString()}`);
   });
 };
 

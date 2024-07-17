@@ -75,7 +75,6 @@ const DashboardContent = () => {
     } finally {
       if (response) setLoading(false);
     }
-    console.log(loading)
   };
 
   const fetchTotalRevenue = async () => {

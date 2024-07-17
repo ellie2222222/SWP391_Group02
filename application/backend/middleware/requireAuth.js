@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const requireAuth = async (req, res, next) => {
     const { authorization } = req.headers;
-    console.log(authorization)
+
     if (!authorization) {
         return res.status(401).json({ error: 'Authorization token required' });
     }
@@ -18,7 +18,7 @@ const requireAuth = async (req, res, next) => {
         }
 
         req.role = role;
-        req.id = _id; // Fixing the variable name from `id` to `_id`
+        req.id = _id;
         next();
     } catch (error) {
         console.error('Error verifying token:', error);
