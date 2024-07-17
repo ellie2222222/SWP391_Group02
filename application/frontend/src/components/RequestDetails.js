@@ -42,7 +42,6 @@ const RequestDetails = () => {
             try {
                 const response = await axiosInstance.get(`/requests/${fetchApi}`);
                 setRequest(response.data)
-                console.log(response.data)
                 setError('')
                 setLoading(false);
             } catch (error) {

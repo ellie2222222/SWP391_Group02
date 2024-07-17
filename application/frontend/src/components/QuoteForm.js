@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { styled } from '@mui/system';
 import JewelryForm from './JewelryForm'; // Adjust the import path as needed
 import axiosInstance from '../utils/axiosInstance';
+import { toast } from 'react-toastify';
 
 const CustomTextField = styled(TextField)({
     '& label.Mui-focused': {
@@ -142,11 +143,21 @@ export default function QuoteForm({ initialValues, onSubmit }) {
             }
 
             setJewelryId(response.data._id);
+            toast.success('Jewelry saved successfully', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
             formik.setFieldValue('jewelry_id', response.data._id);
             setSelectedJewelry(response.data);
             setIsJewelryFormOpen(false);
         } catch (error) {
             console.error('Failed to submit jewelry form', error);
+            toast.error(error.response.data.error || 'Jewelry saved fail', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         }
     };
 

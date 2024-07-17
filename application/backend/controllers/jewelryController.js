@@ -54,7 +54,7 @@ const validateInputData = (data) => {
     if (material_weight != null && (!Number.isFinite(material_weight) || material_weight <= 0)) {
         validationErrors.push('Material weight must be a positive number');
     }
-    if (subgemstone_quantity != null && subgemstone_quantity !== 'undefined' && (!Number.isInteger(subgemstone_quantity) || subgemstone_quantity < 0)) {
+    if (subgemstone_quantity != null && subgemstone_quantity !== 'undefined' && !Number.isInteger(subgemstone_quantity) && subgemstone_quantity < 0) {
         validationErrors.push('Sub gemstone quantity must be a positive number');
     }
 

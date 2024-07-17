@@ -201,7 +201,8 @@ const createRequest = async (req, res) => {
     warranty_start_date: null,
     warranty_end_date: null,
     deposit_paid: false,
-    final_paid: false
+    final_paid: false,
+    status_history: [{ status: 'pending', timestamp: new Date() }]
   };
 
   // Add to the database
@@ -239,23 +240,16 @@ const updateRequest = async (req, res) => {
     }
 
     // Retrieve the existing request
-    let existingRequest = await Request.findById(id);
+    const existingRequest = await Request.findById(id);
     if (!existingRequest) {
       return res.status(404).json({ error: "No such request" });
     }
 
-    // Validate jewelry id and check if it already exists in another request
+    // Validate jewelry ID
     if (jewelry_id) {
       const jewelry = await Jewelry.findById(jewelry_id);
       if (!jewelry) {
         return res.status(404).json({ error: 'No such jewelry' });
-      }
-
-      if (existingRequest.jewelry_id && !existingRequest.jewelry_id.equals(jewelry._id)) {
-        const existingJewelry = await Request.findOne({ jewelry_id: jewelry._id });
-        if (existingJewelry) {
-          return res.status(400).json({ error: "This jewelry already exists in another request" });
-        }
       }
     }
 
@@ -265,40 +259,42 @@ const updateRequest = async (req, res) => {
       return res.status(400).json({ error: "Invalid request status" });
     }
 
-    // Validate quote amount
-    if (quote_amount != null && (typeof Number(quote_amount) !== 'number' || quote_amount <= 0)) {
+    // Validate amounts
+    if (quote_amount != null && (typeof quote_amount !== 'number' || quote_amount <= 0)) {
       return res.status(400).json('Quote amount must be a positive number');
     }
 
-    // Validate production cost
-    if (production_cost != null && (typeof Number(production_cost) !== 'number' || production_cost <= 0)) {
+    if (production_cost != null && (typeof production_cost !== 'number' || production_cost <= 0)) {
       return res.status(400).json('Production cost must be a positive number');
     }
 
-    // Validate and parse dates if provided
-    let parsedStartDate = production_start_date ? new Date(production_start_date) : existingRequest.production_start_date;
+    // Validate and parse dates
+    const parseDate = (date) => new Date(date);
+    
+    let parsedStartDate = production_start_date ? parseDate(production_start_date) : existingRequest.production_start_date;
+    let parsedEndDate = production_end_date ? parseDate(production_end_date) : existingRequest.production_end_date;
+    let parsedEndAt = endedAt ? parseDate(endedAt) : existingRequest.endedAt;
+    let parsedWarrantyStartDate = warranty_start_date ? parseDate(warranty_start_date) : existingRequest.warranty_start_date;
+    let parsedWarrantyEndDate = warranty_end_date ? parseDate(warranty_end_date) : existingRequest.warranty_end_date;
+
     if (production_start_date && isNaN(parsedStartDate)) {
       return res.status(400).json({ error: "Invalid production start date" });
     }
 
-    let parsedEndDate = production_end_date ? new Date(production_end_date) : existingRequest.production_end_date;
     if (production_end_date && isNaN(parsedEndDate)) {
       return res.status(400).json({ error: "Invalid production end date" });
     }
 
-    let parsedEndAt = endedAt ? new Date(endedAt) : existingRequest.endedAt;
     if (endedAt && (isNaN(parsedEndAt) || parsedEndAt <= existingRequest.createdAt)) {
       return res.status(400).json({ error: "End date must be valid and after creation date" });
     }
 
-    let parsedWarrantyEndDate = warranty_end_date ? new Date(warranty_end_date) : existingRequest.warranty_end_date;
-    if (warranty_end_date && isNaN(parsedWarrantyEndDate)) {
-      return res.status(400).json({ error: "Invalid warranty end date" });
-    }
-
-    let parsedWarrantyStartDate = warranty_start_date ? new Date(warranty_start_date) : existingRequest.warranty_start_date;
     if (warranty_start_date && isNaN(parsedWarrantyStartDate)) {
       return res.status(400).json({ error: "Invalid warranty start date" });
+    }
+
+    if (warranty_end_date && isNaN(parsedWarrantyEndDate)) {
+      return res.status(400).json({ error: "Invalid warranty end date" });
     }
 
     // Handle design_images upload
@@ -317,11 +313,21 @@ const updateRequest = async (req, res) => {
           streamifier.createReadStream(file.buffer).pipe(uploadStream);
         });
       });
-
       await Promise.all(uploadPromises);
     }
 
-    // Only update fields that are provided
+    // Update status history
+    if (request_status) {
+      const now = new Date();
+      const statusIndex = existingRequest.status_history.findIndex(entry => entry.status === request_status);
+      if (statusIndex !== -1) {
+        existingRequest.status_history[statusIndex].timestamp = now;
+      } else {
+        existingRequest.status_history.push({ status: request_status, timestamp: now });
+      }
+    }
+
+    // Prepare update fields
     const updateFields = {
       ...(jewelry_id !== undefined && { jewelry_id }),
       ...(request_description !== undefined && { request_description }),
@@ -336,10 +342,11 @@ const updateRequest = async (req, res) => {
       ...(warranty_content !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_content }),
       ...(warranty_start_date !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_start_date: parsedWarrantyStartDate }),
       ...(warranty_end_date !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_end_date: parsedWarrantyEndDate }),
+      ...existingRequest.status_history.length && { status_history: existingRequest.status_history },
     };
 
-    // Apply initial updates
-    let updatedRequest = await Request.findByIdAndUpdate(
+    // Update the request
+    const updatedRequest = await Request.findByIdAndUpdate(
       id,
       { $set: updateFields },
       { new: true, runValidators: true }
@@ -355,6 +362,7 @@ const updateRequest = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const createOrderRequest = async (req, res) => {
   const { authorization } = req.headers;
@@ -376,7 +384,7 @@ const createOrderRequest = async (req, res) => {
     // Initialize all fields with default or null values
     const newRequest = {
       user_id: _id,
-      request_description: 'order request',
+      request_description: 'Sample Request',
       jewelry_id,
       request_status: 'pending',
       quote_content: null,
@@ -392,6 +400,7 @@ const createOrderRequest = async (req, res) => {
       design_images: [],
       deposit_paid: null,
       final_paid: null,
+      status_history: [{ status: 'pending', timestamp: new Date() }],
     };
 
     // Add to the database

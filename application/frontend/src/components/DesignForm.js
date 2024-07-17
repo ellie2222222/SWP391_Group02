@@ -90,8 +90,12 @@ export default function DesignForm({ initialValues, onSubmit }) {
                     formData.append(key, initialValues.jewelry_id[key]);
                 }
             });
-
-            onSubmit(initialValues, formData);
+            try {
+                await onSubmit(initialValues, formData);
+            } catch (error) {
+                console.error(error)
+                toast.error(error)
+            }
             setLoading(false);
         },
     });
@@ -199,7 +203,6 @@ export default function DesignForm({ initialValues, onSubmit }) {
                     </CustomButton1>
                 </DialogActions>
             </Dialog>
-            <ToastContainer />
         </Container>
     );
 }

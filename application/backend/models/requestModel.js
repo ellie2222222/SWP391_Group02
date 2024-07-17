@@ -2,6 +2,20 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+// Sub-schema for status history
+const statusHistorySchema = new Schema({
+    status: {
+        type: String,
+        required: true,
+        enum: ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design', 'production', 'warranty', 'payment', 'cancelled', 'rejected_quote']
+    },
+    timestamp: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+});
+
 const requestSchema = new Schema({
     user_id: { 
         type: mongoose.Schema.Types.ObjectId, 
@@ -22,6 +36,7 @@ const requestSchema = new Schema({
         enum: ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design', 'production', 'warranty', 'payment', 'cancelled', 'rejected_quote'],
         default: 'pending'
     },
+    status_history: [statusHistorySchema],
     quote_content: {
         type: String
     },
@@ -72,6 +87,6 @@ const requestSchema = new Schema({
     manager_feedback_quote: {
         type: Array
     },
-}, {timestamps: true})
+}, {timestamps: true});
 
 module.exports = mongoose.model('Request', requestSchema);

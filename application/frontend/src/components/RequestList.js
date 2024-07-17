@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CardMedia, Container, Box, Typography, Button, CircularProgress, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import Check from '@mui/icons-material/Check';
 
 const CustomButton1 = styled(Button)({
@@ -46,12 +46,12 @@ const CustomStepIconRoot = styled('div')(({ theme, ownerState }) => ({
     alignItems: 'center',
     justifyContent: 'center',
     color: 'white',
-    fontSize: '14px', // Number size
+    fontSize: '14px',
   },
 }));
 
 function CustomStepIcon(props) {
-  const { active, completed, className, icon, status  } = props;
+  const { active, completed, className, icon, status } = props;
 
   return (
     <CustomStepIconRoot ownerState={{ active }} className={className}>
@@ -114,10 +114,10 @@ const RequestList = () => {
       let price;
       if (type === 'deposit') {
         price = request.quote_amount * 10 / 100;
-      } else if (type ==='final') {
-        price = request.quote_amount * 90 / 100
+      } else if (type === 'final') {
+        price = request.quote_amount * 90 / 100;
       }
-      
+
       const payment = await axiosInstance.post('/payment', {
         user_info: userResponse.data,
         product: request.jewelry_id,
@@ -159,7 +159,7 @@ const RequestList = () => {
         {requests.map((request, index) => (
           <Card key={index} variant="outlined" sx={{ marginBottom: '20px' }}>
             <CardContent>
-              <Typography variant="h5" component="p" marginBottom="20px">Request #{index + 1}</Typography>
+              <Typography variant="h5" component="p" mb={2}>Request #{index + 1}</Typography>
               <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
               <Typography variant="h5" sx={{ textTransform: 'capitalize' }}>Status: {request.request_status}</Typography>
               <Typography variant="h5">Type: {request.jewelry_id ? request.jewelry_id.type : 'Custom'}</Typography>
@@ -169,23 +169,30 @@ const RequestList = () => {
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                 Quote Amount: {request.quote_amount ? request.quote_amount.toLocaleString() + '₫' : 'Awaiting Quote Amount'}
               </Typography>
-              <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
-
-              </Typography>
-              <Stepper activeStep={getStatusStep(request.request_status)} alternativeLabel sx={{ marginTop: '20px' }}>
-                {steps.map((label, stepIndex) => (
-                  <Step key={label}>
-                    <CustomStepLabel StepIconComponent={(props) => <CustomStepIcon {...props} status={request.request_status} icon={stepIndex + 1} />}>{label === 'accepted' ? 'quote accepted' : label}</CustomStepLabel>
-                  </Step>
-                ))}
-              </Stepper>
+              <Box my={1}>
+                <Typography variant="h5">Tracking Status:</Typography>
+                <Stepper activeStep={getStatusStep(request.request_status)} alternativeLabel sx={{ marginTop: '20px' }}>
+                  {steps.map((label, stepIndex) => {
+                    const statusEntry = request.status_history.find(entry => entry.status === label);
+                    const timestamp = statusEntry ? new Date(statusEntry.timestamp).toLocaleDateString() : '';
+                    return (
+                      <Step key={label}>
+                        <CustomStepLabel 
+                          StepIconComponent={(props) => <CustomStepIcon {...props} status={request.request_status} icon={stepIndex + 1} />}
+                        >
+                          {label === 'accepted' ? 'quote accept' : label} 
+                        </CustomStepLabel>
+                        <Typography variant='h6' align='center' mt={1} sx={{fontWeight: '300'}}>{timestamp && `${timestamp}`} </Typography>
+                      </Step>
+                    );
+                  })}
+                </Stepper>
+              </Box>
             </CardContent>
             <CardActions>
               <CustomButton1 onClick={() => handleDetailsDialog(request)}>View Detail</CustomButton1>
               {request.request_status === 'accepted' && (
-                <>
-                  <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
-                </>
+                <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
               )}
               {request.request_status === 'payment' && (
                 <CustomButton1 onClick={() => handlePayment(request, 'final')}>Payment</CustomButton1>
@@ -204,17 +211,25 @@ const RequestList = () => {
       {/* Dialog for Request Details */}
       {selectedRequest && (
         <Dialog open={isDetailsDialogOpen} onClose={() => setIsDetailsDialogOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle>Request Details</DialogTitle>
+          <DialogTitle variant='h4' align='center' gutterBottom>Request Details</DialogTitle>
           <DialogContent>
             <Stepper activeStep={getStatusStep(selectedRequest.request_status)} alternativeLabel>
-              {steps.map((label, stepIndex) => (
-                <Step key={label}>
-                  <CustomStepLabel StepIconComponent={(props) => <CustomStepIcon {...props} status={selectedRequest.request_status} icon={stepIndex + 1} />}>{label === 'accepted' ? 'quote accepted' : label}</CustomStepLabel>
-                </Step>
-              ))}
+              {steps.map((label, stepIndex) => {
+                const statusEntry = selectedRequest.status_history.find(entry => entry.status === label);
+                const timestamp = statusEntry ? new Date(statusEntry.timestamp).toLocaleDateString() : '';
+                return (
+                  <Step key={label}>
+                    <CustomStepLabel 
+                      StepIconComponent={(props) => <CustomStepIcon {...props} status={selectedRequest.request_status} icon={stepIndex + 1} />}
+                    >
+                      {label === 'accepted' ? 'quote accept' : label} {timestamp && `(${timestamp})`}
+                    </CustomStepLabel>
+                  </Step>
+                );
+              })}
             </Stepper>
             <Typography variant="h5" component="p" marginTop="20px">
-              Request ID: {selectedRequest._id}
+              {selectedRequest.request_description}
             </Typography>
             <Typography variant="h5" component="p">
               Status: {selectedRequest.request_status}
@@ -258,7 +273,7 @@ const RequestList = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setIsDetailsDialogOpen(false)} color="primary">
+            <Button onClick={() => setIsDetailsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72'}}>
               Close
             </Button>
           </DialogActions>

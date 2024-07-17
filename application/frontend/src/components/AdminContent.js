@@ -223,7 +223,11 @@ const AdminContent = () => {
             setIsDialogOpen(false);
         } catch (error) {
             console.error("There was an error saving the jewelry!", error);
-            toast.error(error.response?.data?.error || error.message);
+            toast.error(error.response?.data?.error || error.message, {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } finally {
             setLoading(false);
         }

@@ -4,6 +4,8 @@ import axiosInstance from '../utils/axiosInstance';
 import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import QuoteForm from './QuoteForm';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -55,9 +57,19 @@ export default function SaleStaffDashboard() {
         try {
             await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
             setIsDialogOpen(false);
+            toast.success('Request update successfully', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
             fetchRequests();
         } catch (error) {
             console.error("There was an error saving the request!", error);
+            toast.error('Request update fail', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         }
     };
 
@@ -70,22 +82,7 @@ export default function SaleStaffDashboard() {
         setIsDetailDialogOpen(true);
         setSelectedRequest(request);
     };
-
-    const handleDeleteClick = (request) => {
-        setSelectedRequest(request);
-        setIsDeleteDialogOpen(true);
-    };
-
-    const handleDeleteConfirm = async () => {
-        try {
-            await axiosInstance.delete(`/requests/${selectedRequest._id}`);
-            fetchRequests();
-            setIsDeleteDialogOpen(false);
-        } catch (error) {
-            console.error("There was an error deleting the request!", error);
-        }
-    };
-
+    
     useEffect(() => {
         fetchRequests();
     }, []);
@@ -119,9 +116,6 @@ export default function SaleStaffDashboard() {
                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>
                                             <Add fontSize="large" sx={{ color: '#b48c72' }} />
                                         </IconButton>
-                                        <IconButton color="secondary" onClick={() => handleDeleteClick(request)}>
-                                            <Delete fontSize="large" sx={{ color: '#b48c72' }} />
-                                        </IconButton>
                                     </CustomTableCell>
                                 </TableRow>
                             )
@@ -147,22 +141,7 @@ export default function SaleStaffDashboard() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-            {/* Delete Confirmation Dialog */}
-            <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
-                <DialogTitle>Confirm Deletion</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body1" sx={{fontSize: '1.3rem', color: '#b48c72'}}>Are you sure you want to delete this request?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <CustomButton1 onClick={() => setIsDeleteDialogOpen(false)}>
-                        Cancel
-                    </CustomButton1>
-                    <CustomButton1 onClick={handleDeleteConfirm}>
-                        Delete
-                    </CustomButton1>
-                </DialogActions>
-            </Dialog>
+            <ToastContainer />
         </Container>
     );
 }

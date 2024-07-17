@@ -192,10 +192,20 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
 
       try {
         await onSubmit(formData);
-        setLoading(false);
+        toast.success('Form submitted', {
+          autoClose: 5000, // Auto close after 5 seconds
+          closeOnClick: true,
+          draggable: true,
+      })
       } catch (error) {
-        setLoading(false);
+        console.error(error)
+        toast.error(error, {
+          autoClose: 5000, // Auto close after 5 seconds
+          closeOnClick: true,
+          draggable: true,
+      })
       }
+      setLoading(false);
     },
   });
 
@@ -642,7 +652,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
         </DialogActions>
       </Dialog>
 
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </Container>
   );
 };

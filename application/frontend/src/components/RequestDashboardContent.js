@@ -63,7 +63,6 @@ const RequestDashboardContent = () => {
 
     const [requests, setRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isJewelryDetailDialogOpen, setIsJewelryDetailDialogOpen] = useState(false);
     const [isQuoteDetailDialogOpen, setIsQuoteDetailDialogOpen] = useState(false);
@@ -88,6 +87,7 @@ const RequestDashboardContent = () => {
             setRequests(response.data.requests);
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total)
+            console.log(response.data.requests)
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
         } finally {
