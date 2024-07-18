@@ -3,7 +3,7 @@ const Invoice = require('../models/invoiceModel');
 const User = require('../models/userModel');
 const Request = require('../models/requestModel');
 const Transaction = require('../models/transactionModel');
-
+const ObjectId = mongoose.Types.ObjectId;
 // Helper function to validate ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -133,8 +133,14 @@ const getAllInvoices = async (req, res) => {
     // Create sort object
     const sort = {};
     if (sortBy) sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
-
+    
     try {
+        if (search) {
+            if (ObjectId.isValid(search)) {
+                filter._id = new ObjectId(search);
+            }
+        }
+
         // Fetch invoices with filters, sorting, and pagination
         const invoices = await Invoice.find(filter)
             .sort(sort)
@@ -146,7 +152,6 @@ const getAllInvoices = async (req, res) => {
                     path: 'request_id',
                     populate: {
                         path: 'user_id',
-                        match: search ? { email: { $regex: search, $options: 'i' } } : {}
                     }
                 }
             });

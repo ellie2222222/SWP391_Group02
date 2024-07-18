@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, styled, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Typography, styled, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, InputAdornment, TextField, Stack, Pagination } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Add, Search } from '@mui/icons-material';
 import QuoteForm from './QuoteForm';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSearchParams } from 'react-router-dom';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -23,6 +24,34 @@ const CustomTableCell = styled(TableCell)({
     fontSize: '1.3rem',
 });
 
+const CustomTextField = styled(TextField)({
+    width: '100%',
+    variant: "outlined",
+    padding: "0",
+    "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
+        "&:hover fieldset": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#b48c72",
+        },
+    },
+    "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+});
+
+const StyledIconButton = styled(IconButton)({
+    color: '#b48c72',
+    '&:hover': {
+        color: '#8e735c',
+    },
+});
+
 const DetailDialog = ({ open, onClose, request }) => (
     <Dialog open={open} onClose={onClose}>
         <DialogTitle variant='h5'>Request Details</DialogTitle>
@@ -38,6 +67,11 @@ const DetailDialog = ({ open, onClose, request }) => (
 );
 
 export default function SaleStaffDashboard() {
+    const [total, setTotal] = useState(0);
+    const [search, setSearch] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [requests, setRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -45,10 +79,21 @@ export default function SaleStaffDashboard() {
 
     const fetchRequests = async () => {
         try {
-            const response = await axiosInstance.get('/requests');
+            const response = await axiosInstance.get('/requests', {
+                params: {
+                    ...Object.fromEntries(searchParams),
+                },
+            });
             setRequests(response.data.requests);
+            setTotalPages(response.data.totalPages);
+            setTotal(response.data.total)
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
+            toast.error('There was an error fetching the requests!', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         }
     };
 
@@ -81,10 +126,43 @@ export default function SaleStaffDashboard() {
         setIsDetailDialogOpen(true);
         setSelectedRequest(request);
     };
-    
+
+    const updateQueryParams = (key, value, resetPage = false) => {
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (value) {
+            newSearchParams.set(key, value);
+        } else {
+            newSearchParams.delete(key);
+        }
+        if (resetPage) {
+            newSearchParams.set('page', '1');
+        }
+        setSearchParams(newSearchParams);
+    };
+
+    const handleSearchClick = () => {
+        updateQueryParams('search', search, true);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleSearchClick();
+        }
+    };
+
+    const handlePageChange = (event, newPage) => {
+        setPage(newPage);
+        updateQueryParams('page', newPage.toString());
+    };
+
+    useEffect(() => {
+        setSearch(searchParams.get('search') || '');
+        fetchRequests();
+    }, [searchParams]);
+
     useEffect(() => {
         fetchRequests();
-    }, []);
+    }, [searchParams, page]);
 
     const getTimestamp = (request) => {
         const status = request.status_history.find(history => history.status === 'pending');
@@ -93,6 +171,23 @@ export default function SaleStaffDashboard() {
 
     return (
         <Container>
+            <Box mb={2}>
+                <CustomTextField
+                    label="Search by request ID or email"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    onKeyDown={handleKeyDown}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <StyledIconButton color="inherit" onClick={handleSearchClick}>
+                                    <Search fontSize="large" />
+                                </StyledIconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </Box>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -128,9 +223,29 @@ export default function SaleStaffDashboard() {
                                 </TableRow>
                             )
                         ))}
+                        {requests.length === 0 && (
+                            <TableRow>
+                                <TableCell align='center' colSpan={9}>
+                                    <Typography variant="h6">No requests found</Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <Box display="flex" justifyContent="center" mt={2}>
+                <Stack spacing={2}>
+                    <Pagination
+                        size="large"
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                        showFirstButton
+                        showLastButton
+                    />
+                </Stack>
+            </Box>
 
             {/* Detail Dialog */}
             <DetailDialog open={isDetailDialogOpen} onClose={() => setIsDetailDialogOpen(false)} request={selectedRequest} />
@@ -149,7 +264,6 @@ export default function SaleStaffDashboard() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <ToastContainer />
         </Container>
     );
 }

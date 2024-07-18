@@ -99,12 +99,17 @@ const InvoiceDashboardContent = () => {
                     ...Object.fromEntries(searchParams),
                 },
             });
-            
+
             setInvoices(response.data.invoices);
             setTotal(response.data.totalInvoices);
             setTotalPages(response.data.totalPages);
         } catch (error) {
-            toast.error("There was an error fetching invoices!");
+            console.error(error)
+            toast.error("There was an error fetching invoices!", {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } finally {
             setLoading(false);
         }
@@ -124,6 +129,8 @@ const InvoiceDashboardContent = () => {
     };
 
     useEffect(() => {
+        setPaymentGateway(searchParams.get('payment_gateway') || '');
+        setPaymentMethod(searchParams.get('payment_method') || '');
         setSearch(searchParams.get('search') || '');
         setPage(parseInt(searchParams.get('page') || '1', 10));
     }, [searchParams]);
@@ -155,103 +162,103 @@ const InvoiceDashboardContent = () => {
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             <ToastContainer />
-            <Container>
-                <Box display="flex" mb={2} flexDirection="column">
-                    <Box mb={2}>
-                        <CustomTextField
-                            label="Search by email"
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            onKeyDown={handleKeyDown}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <StyledIconButton color="inherit" onClick={handleSearchClick}>
-                                            <Search fontSize="large" />
-                                        </StyledIconButton>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-                    <Box display="flex" mb={2}>
-                        <CustomFormControl>
-                            <InputLabel id="payment-method-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Payment Method</InputLabel>
-                            <Select
-                                labelId='payment-method-label'
-                                label='Payment Method'
-                                value={paymentMethod}
-                                onChange={(event) => {
-                                    setPaymentMethod(event.target.value);
-                                    handleFilterChange('payment_method', event.target.value);
-                                }}
-                            >
-                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
-                                <CustomMenuItem value="credit_card">Credit Card</CustomMenuItem>
-                                <CustomMenuItem value="domestic_card">Domestic Card</CustomMenuItem>
-                                <CustomMenuItem value="cash">Cash</CustomMenuItem>
-                                <CustomMenuItem value="other">Other</CustomMenuItem>
-                            </Select>
-                        </CustomFormControl>
-                        <CustomFormControl sx={{ ml: 2 }}>
-                            <InputLabel id="payment-gateway-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Payment Gateway</InputLabel>
-                            <Select
-                                labelId='payment-gateway-label'
-                                label='Payment Gateway'
-                                value={paymentGateway}
-                                onChange={(event) => {
-                                    setPaymentGateway(event.target.value);
-                                    handleFilterChange('payment_gateway', event.target.value);
-                                }}
-                            >
-                                <CustomMenuItem value=""><em>None</em></CustomMenuItem>
-                                <CustomMenuItem value="zalopay">ZaloPay</CustomMenuItem>
-                                <CustomMenuItem value="other">Other</CustomMenuItem>
-                            </Select>
-                        </CustomFormControl>
-                        <CustomFormControl sx={{ ml: 2 }}>
-                            <InputLabel id="sort-by-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By</InputLabel>
-                            <Select
-                                labelId='sort-by-label'
-                                label='Sort By'
-                                value={sortBy}
-                                onChange={(event) => {
-                                    setSortBy(event.target.value);
-                                    handleFilterChange('sortBy', event.target.value);
-                                }}
-                            >
-                                <CustomMenuItem value="createdAt">Date</CustomMenuItem>
-                                <CustomMenuItem value="total_amount">Amount</CustomMenuItem>
-                            </Select>
-                        </CustomFormControl>
-                        <CustomFormControl sx={{ ml: 2 }}>
-                            <InputLabel id="sort-order-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort Order</InputLabel>
-                            <Select
-                                labelId='sort-order-label'
-                                label='Sort Order'
-                                value={sortOrder}
-                                onChange={(event) => {
-                                    setSortOrder(event.target.value);
-                                    handleFilterChange('sortOrder', event.target.value);
-                                }}
-                            >
-                                <CustomMenuItem value="asc">Ascending</CustomMenuItem>
-                                <CustomMenuItem value="desc">Descending</CustomMenuItem>
-                            </Select>
-                        </CustomFormControl>
-                    </Box>
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+                    <CircularProgress/>
                 </Box>
-
-                <Box mb={2}>
-                    <Typography variant='h5'>There are a total of {total} result(s)</Typography>
-                </Box>
-
-                <TableContainer component={Paper}>
-                    {loading ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                            <CircularProgress size={24} />
+            ) : (
+                <Container>
+                    <Box display="flex" mb={2} flexDirection="column">
+                        <Box mb={2}>
+                            <CustomTextField
+                                label="Search by invoice ID"
+                                value={search}
+                                onChange={(event) => setSearch(event.target.value)}
+                                onKeyDown={handleKeyDown}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <StyledIconButton color="inherit" onClick={handleSearchClick}>
+                                                <Search fontSize="large" />
+                                            </StyledIconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
                         </Box>
-                    ) : (
+                        <Box display="flex" mb={2}>
+                            <CustomFormControl>
+                                <InputLabel id="payment-method-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Payment Method</InputLabel>
+                                <Select
+                                    labelId='payment-method-label'
+                                    label='Payment Method'
+                                    value={paymentMethod}
+                                    onChange={(event) => {
+                                        setPaymentMethod(event.target.value);
+                                        handleFilterChange('payment_method', event.target.value);
+                                    }}
+                                >
+                                    <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                    <CustomMenuItem value="credit_card">Credit Card</CustomMenuItem>
+                                    <CustomMenuItem value="domestic_card">Domestic Card</CustomMenuItem>
+                                    <CustomMenuItem value="cash">Cash</CustomMenuItem>
+                                    <CustomMenuItem value="other">Other</CustomMenuItem>
+                                </Select>
+                            </CustomFormControl>
+                            <CustomFormControl sx={{ ml: 2 }}>
+                                <InputLabel id="payment-gateway-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Payment Gateway</InputLabel>
+                                <Select
+                                    labelId='payment-gateway-label'
+                                    label='Payment Gateway'
+                                    value={paymentGateway}
+                                    onChange={(event) => {
+                                        setPaymentGateway(event.target.value);
+                                        handleFilterChange('payment_gateway', event.target.value);
+                                    }}
+                                >
+                                    <CustomMenuItem value=""><em>None</em></CustomMenuItem>
+                                    <CustomMenuItem value="zalopay">ZaloPay</CustomMenuItem>
+                                    <CustomMenuItem value="other">Other</CustomMenuItem>
+                                </Select>
+                            </CustomFormControl>
+                            <CustomFormControl sx={{ ml: 2 }}>
+                                <InputLabel id="sort-by-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort By</InputLabel>
+                                <Select
+                                    labelId='sort-by-label'
+                                    label='Sort By'
+                                    value={sortBy}
+                                    onChange={(event) => {
+                                        setSortBy(event.target.value);
+                                        handleFilterChange('sortBy', event.target.value);
+                                    }}
+                                >
+                                    <CustomMenuItem value="createdAt">Date</CustomMenuItem>
+                                    <CustomMenuItem value="total_amount">Amount</CustomMenuItem>
+                                </Select>
+                            </CustomFormControl>
+                            <CustomFormControl sx={{ ml: 2 }}>
+                                <InputLabel id="sort-order-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Sort Order</InputLabel>
+                                <Select
+                                    labelId='sort-order-label'
+                                    label='Sort Order'
+                                    value={sortOrder}
+                                    onChange={(event) => {
+                                        setSortOrder(event.target.value);
+                                        handleFilterChange('sortOrder', event.target.value);
+                                    }}
+                                >
+                                    <CustomMenuItem value="asc">Ascending</CustomMenuItem>
+                                    <CustomMenuItem value="desc">Descending</CustomMenuItem>
+                                </Select>
+                            </CustomFormControl>
+                        </Box>
+                    </Box>
+
+                    <Box mb={2}>
+                        <Typography variant='h5'>There are a total of {total} result(s)</Typography>
+                    </Box>
+
+                    <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -271,7 +278,7 @@ const InvoiceDashboardContent = () => {
                                             <CustomTableCell>{invoice.transaction_id?.request_id?.user_id?.email || 'N/A'}</CustomTableCell>
                                             <CustomTableCell sx={{ textTransform: 'capitalize' }}>{invoice.payment_method && capitalizeWords(invoice.payment_method)}</CustomTableCell>
                                             <CustomTableCell>{invoice.payment_gateway}</CustomTableCell>
-                                            <CustomTableCell>{invoice.createdAt &&  (new Date(invoice.createdAt)).toLocaleDateString()}</CustomTableCell>
+                                            <CustomTableCell>{invoice.createdAt && (new Date(invoice.createdAt)).toLocaleDateString()}</CustomTableCell>
                                             <CustomTableCell>{invoice.total_amount && invoice.total_amount.toLocaleString() + "₫"}</CustomTableCell>
                                         </TableRow>
                                     ))
@@ -284,22 +291,22 @@ const InvoiceDashboardContent = () => {
                                 )}
                             </TableBody>
                         </Table>
-                    )}
-                </TableContainer>
+                    </TableContainer>
 
-                <Box display="flex" justifyContent="center" marginTop="20px">
-                    <Stack spacing={2}>
-                        <Pagination
-                            size='large'
-                            count={totalPages}
-                            page={page}
-                            onChange={handlePageChange}
-                            showFirstButton
-                            showLastButton
-                        />
-                    </Stack>
-                </Box>
-            </Container>
+                    <Box display="flex" justifyContent="center" marginTop="20px">
+                        <Stack spacing={2}>
+                            <Pagination
+                                size='large'
+                                count={totalPages}
+                                page={page}
+                                onChange={handlePageChange}
+                                showFirstButton
+                                showLastButton
+                            />
+                        </Stack>
+                    </Box>
+                </Container>
+            )}
         </Box>
     );
 };

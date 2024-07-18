@@ -4,13 +4,14 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const streamifier = require('streamifier');
 const { cloudinary } = require('../cloudinary');
+const ObjectId = mongoose.Types.ObjectId;
 
 // get all requests
 const getRequests = async (req, res) => {
-  const { request_status, page = 1, limit = 10 } = req.query;
+  const { search, request_status, page = 1, limit = 10 } = req.query;
 
   try {
-    // Construct query object
+    // Construct base query object
     let query = {};
     if (request_status) {
       query.request_status = new RegExp(request_status, 'i'); // Case-insensitive search
@@ -18,78 +19,53 @@ const getRequests = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    let requests;
-    let totalRequests;
-    if (req.role === "sale_staff") {
-      requests = await Request.find({
-        $or: [
-          { request_status: "pending" },
-          { request_status: "warranty" }
-        ]
-      })
-        .sort({ createdAt: -1 })
-        .populate({
-          path: 'user_id',
-          select: 'email'
-        })
-        .populate({
-          path: 'jewelry_id',
-          populate: [
-            { path: 'material_id' },
-            { path: 'gemstone_id' }
-          ]
-        });
-    } else if (req.role === "design_staff") {
-      requests = await Request.find({ request_status: "design" })
-        .sort({ createdAt: -1 })
-        .populate({
-          path: 'user_id',
-          select: 'email'
-        })
-        .populate({
-          path: 'jewelry_id',
-          populate: [
-            { path: 'material_id' },
-            { path: 'gemstone_id' }
-          ]
-        });
-      totalRequests = await Request.countDocuments({ request_status: "design" });
-    } else if (req.role === "production_staff") {
-      requests = await Request.find({ request_status: "production" })
-        .sort({ createdAt: -1 })
-        .populate({
-          path: 'user_id',
-          select: 'email'
-        })
-        .populate({
-          path: 'jewelry_id',
-          populate: [
-            { path: 'material_id' },
-            { path: 'gemstone_id' }
-          ]
-        });
-      totalRequests = await Request.countDocuments({ request_status: "production" });
-    } else {
-      requests = await Request.find(query)
-        .skip(skip)
-        .limit(parseInt(limit))
-        .sort({ createdAt: -1 })
-        .populate({
-          path: 'user_id',
-          select: 'email'
-        })
-        .populate({
-          path: 'jewelry_id',
-          populate: [
-            { path: 'material_id' },
-            { path: 'gemstone_id' }
-          ]
-        });
-      totalRequests = await Request.countDocuments(query);
+    let userFilter = {};
+    if (search) {
+      if (ObjectId.isValid(search)) {
+        query._id = new ObjectId(search);
+      } else {
+        userFilter = { email: new RegExp(search, 'i') };
+      }
     }
 
+    // Role-based query adjustments
+    if (req.role === "sale_staff") {
+      query.$or = [
+        { request_status: "pending" },
+        { request_status: "warranty" }
+      ];
+    } else if (req.role === "design_staff") {
+      query.request_status = "design";
+    } else if (req.role === "production_staff") {
+      query.request_status = "production";
+    }
+
+    // Fetch requests with pagination and population
+    const requests = await Request.find(query)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'user_id',
+        select: 'email',
+        match: userFilter
+      })
+      .populate({
+        path: 'jewelry_id',
+        populate: [
+          { path: 'material_id' },
+          { path: 'gemstone_id' }
+        ]
+      });
+
+    // Filter out requests where user_id didn't match the search
+    const filteredRequests = requests.filter(request => request.user_id);
+
+    // Count total requests for pagination
+    const totalRequests = await Request.countDocuments(query);
+
     res.status(200).json({
-      requests,
+      requests: filteredRequests,
       total: totalRequests,
       totalPages: Math.ceil(totalRequests / limit),
       currentPage: parseInt(page),
@@ -99,7 +75,6 @@ const getRequests = async (req, res) => {
     res.status(500).json({ error: "An error occurred while fetching requests" });
   }
 };
-
 
 // get one request
 const getRequest = async (req, res) => {

@@ -280,9 +280,9 @@ const DashboardContent = () => {
             recentInvoices.map((invoice, index) => (
               <Box key={invoice._id} p={1} borderRadius="5px" display="flex" alignItems="center" gap="20px" boxShadow={3} mb={2} bgcolor="rgba(255, 255, 255, 0.9)">
                 <Typography variant="h5" sx={{ flex: 1, fontWeight: 'bold' }}>{index + 1}</Typography>
-                <Typography variant="h5" sx={{ flex: 1 }}>{invoice.transaction_id._id}</Typography>
-                <Typography variant="h5" sx={{ flex: 1 }}>{invoice.transaction_id.request_id.user_id.email}</Typography>
-                <Typography variant="h5" sx={{ flex: 1 }}>{new Date(invoice.createdAt).toLocaleDateString()}</Typography>
+                <Typography variant="h5" sx={{ flex: 1 }}>{invoice?.transaction_id?._id || 'N/A'}</Typography>
+                <Typography variant="h5" sx={{ flex: 1 }}>{invoice?.transaction_id?.request_id?.user_id?.email || 'N/A'}</Typography>
+                <Typography variant="h5" sx={{ flex: 1 }}>{new Date(invoice?.createdAt).toLocaleDateString()}</Typography>
                 <Typography variant="h5" sx={{ flex: 1, padding: '10px', backgroundColor: "#b48c72", borderRadius: "10px", color: "#fff", textAlign: 'center' }}>
                   {invoice.total_amount.toLocaleString()}₫
                 </Typography>

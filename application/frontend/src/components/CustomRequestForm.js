@@ -10,7 +10,7 @@ const CustomButton1 = styled(Button)({
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
@@ -23,17 +23,19 @@ const StyledDialogTitle = styled(DialogTitle)({
 
 const StyledDialogContentText = styled(DialogContentText)({
     color: '#000',
-    fontSize: '1.1rem',
+    fontSize: '1.3rem',
     textAlign: 'center',
 });
 
 const CustomTextField = styled(TextField)({
     "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
       "&.Mui-focused": {
         color: "#b48c72",
       },
     },
     "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
       "&:hover .MuiOutlinedInput-notchedOutline": {
         borderColor: "#b48c72",
       },
@@ -65,10 +67,18 @@ const CustomRequestForm = () => {
                     'Content-Type': 'application/json'
                 }
             });
-            toast.success('Request sent successfully');
+            toast.success('Request sent successfully', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
             setLoading(false);  
         } catch (error) {
-            toast.error(error.response?.data?.error || error.message);
+            toast.error(error.response?.data?.error || error.message, {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
             setLoading(false);
         }
     };

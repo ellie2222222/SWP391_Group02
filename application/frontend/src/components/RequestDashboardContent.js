@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled, CircularProgress, MenuItem, Select, InputLabel, FormControl, Stack, Pagination } from '@mui/material';
+import { Box, Typography, styled, CircularProgress, MenuItem, Select, InputLabel, FormControl, Stack, Pagination, InputAdornment, TextField } from '@mui/material';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Edit, Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import RequestForm from './RequestForm';
 import useAuth from '../hooks/useAuthContext';
@@ -10,6 +10,7 @@ import ProductionStaffDashboard from './ProductionStaffDashboard';
 import DesignStaffDashboard from './DesignStaffDashboard';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSearchParams } from 'react-router-dom';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -52,6 +53,34 @@ const CustomMenuItem = styled(MenuItem)({
     fontSize: '1.3rem',
 })
 
+const CustomTextField = styled(TextField)({
+    width: '100%',
+    variant: "outlined",
+    padding: "0",
+    "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
+        "&:hover fieldset": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#b48c72",
+        },
+    },
+    "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+});
+
+const StyledIconButton = styled(IconButton)({
+    color: '#b48c72',
+    '&:hover': {
+        color: '#8e735c',
+    },
+});
+
 const RequestDashboardContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -70,26 +99,33 @@ const RequestDashboardContent = () => {
     const [isProductionDetailDialogOpen, setIsProductionDetailDialogOpen] = useState(false);
     const [isDescriptionDetailDialogOpen, setIsDescriptionDetailDialogOpen] = useState(false); // State for description dialog
     const [loading, setLoading] = useState(true);
-    const [total, setTotal] = useState(0);
     const { user } = useAuth();
-
-    const [filter, setFilter] = useState({
-        request_status: '',
-    });
-
+    const [total, setTotal] = useState(0);
+    const [search, setSearch] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [requestStatus, setRequestStatus] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/requests/', { params: { ...filter, page } });
+            const response = await axiosInstance.get('/requests/', {
+                params: {
+                    ...Object.fromEntries(searchParams),
+                },
+            });
+
             setRequests(response.data.requests);
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total)
-            console.log(response.data.requests)
         } catch (error) {
             console.error("There was an error fetching the requests!", error);
+            toast.error('There was an error fetching the requests!', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         } finally {
             setLoading(false);
         }
@@ -128,9 +164,8 @@ const RequestDashboardContent = () => {
     const handleSubmit = async (values) => {
         try {
             setLoading(true);
-            let response;
             if (selectedRequest) {
-                response = await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
+                await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
             }
             fetchRequests();
             handleCloseAllDialogs();
@@ -160,40 +195,84 @@ const RequestDashboardContent = () => {
         setIsDescriptionDetailDialogOpen(false); // Close description dialog
     };
 
-    const handleFilterChange = (e) => {
-        setFilter({
-            ...filter,
-            [e.target.name]: e.target.value
-        });
+    const updateQueryParams = (key, value, resetPage = false) => {
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (value) {
+            newSearchParams.set(key, value);
+        } else {
+            newSearchParams.delete(key);
+        }
+        if (resetPage) {
+            newSearchParams.set('page', '1');
+        }
+        setSearchParams(newSearchParams);
     };
 
-    const handlePageChange = (event, value) => {
-        setPage(value);
+    const handleSearchClick = () => {
+        updateQueryParams('search', search, true);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleSearchClick();
+        }
+    };
+
+    const handleFilterChange = (key, value) => {
+        updateQueryParams(key, value, true);
+    };
+
+    const handlePageChange = (event, newPage) => {
+        setPage(newPage);
+        updateQueryParams('page', newPage.toString());
     };
 
     useEffect(() => {
+        setSearch(searchParams.get('search') || '');
+        setRequestStatus(searchParams.get('request_status') || '')
         fetchRequests();
-    }, [filter, page]);
+    }, [searchParams]);
+
+    useEffect(() => {
+        fetchRequests();
+    }, [searchParams, page]);
 
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
             {loading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
                     <CircularProgress />
                 </Box>
             ) : (
                 <>
                     {user.role === 'manager' && (
                         <Container>
+                            <Box mb={2}>
+                                <CustomTextField
+                                    label="Search by request ID or email"
+                                    value={search}
+                                    onChange={(event) => setSearch(event.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <StyledIconButton color="inherit" onClick={handleSearchClick}>
+                                                    <Search fontSize="large" />
+                                                </StyledIconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Box>
                             <Box display="flex" mb={2}>
                                 <CustomFormControl variant="outlined">
                                     <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Request Status</InputLabel>
                                     <Select
                                         sx={{ fontSize: "1.3rem" }}
                                         name="request_status"
-                                        value={filter.request_status}
-                                        onChange={handleFilterChange}
+                                        value={requestStatus}
+                                        onChange={(event) => handleFilterChange('request_status', event.target.value)}
                                         label="Request Status"
                                     >
                                         <CustomMenuItem value="">All</CustomMenuItem>
@@ -268,14 +347,14 @@ const RequestDashboardContent = () => {
                             </TableContainer>
                             <Box display="flex" justifyContent="center" mt={2}>
                                 <Stack spacing={2}>
-                                <Pagination
-                                    size="large"
-                                    count={totalPages}
-                                    page={page}
-                                    onChange={handlePageChange}
-                                    showFirstButton
-                                    showLastButton
-                                />
+                                    <Pagination
+                                        size="large"
+                                        count={totalPages}
+                                        page={page}
+                                        onChange={handlePageChange}
+                                        showFirstButton
+                                        showLastButton
+                                    />
                                 </Stack>
                             </Box>
                         </Container>
