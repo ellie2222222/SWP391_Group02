@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled } from '@mui/material';
+import { Typography, styled } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import { Grid, Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import ProductionForm from './ProductionForm';
@@ -87,6 +87,11 @@ export default function ProductionStaffDashboard() {
         fetchRequests();
     }, []);
 
+    const getTimestamp = (request) => {
+        const status = request.status_history.find(history => history.status === 'production');
+        return status ? new Date(status.timestamp).toLocaleDateString() : 'N/A';
+    };
+
     return (
         <Container>
             <TableContainer component={Paper}>
@@ -96,6 +101,7 @@ export default function ProductionStaffDashboard() {
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Request ID</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Sender</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Request Status</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }}>Status Update Date</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Description</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Jewelry</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
@@ -109,6 +115,9 @@ export default function ProductionStaffDashboard() {
                                     <CustomTableCell sx={{ fontWeight: 'bold' }}>{request._id}</CustomTableCell>
                                     <CustomTableCell>{request.user_id ? request.user_id.email : 'User not found'}</CustomTableCell>
                                     <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
+                                    <CustomTableCell>
+                                        {getTimestamp(request)}
+                                    </CustomTableCell>
                                     <CustomTableCell>
                                         <CustomButton1 onClick={() => handleRequestDetailOpen(request)}>
                                             Detail

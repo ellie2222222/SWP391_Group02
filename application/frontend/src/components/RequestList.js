@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CardMedia, Container, Box, Typography, Button, CircularProgress, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { CardMedia, Container, Box, Typography, Button, CircularProgress, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 import { jwtDecode } from 'jwt-decode';
@@ -71,15 +70,18 @@ const RequestList = () => {
   const { user } = useAuth();
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const steps = ['pending', 'quote', 'accepted', 'deposit', 'design', 'production', 'payment', 'warranty', 'completed'];
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (pageNumber = 1) => {
+    setLoading(true);
     try {
-      const response = await axiosInstance.get(`/requests/user-requests/`);
+      const response = await axiosInstance.get(`/requests/user-requests?page=${pageNumber}`);
       setRequests(response.data.requests);
+      setTotalPages(response.data.totalPages);
       setError('');
       setLoading(false);
     } catch (error) {
@@ -94,7 +96,7 @@ const RequestList = () => {
     try {
       await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit' });
       setError('');
-      fetchRequests();
+      fetchRequests(page); // Fetch the current page again after updating
     } catch (error) {
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
@@ -124,7 +126,7 @@ const RequestList = () => {
         price: price,
       });
 
-      const transaction = await axiosInstance.post('transactions', {
+      await axiosInstance.post('transactions', {
         trans_id: payment.data.trans_id,
         request_id: request._id,
         type,
@@ -140,9 +142,14 @@ const RequestList = () => {
     return steps.indexOf(status);
   };
 
+  const handlePageChange = (event, value) => {
+    setPage(value);
+    fetchRequests(value);
+  };
+
   useEffect(() => {
-    fetchRequests();
-  }, [user.token]);
+    fetchRequests(page);
+  }, [user.token, page]);
 
   if (loading) {
     return (
@@ -154,12 +161,11 @@ const RequestList = () => {
 
   return (
     <Container>
-      <Box padding="40px 0" minHeight="60vh">
-        <Typography variant="h2" component="p" marginBottom="20px" textAlign="center">Requests</Typography>
+      <Box minHeight="60vh">
+        <Typography variant="h2" component="p" textAlign="center" my={2}>Requests</Typography>
         {requests.map((request, index) => (
           <Card key={index} variant="outlined" sx={{ marginBottom: '20px' }}>
             <CardContent>
-              <Typography variant="h5" component="p" mb={2}>Request #{index + 1}</Typography>
               <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
               <Typography variant="h5" sx={{ textTransform: 'capitalize' }}>Status: {request.request_status}</Typography>
               <Typography variant="h5">Type: {request.jewelry_id ? request.jewelry_id.type : 'Custom'}</Typography>
@@ -208,31 +214,27 @@ const RequestList = () => {
         )}
       </Box>
 
+      {/* Pagination */}
+      <Box display="flex" justifyContent="center" my={2}>
+        <Stack spacing={2}>
+          <Pagination
+            size="large"
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            showFirstButton
+            showLastButton
+          />
+        </Stack>
+      </Box>
+
       {/* Dialog for Request Details */}
       {selectedRequest && (
         <Dialog open={isDetailsDialogOpen} onClose={() => setIsDetailsDialogOpen(false)} maxWidth="md" fullWidth>
           <DialogTitle variant='h4' align='center' gutterBottom>Request Details</DialogTitle>
           <DialogContent>
-            <Stepper activeStep={getStatusStep(selectedRequest.request_status)} alternativeLabel>
-              {steps.map((label, stepIndex) => {
-                const statusEntry = selectedRequest.status_history.find(entry => entry.status === label);
-                const timestamp = statusEntry ? new Date(statusEntry.timestamp).toLocaleDateString() : '';
-                return (
-                  <Step key={label}>
-                    <CustomStepLabel 
-                      StepIconComponent={(props) => <CustomStepIcon {...props} status={selectedRequest.request_status} icon={stepIndex + 1} />}
-                    >
-                      {label === 'accepted' ? 'quote accept' : label} {timestamp && `(${timestamp})`}
-                    </CustomStepLabel>
-                  </Step>
-                );
-              })}
-            </Stepper>
             <Typography variant="h5" component="p" marginTop="20px">
-              {selectedRequest.request_description}
-            </Typography>
-            <Typography variant="h5" component="p">
-              Status: {selectedRequest.request_status}
+              Description: {selectedRequest.request_description}
             </Typography>
             {selectedRequest.quote_content && (
               <>
@@ -249,7 +251,7 @@ const RequestList = () => {
                 <Typography variant="h6" component="p">Design Images:</Typography>
                 <Box display="flex" flexWrap="wrap">
                   {selectedRequest.jewelry_id.images.map((image, index) => (
-                    <Card key={index} sx={{ maxWidth: 200, margin: 1 }}>
+                    <Card key={index} sx={{ maxWidth: 200, margin: "10px 20px 0 0" }}>
                       <CardMedia
                         component="img"
                         height="140"

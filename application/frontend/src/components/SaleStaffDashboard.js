@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Typography, styled, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import QuoteForm from './QuoteForm';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -42,7 +42,6 @@ export default function SaleStaffDashboard() {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const fetchRequests = async () => {
         try {
@@ -87,6 +86,11 @@ export default function SaleStaffDashboard() {
         fetchRequests();
     }, []);
 
+    const getTimestamp = (request) => {
+        const status = request.status_history.find(history => history.status === 'pending');
+        return status ? new Date(status.timestamp).toLocaleDateString() : 'N/A';
+    };
+
     return (
         <Container>
             <TableContainer component={Paper}>
@@ -96,6 +100,7 @@ export default function SaleStaffDashboard() {
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Request ID</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Sender</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Request Status</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }}>Status Update Date</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Description</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
                         </TableRow>
@@ -107,6 +112,9 @@ export default function SaleStaffDashboard() {
                                     <CustomTableCell sx={{ fontWeight: 'bold' }}>{request._id}</CustomTableCell>
                                     <CustomTableCell>{request.user_id ? request.user_id.email : 'User not found'}</CustomTableCell>
                                     <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
+                                    <CustomTableCell>
+                                        {getTimestamp(request)}
+                                    </CustomTableCell>
                                     <CustomTableCell onClick={() => handleDetailClick(request)}>
                                         <CustomButton1>
                                             Detail

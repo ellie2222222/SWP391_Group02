@@ -27,6 +27,7 @@ const getRequests = async (req, res) => {
           { request_status: "warranty" }
         ]
       })
+        .sort({ createdAt: -1 })
         .populate({
           path: 'user_id',
           select: 'email'
@@ -40,6 +41,7 @@ const getRequests = async (req, res) => {
         });
     } else if (req.role === "design_staff") {
       requests = await Request.find({ request_status: "design" })
+        .sort({ createdAt: -1 })
         .populate({
           path: 'user_id',
           select: 'email'
@@ -54,6 +56,7 @@ const getRequests = async (req, res) => {
       totalRequests = await Request.countDocuments({ request_status: "design" });
     } else if (req.role === "production_staff") {
       requests = await Request.find({ request_status: "production" })
+        .sort({ createdAt: -1 })
         .populate({
           path: 'user_id',
           select: 'email'
@@ -70,6 +73,7 @@ const getRequests = async (req, res) => {
       requests = await Request.find(query)
         .skip(skip)
         .limit(parseInt(limit))
+        .sort({ createdAt: -1 })
         .populate({
           path: 'user_id',
           select: 'email'
@@ -126,19 +130,34 @@ const getRequest = async (req, res) => {
 // get user requests
 const getUserRequests = async (req, res) => {
   try {
-    const { authorization } = req.headers
-    const token = authorization.split(' ')[1]
-    const { _id } = jwt.verify(token, process.env.SECRET)
+    const { authorization } = req.headers;
+    const token = authorization.split(' ')[1];
+    const { _id } = jwt.verify(token, process.env.SECRET);
+
+    const { page = 1, limit = 10 } = req.query;
+
+    const skip = (page - 1) * limit;
 
     const requests = await Request.find({ user_id: _id })
-      .populate('jewelry_id');
+      .populate('jewelry_id')
+      .sort({ createdAt: -1 }) // Sort by creation date in descending order
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Get total count of requests
+    const totalRequests = await Request.countDocuments({ user_id: _id });
 
     // Check if requests exist
     if (requests.length === 0) {
       return res.status(404).json({ error: "No requests found" });
     }
 
-    res.status(200).json({ requests });
+    res.status(200).json({
+      requests,
+      total: totalRequests,
+      totalPages: Math.ceil(totalRequests / limit),
+      currentPage: parseInt(page),
+    });
   } catch (error) {
     console.error('Error fetching request:', error);
     res.status(500).json({ error: "An error occurred while fetching your requests" });
@@ -270,7 +289,7 @@ const updateRequest = async (req, res) => {
 
     // Validate and parse dates
     const parseDate = (date) => new Date(date);
-    
+
     let parsedStartDate = production_start_date ? parseDate(production_start_date) : existingRequest.production_start_date;
     let parsedEndDate = production_end_date ? parseDate(production_end_date) : existingRequest.production_end_date;
     let parsedEndAt = endedAt ? parseDate(endedAt) : existingRequest.endedAt;

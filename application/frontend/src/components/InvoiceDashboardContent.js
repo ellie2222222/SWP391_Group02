@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, styled, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem, Pagination, Stack, Typography } from '@mui/material';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Box, styled, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem, Pagination, Stack, Typography, CircularProgress } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import { useSearchParams } from 'react-router-dom';
@@ -11,14 +11,6 @@ const StyledIconButton = styled(IconButton)({
     color: '#b48c72',
     '&:hover': {
         color: '#8e735c',
-    },
-});
-
-const CustomButton = styled(Button)({
-    backgroundColor: '#b48c72',
-    fontSize: '1.3rem',
-    '&:hover': {
-      backgroundColor: '#a57d65',
     },
 });
 
@@ -97,20 +89,24 @@ const InvoiceDashboardContent = () => {
     const [paymentGateway, setPaymentGateway] = useState('');
     const [sortBy, setSortBy] = useState('createdAt');
     const [sortOrder, setSortOrder] = useState('desc');
+    const [loading, setLoading] = useState(false);
 
     const fetchInvoices = async () => {
+        setLoading(true);
         try {
             const response = await axiosInstance.get('/invoices', {
                 params: {
                     ...Object.fromEntries(searchParams),
-                   
                 },
             });
+            
             setInvoices(response.data.invoices);
             setTotal(response.data.totalInvoices);
             setTotalPages(response.data.totalPages);
         } catch (error) {
             toast.error("There was an error fetching invoices!");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -221,7 +217,7 @@ const InvoiceDashboardContent = () => {
                                 value={sortBy}
                                 onChange={(event) => {
                                     setSortBy(event.target.value);
-                                    handleFilterChange('sort_by', event.target.value);
+                                    handleFilterChange('sortBy', event.target.value);
                                 }}
                             >
                                 <CustomMenuItem value="createdAt">Date</CustomMenuItem>
@@ -236,7 +232,7 @@ const InvoiceDashboardContent = () => {
                                 value={sortOrder}
                                 onChange={(event) => {
                                     setSortOrder(event.target.value);
-                                    handleFilterChange('sort_order', event.target.value);
+                                    handleFilterChange('sortOrder', event.target.value);
                                 }}
                             >
                                 <CustomMenuItem value="asc">Ascending</CustomMenuItem>
@@ -251,38 +247,44 @@ const InvoiceDashboardContent = () => {
                 </Box>
 
                 <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Invoice ID</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: 'bold' }}>User</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Payment Method</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Payment Gateway</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Date</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Amount</CustomTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {invoices.length > 0 ? (
-                                invoices.map((invoice) => (
-                                    <TableRow key={invoice._id}>
-                                        <CustomTableCell sx={{ fontWeight: 'bold' }}>{invoice._id}</CustomTableCell>
-                                        <CustomTableCell>{invoice.transaction_id?.request_id?.user_id?.email}</CustomTableCell>
-                                        <CustomTableCell sx={{ textTransform: 'capitalize' }}>{invoice.payment_method && capitalizeWords(invoice.payment_method)}</CustomTableCell>
-                                        <CustomTableCell>{invoice.payment_gateway}</CustomTableCell>
-                                        <CustomTableCell>{invoice.createdAt &&  (new Date(invoice.createdAt)).toLocaleDateString()}</CustomTableCell>
-                                        <CustomTableCell>{invoice.total_amount && invoice.total_amount.toLocaleString() + "₫"}</CustomTableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
+                    {loading ? (
+                        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                            <CircularProgress size={24} />
+                        </Box>
+                    ) : (
+                        <Table>
+                            <TableHead>
                                 <TableRow>
-                                    <CustomTableCell align='center' colSpan={6}>
-                                        <Typography variant="h6">No invoices found</Typography>
-                                    </CustomTableCell>
+                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>Invoice ID</CustomTableCell>
+                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>User</CustomTableCell>
+                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>Payment Method</CustomTableCell>
+                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>Payment Gateway</CustomTableCell>
+                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>Date</CustomTableCell>
+                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>Amount</CustomTableCell>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHead>
+                            <TableBody>
+                                {invoices.length > 0 ? (
+                                    invoices.map((invoice, index) => (
+                                        <TableRow key={index}>
+                                            <CustomTableCell sx={{ fontWeight: 'bold' }}>{invoice._id}</CustomTableCell>
+                                            <CustomTableCell>{invoice.transaction_id?.request_id?.user_id?.email || 'N/A'}</CustomTableCell>
+                                            <CustomTableCell sx={{ textTransform: 'capitalize' }}>{invoice.payment_method && capitalizeWords(invoice.payment_method)}</CustomTableCell>
+                                            <CustomTableCell>{invoice.payment_gateway}</CustomTableCell>
+                                            <CustomTableCell>{invoice.createdAt &&  (new Date(invoice.createdAt)).toLocaleDateString()}</CustomTableCell>
+                                            <CustomTableCell>{invoice.total_amount && invoice.total_amount.toLocaleString() + "₫"}</CustomTableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <CustomTableCell align='center' colSpan={6}>
+                                            <Typography variant="h6">No invoices found</Typography>
+                                        </CustomTableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    )}
                 </TableContainer>
 
                 <Box display="flex" justifyContent="center" marginTop="20px">

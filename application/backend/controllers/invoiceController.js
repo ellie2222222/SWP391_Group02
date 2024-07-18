@@ -127,8 +127,8 @@ const getAllInvoices = async (req, res) => {
 
     // Create filter object
     const filter = {};
-    if (payment_method) filter.payment_method = payment_method;
-    if (payment_gateway) filter.payment_gateway = payment_gateway;
+    if (payment_method) filter.payment_method = new RegExp(payment_method, 'i');
+    if (payment_gateway) filter.payment_gateway = new RegExp(payment_gateway, 'i');
 
     // Create sort object
     const sort = {};
@@ -151,13 +151,10 @@ const getAllInvoices = async (req, res) => {
                 }
             });
 
-        // Filter out invoices where the user didn't match the email search (if search was provided)
-        const filteredInvoices = invoices.filter(invoice => invoice.transaction_id?.request_id?.user_id);
-
         // Get total count of filtered invoices
         const totalInvoices = await Invoice.countDocuments(filter);
 
-        res.json({ totalInvoices, invoices: filteredInvoices });
+        res.json({ totalInvoices, invoices, totalPages: Math.ceil(totalInvoices / limit) });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
