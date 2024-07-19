@@ -228,6 +228,9 @@ const RequestList = () => {
                   <CustomButton1 onClick={() => handleOpenFeedbackDialog(request)}>Reject Quote</CustomButton1>
                 </>
               )}
+              {request.request_status === 'production' && (
+                <CustomButton1 > Reject Design</CustomButton1>
+              )}
               {request.request_status === 'payment' && (
                 <CustomButton1 onClick={() => handlePayment(request, 'final')}>Payment</CustomButton1>
               )}
