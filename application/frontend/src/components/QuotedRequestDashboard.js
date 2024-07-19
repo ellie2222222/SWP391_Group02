@@ -13,6 +13,7 @@ const CustomButton1 = styled(Button)({
     color: '#fff',
     width: '100%',
     fontSize: '1.3rem',
+    margin:'10px 0',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
@@ -213,6 +214,7 @@ export default function QuotedRequestDashBoard() {
                                         </CustomTableCell>
                                         <CustomTableCell>
                                             <CustomButton1 onClick={() => handleOpenDialog(request._id)}>Approve Quote</CustomButton1>
+                                            <CustomButton1 >Reject Quote</CustomButton1>
                                         </CustomTableCell>
                                     </TableRow>
                                 ))}

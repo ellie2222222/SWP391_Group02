@@ -183,12 +183,12 @@ const RequestList = () => {
                     const timestamp = statusEntry ? new Date(statusEntry.timestamp).toLocaleDateString() : '';
                     return (
                       <Step key={label}>
-                        <CustomStepLabel 
+                        <CustomStepLabel
                           StepIconComponent={(props) => <CustomStepIcon {...props} status={request.request_status} icon={stepIndex + 1} />}
                         >
-                          {label === 'accepted' ? 'quote accept' : label} 
+                          {label === 'accepted' ? 'quote accept' : label}
                         </CustomStepLabel>
-                        <Typography variant='h6' align='center' mt={1} sx={{fontWeight: '300'}}>{timestamp && `${timestamp}`} </Typography>
+                        <Typography variant='h6' align='center' mt={1} sx={{ fontWeight: '300' }}>{timestamp && `${timestamp}`} </Typography>
                       </Step>
                     );
                   })}
@@ -198,7 +198,10 @@ const RequestList = () => {
             <CardActions>
               <CustomButton1 onClick={() => handleDetailsDialog(request)}>View Detail</CustomButton1>
               {request.request_status === 'accepted' && (
-                <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
+                <>
+                  <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
+                  <CustomButton1 >Reject Quote</CustomButton1>
+                </>
               )}
               {request.request_status === 'payment' && (
                 <CustomButton1 onClick={() => handlePayment(request, 'final')}>Payment</CustomButton1>
@@ -275,7 +278,7 @@ const RequestList = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setIsDetailsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72'}}>
+            <Button onClick={() => setIsDetailsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
               Close
             </Button>
           </DialogActions>
