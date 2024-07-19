@@ -197,6 +197,8 @@ export default function SaleStaffDashboard() {
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Request Status</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Status Update Date</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Description</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Manager Feedback</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>User Feedback</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
                         </TableRow>
                     </TableHead>
@@ -214,6 +216,20 @@ export default function SaleStaffDashboard() {
                                         <CustomButton1>
                                             Detail
                                         </CustomButton1>
+                                    </CustomTableCell>
+                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>
+                                        {request.manager_feedback_quote && request.manager_feedback_quote.length > 0
+                                            ? request.manager_feedback_quote.map((feedback, index) => (
+                                                <Typography variant='h6' key={index}>Feedback {index + 1}: {feedback}</Typography>
+                                            ))
+                                            : 'N/A'}
+                                    </CustomTableCell>
+                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>
+                                        {request.user_feedback_quote && request.user_feedback_quote.length > 0
+                                            ? request.user_feedback_quote.map((feedback, index) => (
+                                                <Typography variant='h6' key={index}>Feedback {index + 1}: {feedback}</Typography>
+                                            ))
+                                            : 'N/A'}
                                     </CustomTableCell>
                                     <CustomTableCell align="center">
                                         <IconButton color="primary" onClick={() => handleEditClick(request)}>

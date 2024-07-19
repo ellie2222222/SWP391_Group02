@@ -114,6 +114,7 @@ export default function QuotedRequestDashBoard() {
     const handleRejectRequest = async (values) => {
         try {
             await axiosInstance.patch(`/requests/manager-fb-quote/${selectedRequest._id}`, values);
+            await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
             setError('');
             fetchRequests();
             handleCloseFeedBackDialog();

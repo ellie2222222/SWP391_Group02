@@ -258,7 +258,7 @@ const updateRequest = async (req, res) => {
       return res.status(400).json('Quote amount must be a positive number');
     }
 
-    if (production_cost != null && (typeof production_cost !== 'number' || production_cost <= 0)) {
+    if (production_cost != null && (typeof Number(production_cost) !== 'number' || production_cost <= 0)) {
       return res.status(400).json('Production cost must be a positive number');
     }
 
@@ -410,7 +410,7 @@ const createOrderRequest = async (req, res) => {
 const userFeedbackQuote = async (req, res) => {
   try {
     const { id } = req.params;
-    const { user_quote_feedback } = req.body;
+    const { user_feedback_quote } = req.body;
 
     // Validate request ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -423,15 +423,15 @@ const userFeedbackQuote = async (req, res) => {
       return res.status(404).json({ error: "No such request" });
     }
 
-    // Check if user_quote_feedback is provided
-    if (!user_quote_feedback) {
+    // Check if user_feedback_quote is provided
+    if (!user_feedback_quote) {
       return res.status(400).json({ error: "Feedback content is required" });
     }
 
     // Update the user feedback for quote
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
-      { $push: { user_feedback_quote: user_quote_feedback } }, // Ensure this matches your schema field name
+      { $push: { user_feedback_quote: user_feedback_quote } }, // Ensure this matches your schema field name
       { new: true, runValidators: true }
     );
 

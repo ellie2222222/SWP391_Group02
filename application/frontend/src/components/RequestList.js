@@ -4,7 +4,8 @@ import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 import { jwtDecode } from 'jwt-decode';
 import Check from '@mui/icons-material/Check';
-
+import { ToastContainer, toast } from 'react-toastify';
+import UserFeedbackQuoteForm from './UserFeedbackQuoteForm';
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
   backgroundColor: '#b48c72',
@@ -71,6 +72,7 @@ const RequestList = () => {
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState('');
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -146,6 +148,29 @@ const RequestList = () => {
     setPage(value);
     fetchRequests(value);
   };
+  const handleCloseFeedBackDialog = () => {
+    setIsFeedbackDialogOpen(false);
+    setSelectedRequest(null);
+  };
+  const handleOpenFeedbackDialog = (request) => {
+    setSelectedRequest(request);
+    setIsFeedbackDialogOpen(true);
+};
+
+  const handleRejectRequest = async (values) => {
+    try {
+        await axiosInstance.patch(`/requests/user-fb-quote/${selectedRequest._id}`, values);
+        await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
+        setError('');
+        fetchRequests(page);
+        handleCloseFeedBackDialog();
+        toast.success('Quote Reject successfully!');
+    } catch (error) {
+        if (error.response === undefined) setError(error.message);
+        else setError(error.response.data.error);
+        toast.error('Failed to reject the quote.');
+    }
+};
 
   useEffect(() => {
     fetchRequests(page);
@@ -200,7 +225,7 @@ const RequestList = () => {
               {request.request_status === 'accepted' && (
                 <>
                   <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
-                  <CustomButton1 >Reject Quote</CustomButton1>
+                  <CustomButton1 onClick={() => handleOpenFeedbackDialog(request)}>Reject Quote</CustomButton1>
                 </>
               )}
               {request.request_status === 'payment' && (
@@ -284,6 +309,16 @@ const RequestList = () => {
           </DialogActions>
         </Dialog>
       )}
+      <Dialog open={isFeedbackDialogOpen} onClose={handleCloseFeedBackDialog}>
+        <DialogContent>
+          <UserFeedbackQuoteForm initialValues={selectedRequest} onSubmit={handleRejectRequest} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFeedBackDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

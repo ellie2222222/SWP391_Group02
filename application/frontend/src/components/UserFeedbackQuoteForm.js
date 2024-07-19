@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, Typography } from '@mui/material';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
-
+import useAuth from '../hooks/useAuthContext';
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: '#b48c72', // focused label color
@@ -48,16 +48,20 @@ const CustomButton = styled(Button)({
 });
 
 const UserFeedbackQuoteForm = ({ initialValues,onSubmit }) => {
+  const {user} = useAuth();
   const formik = useFormik({
     initialValues: {
       ...initialValues,
       manager_feedback_quote: '',
+      user_feedback_quote:'',
+      request_status:'pending',
     },
     onSubmit: async (values) => {
       onSubmit(values);
     },
     validationSchema: Yup.object({
-      manager_feedback_quote: Yup.string().required('User Feedback Quote is required'),
+      manager_feedback_quote: user.role ==='manager' ? Yup.string().required('Manager feedback is required') : Yup.string().nullable() ,
+      user_feedback_quote:user.role ==='user' ?Yup.string().required('User feedback is required') : Yup.string().nullable() ,
     }),
   });
 
@@ -67,7 +71,7 @@ const UserFeedbackQuoteForm = ({ initialValues,onSubmit }) => {
         User Feedback Quote
       </Typography>
       <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-        <CustomTextField
+        {user.role ==='manager' && (<CustomTextField
           name="manager_feedback_quote"
           label="Manager Feedback Quote"
           variant="outlined"
@@ -78,7 +82,20 @@ const UserFeedbackQuoteForm = ({ initialValues,onSubmit }) => {
           onBlur={formik.handleBlur}
           error={formik.touched.manager_feedback_quote && Boolean(formik.errors.manager_feedback_quote)}
           helperText={formik.touched.manager_feedback_quote && formik.errors.manager_feedback_quote}
-        />
+        /> )}
+        {user.role === 'user' &&( <CustomTextField
+          name="user_feedback_quote"
+          label="User Feedback Quote"
+          variant="outlined"
+          multiline
+          rows={4}
+          value={formik.values.user_feedback_quote}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.user_feedback_quote && Boolean(formik.errors.user_feedback_quote)}
+          helperText={formik.touched.user_feedback_quote && formik.errors.user_feedback_quote}
+        />)}
+       
         <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
           Submit
         </CustomButton>
