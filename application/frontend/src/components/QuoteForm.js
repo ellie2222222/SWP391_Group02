@@ -115,11 +115,11 @@ export default function QuoteForm({ initialValues, onSubmit }) {
             const materialWeight = selectedJewelry?.material_weight || 0;
             const materialSellPrice = selectedJewelry?.material_id?.sell_price || 0;
             const productionCost = Number(formik.values.production_cost) || 0;
-        
-            const totalCost = gemstonePrice + subGemstonePrice + (materialSellPrice * materialWeight) + productionCost;
+            const subGemstoneQuantity = selectedJewelry?.subgemstone_quantity
+            const totalCost = gemstonePrice + (subGemstonePrice * subGemstoneQuantity) + (materialSellPrice * materialWeight) + productionCost;
         
             const quoteContent = `
-                ${gemstoneName} + ${subGemstoneName} + ${materialName} * ${materialWeight} mace + Production Cost = ${gemstonePrice} + ${subGemstonePrice} + ${materialSellPrice} * ${materialWeight} + ${productionCost} = ${totalCost}
+                Main Gemstone (${gemstoneName}) + Sub Gamestone (${subGemstoneName} * ${subGemstoneQuantity} ) + ${materialName} * ${materialWeight} mace + Production Cost = ${gemstonePrice} + ${subGemstonePrice} + ${materialSellPrice} * ${materialWeight} + ${productionCost} = ${totalCost}
             `.trim();
         
             formik.setFieldValue('quote_content', quoteContent);
@@ -171,6 +171,8 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     name="quote_content"
                     label="Quote Content"
                     variant="outlined"
+                    multiline
+                    rows={4}
                     value={formik.values.quote_content || ''}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
