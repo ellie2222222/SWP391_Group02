@@ -220,12 +220,12 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                     }}
                     sx={{ mt: 2 }}
                 />
-                <CustomTextField
+               <CustomTextField
                     name="production_cost"
                     label="Production Cost"
                     variant="outlined"
                     value={formik.values.production_cost || ''}
-                    onChange={formik.handleChange}
+                    onChange={(e) => formik.setFieldValue('production_cost', Number(e.target.value))}
                     onBlur={formik.handleBlur}
                     error={formik.touched.production_cost && Boolean(formik.errors.production_cost)}
                     helperText={formik.touched.production_cost && formik.errors.production_cost}

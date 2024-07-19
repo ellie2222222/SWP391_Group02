@@ -312,14 +312,18 @@ const updateRequest = async (req, res) => {
 
     // Update status history
     if (request_status) {
-      const now = new Date();
-      const statusIndex = existingRequest.status_history.findIndex(entry => entry.status === request_status);
-      if (statusIndex !== -1) {
-        existingRequest.status_history[statusIndex].timestamp = now;
-      } else {
-        existingRequest.status_history.push({ status: request_status, timestamp: now });
-      }
+        const now = new Date();
+        const statusIndex = existingRequest.status_history.findIndex(entry => entry.status === request_status);
+    
+        if (statusIndex !== -1) {
+            if (!existingRequest.status_history[statusIndex].timestamp) {
+                existingRequest.status_history[statusIndex].timestamp = now;
+            }
+        } else {
+            existingRequest.status_history.push({ status: request_status, timestamp: now });
+        }
     }
+  
 
     // Prepare update fields
     const updateFields = {
