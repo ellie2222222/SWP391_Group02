@@ -47,9 +47,10 @@ const CustomButton = styled(Button)({
   },
 });
 
-const UserFeedbackQuoteForm = ({ onSubmit }) => {
+const UserFeedbackQuoteForm = ({ initialValues,onSubmit }) => {
   const formik = useFormik({
     initialValues: {
+      ...initialValues,
       manager_feedback_quote: '',
     },
     onSubmit: async (values) => {

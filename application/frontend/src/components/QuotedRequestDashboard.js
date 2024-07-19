@@ -113,7 +113,7 @@ export default function QuotedRequestDashBoard() {
     };
     const handleRejectRequest = async (values) => {
         try {
-            await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
+            await axiosInstance.patch(`/requests/manager-fb-quote/${selectedRequest._id}`, values);
             setError('');
             fetchRequests();
             handleCloseFeedBackDialog();
@@ -283,7 +283,7 @@ export default function QuotedRequestDashBoard() {
             </Dialog>
             <Dialog open={isFeedbackDialogOpen} onClose={handleCloseFeedBackDialog}>
                 <DialogContent>
-                        <UserFeedbackQuoteForm onSubmit={handleRejectRequest}/>
+                        <UserFeedbackQuoteForm initialValues={selectedRequest} onSubmit={handleRejectRequest}/>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseFeedBackDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>
