@@ -450,8 +450,7 @@ const userFeedbackQuote = async (req, res) => {
 const managerFeedbackQuote = async (req, res) => {
   try {
     const { id } = req.params;
-    const { manager_quote_feedback } = req.body;
-
+    const { manager_feedback_quote } = req.body;
     // Validate request ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid ID" });
@@ -463,15 +462,15 @@ const managerFeedbackQuote = async (req, res) => {
       return res.status(404).json({ error: "No such request" });
     }
 
-    // Check if manager_quote_feedback is provided
-    if (!manager_quote_feedback) {
+    // Check if manager_feedback_quote is provided
+    if (!manager_feedback_quote) {
       return res.status(400).json({ error: "Feedback content is required" });
     }
 
     // Update the manager feedback for quote
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
-      { $push: { manager_feedback_quote: manager_quote_feedback } }, // Ensure this matches your schema field name
+      { $push: { manager_feedback_quote: manager_feedback_quote } }, // Ensure this matches your schema field name
       { new: true, runValidators: true }
     );
 

@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Search } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
-
+import UserFeedbackQuoteForm from './UserFeedbackQuoteForm';
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
     backgroundColor: '#b48c72',
@@ -65,7 +65,9 @@ export default function QuotedRequestDashBoard() {
     const [requests, setRequests] = useState([]);
     const [error, setError] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
     const [selectedRequestId, setSelectedRequestId] = useState(null);
+    const [selectedRequest, setSelectedRequest] = useState(null);
     const [total, setTotal] = useState(0);
     const [search, setSearch] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
@@ -109,15 +111,36 @@ export default function QuotedRequestDashBoard() {
             toast.error('Failed to approve the quote.');
         }
     };
+    const handleRejectRequest = async (values) => {
+        try {
+            await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
+            setError('');
+            fetchRequests();
+            handleCloseFeedBackDialog();
+            toast.success('Quote Reject successfully!');
+        } catch (error) {
+            if (error.response === undefined) setError(error.message);
+            else setError(error.response.data.error);
+            toast.error('Failed to reject the quote.');
+        }
+    };
 
     const handleOpenDialog = (requestId) => {
         setSelectedRequestId(requestId);
         setIsDialogOpen(true);
     };
+    const handleOpenFeedbackDialog = (request) => {
+        setSelectedRequest(request);
+        setIsFeedbackDialogOpen(true);
+    };
 
     const handleCloseDialog = () => {
         setIsDialogOpen(false);
         setSelectedRequestId(null);
+    };
+    const handleCloseFeedBackDialog = () => {
+        setIsFeedbackDialogOpen(false);
+        setSelectedRequest(null);
     };
 
     const updateQueryParams = (key, value, resetPage = false) => {
@@ -214,7 +237,7 @@ export default function QuotedRequestDashBoard() {
                                         </CustomTableCell>
                                         <CustomTableCell>
                                             <CustomButton1 onClick={() => handleOpenDialog(request._id)}>Approve Quote</CustomButton1>
-                                            <CustomButton1 >Reject Quote</CustomButton1>
+                                            <CustomButton1 onClick={() => handleOpenFeedbackDialog(request)}>Reject Quote</CustomButton1>
                                         </CustomTableCell>
                                     </TableRow>
                                 ))}
@@ -256,6 +279,16 @@ export default function QuotedRequestDashBoard() {
                     <CustomButton1 onClick={handleAcceptRequest} sx={{ color: "white" }}>
                         Confirm
                     </CustomButton1>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={isFeedbackDialogOpen} onClose={handleCloseFeedBackDialog}>
+                <DialogContent>
+                        <UserFeedbackQuoteForm onSubmit={handleRejectRequest}/>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseFeedBackDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>
+                        Cancel
+                    </Button>
                 </DialogActions>
             </Dialog>
             <ToastContainer />
