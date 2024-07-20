@@ -106,6 +106,13 @@ const BlogCreate = () => {
         }
     };
 
+    const truncateText = (text, maxLength) => {
+        if (text.length > maxLength) {
+          return text.substring(0, maxLength) + '...';
+        }
+        return text;
+      };
+
     const handleSubmit = async (values) => {
         try {
             if (selectedBlog) {
@@ -150,7 +157,7 @@ const BlogCreate = () => {
                                     blogs.map((blog) => (
                                         <TableRow key={blog._id}>
                                             <CustomTableCell>{blog.blog_title}</CustomTableCell>
-                                            <CustomTableCell>{blog.blog_content}</CustomTableCell>
+                                            <CustomTableCell>{truncateText(blog.blog_content, 100)}</CustomTableCell>
                                             <TableCell>
                                                 {blog.images && blog.images[0] && (
                                                     <CardMedia

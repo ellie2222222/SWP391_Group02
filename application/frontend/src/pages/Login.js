@@ -33,9 +33,21 @@ const CustomButton = styled(Button)({
   backgroundColor: '#b48c72',
   color: '#fff',
   marginTop: '1rem',
+  marginBottom: '1rem',
   width: '100%',
   '&:hover': {
     backgroundColor: '#8e735c',
+  },
+  fontSize: '1.3rem',
+});
+
+const CustomGuestButton = styled(Button)({
+  backgroundColor: '#F9FAFB',
+  color: '#b48c72',
+  marginTop: '1rem',
+  width: '100%',
+  '&:hover': {
+    backgroundColor: '#E0E0E0',
   },
   fontSize: '1.3rem',
 });
@@ -115,12 +127,7 @@ const Login = () => {
 
   return (
     <CustomContainer maxWidth={false} sx={{ position: 'relative' }}>
-      <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <Typography variant="h4" sx={{ position: 'absolute', top: 10, left: 10 }}>
-          Home
-        </Typography>
-      </Link>
-      <Grid container style={{ height: '100vh', margin: 0, padding: 0 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      <Grid container style={{ height: '100vh', margin: 0, padding: 0 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingLeft: { md: 10, xs: 2 }, margin: 0, height: '400px' }}>
           <FormContainer elevation={3} sx={{ height: '100%' }}>
             <CustomTypography variant="h6" align="center" sx={{ fontSize: '2.1rem' }}>
@@ -157,6 +164,11 @@ const Login = () => {
               <CustomButton variant="contained" type="submit">
                 LOGIN
               </CustomButton>
+              <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <CustomGuestButton variant="contained" type="submit">
+                  Continue as Guest
+                </CustomGuestButton>
+              </Link>
               {error && (
                 <Typography color="error" align="center" sx={{ marginTop: '1rem', fontSize: '1rem' }}>
                   {error}
