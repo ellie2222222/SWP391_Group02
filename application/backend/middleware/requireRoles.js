@@ -100,6 +100,13 @@ const requireAdminOrManagerOrSaleOrDesign = (req, res, next) => {
 
   next();
 }
+const requireAdminOrManagerOrSaleOrDesignOrUser = (req, res, next) => {
+  if (req.role !== 'admin' && req.role !== 'manager' && req.role !== 'sale_staff' && req.role !== 'design_staff' && req.role !== 'user') {
+    return res.status(403).json({ error: 'Admin or Manager or Sale or Design or User staff access required' });
+  }
+
+  next();
+}
 
 module.exports = {
   requireAdmin,
@@ -115,4 +122,5 @@ module.exports = {
   requireUserOrManagerOrSale,
   requireAdminOrManagerOrSale,
   requireAdminOrManagerOrSaleOrDesign,
+  requireAdminOrManagerOrSaleOrDesignOrUser,
 };
