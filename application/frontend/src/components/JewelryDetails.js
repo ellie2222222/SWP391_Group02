@@ -114,11 +114,7 @@ const JewelryDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-  });
+  const [formData, setFormData] = useState({ description: '' });
 
   useEffect(() => {
     const fetchJewelry = async () => {

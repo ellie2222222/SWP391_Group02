@@ -76,6 +76,30 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// update a user
+const updateUser = async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  // Convert id to ObjectID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(id, updates, { new: true, runValidators: true }).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: "An error occurred while updating the user" });
+  }
+};
+
 const assignRole = async (req, res) => {
   const { id } = req.params
   const { role } = req.body;
@@ -163,8 +187,6 @@ const getUsers = async (req, res) => {
     return res.status(500).json({ error: "Error while getting users" });
   }
 }
-
-
 
 const getUser = async (req, res) => {
   try {
@@ -268,7 +290,7 @@ const resetProfilePassword = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
+    user.password = hashedPassword; 
     await user.save();
 
     res.send({ Status: 'Password updated successfully' });
@@ -300,4 +322,4 @@ const logout = (req, res) => {
 
 
 
-module.exports = { signupUser, loginUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword };
+module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword };
