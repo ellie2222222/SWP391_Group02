@@ -197,8 +197,8 @@ export default function SaleStaffDashboard() {
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Request Status</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Status Update Date</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Description</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Manager Feedback</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>User Feedback</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }}>Manager Feedback</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }}>User Feedback</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
                         </TableRow>
                     </TableHead>

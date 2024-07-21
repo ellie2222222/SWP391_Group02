@@ -22,6 +22,7 @@ import {
   Paper,
   TableContainer,
   Icon,
+  TextField,
 } from '@mui/material';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
@@ -45,13 +46,14 @@ const CustomButton = styled(Button)({
 });
 
 const StyledDialogTitle = styled(DialogTitle)({
+  fontSize: '2rem',
   textAlign: 'center',
   fontWeight: 'bold',
 });
 
 const StyledDialogContentText = styled(DialogContentText)({
   color: '#000',
-  fontSize: '1.3rem',
+  fontSize: '1.5rem',
   textAlign: 'center',
 });
 
@@ -69,6 +71,41 @@ const CenteredBox = styled(Box)({
   minHeight: '100vh',
 });
 
+const CustomTextField = styled(TextField)({
+  '& label.Mui-focused': {
+      color: '#b48c72',
+  },
+  '& .MuiInput-underline:after': {
+      borderBottomColor: '#b48c72',
+  },
+  '& .MuiOutlinedInput-root': {
+      fontSize: "1.3rem",
+      '& fieldset': {
+          borderColor: '#b48c72',
+      },
+      '&:hover fieldset': {
+          borderColor: '#b48c72',
+      },
+      '&.Mui-focused fieldset': {
+          borderColor: '#b48c72',
+      },
+  },
+  "& .MuiInputLabel-root": {
+      fontSize: "1.3rem",
+      "&.Mui-focused": {
+          color: "#b48c72",
+      },
+  },
+  "& .MuiFormHelperText-root": {
+      fontSize: "1.2rem",
+      marginLeft: 0,
+  },
+  "& .MuiTypography-root": {
+      fontSize: "1.2rem",
+      marginLeft: 0,
+  },
+});
+
 const JewelryDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -76,6 +113,12 @@ const JewelryDetails = () => {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    address: '',
+    phone: '',
+  });
 
   useEffect(() => {
     const fetchJewelry = async () => {
@@ -99,12 +142,23 @@ const JewelryDetails = () => {
     }
 
     try {
-      await axiosInstance.post('/requests/order-requests', { jewelry_id: id });
+      await axiosInstance.post('/requests/order-requests', {
+        jewelry_id: id,
+        ...formData
+      });
       setOpen(false);
-      toast.success('Order created successfully!', { autoClose: 3000 });
+      toast.success('Request created successfully!', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+    });
     } catch (error) {
       console.error('Error while creating order information!', error);
-      toast.error('Failed to create order. Please try again later.', { autoClose: 3000 });
+      toast.error('Failed to create request. Please try again later.', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+    });
     }
   };
 
@@ -114,6 +168,13 @@ const JewelryDetails = () => {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   if (loading) {
@@ -342,6 +403,27 @@ const JewelryDetails = () => {
           <StyledDialogContentText id="alert-dialog-description">
             Are you sure you want to create a request using this sample?
           </StyledDialogContentText>
+          <DialogContentText id="alert-dialog-description" sx={{ fontSize: '1.3rem', fontWeight: '600' }} mt={2}>
+            Additional custom idea you want to change for this sample (or leave blank)
+          </DialogContentText>
+          <Box
+            component="form"
+            noValidate
+            autoComplete="off"
+            sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
+          >
+            <CustomTextField
+              id="description"
+              name="description"
+              label="Description"
+              variant="outlined"
+              multiline
+              rows={4}
+              fullWidth
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <CustomButton onClick={handleClose}>

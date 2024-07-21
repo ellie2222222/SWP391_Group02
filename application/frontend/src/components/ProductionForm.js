@@ -58,6 +58,14 @@ const CustomMenuItem = styled(MenuItem)({
     fontSize: '1.3rem',
 })
 
+const convertToInputDateFormat = (dateStr) => {
+    const date = new Date(dateStr);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+};
+
 const ProductionForm = ({ initialValues, onSubmit }) => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
@@ -65,19 +73,13 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
     const today = new Date().toISOString().split('T')[0];
     const formik = useFormik({
         initialValues: {
-            production_start_date: initialValues.production_start_date ? format(parseISO(initialValues.production_start_date), 'yyyy-MM-dd') : '',
-            production_end_date: initialValues.production_end_date ? format(parseISO(initialValues.production_end_date), 'yyyy-MM-dd') : '',
+            production_start_date: initialValues.production_start_date ? convertToInputDateFormat(new Date(initialValues.production_start_date).toLocaleDateString()) : '',
+            production_end_date: initialValues.production_end_date ? convertToInputDateFormat(new Date(initialValues.production_end_date).toLocaleDateString()) : '',
             request_status: initialValues.request_status || ''
         },
         validationSchema: Yup.object({
-            production_start_date: Yup.date()
-                .required('Required')
-                .min(today, 'Start date cannot be in the past'),
-            production_end_date: Yup.date()
-                .required('Required')
-                .when('production_start_date', (production_start_date, schema) => {
-                    return production_start_date ? schema.min(production_start_date, 'End date cannot be before start date') : schema;
-                }),
+            production_start_date: Yup.date().min(today, 'Start date cannot be in the past').required('Required.'),
+            production_end_date: Yup.date().required('Required.'),
             request_status: Yup.string()
                 .required('Required'),
         }),
@@ -86,8 +88,6 @@ const ProductionForm = ({ initialValues, onSubmit }) => {
             setLoading(true);
             const formattedValues = {
                 ...values,
-                production_start_date: format(parseISO(values.production_start_date), 'yyyy-MM-dd'),
-                production_end_date: format(parseISO(values.production_end_date), 'yyyy-MM-dd'),
             };
             
             await onSubmit(formattedValues);

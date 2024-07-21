@@ -119,7 +119,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
             const totalCost = gemstonePrice + (subGemstonePrice * subGemstoneQuantity) + (materialSellPrice * materialWeight) + productionCost;
         
             const quoteContent = `
-                Main Gemstone (${gemstoneName}) + Sub Gamestone (${subGemstoneName} * ${subGemstoneQuantity} ) + ${materialName} * ${materialWeight} mace + Production Cost = ${gemstonePrice} + ${subGemstonePrice} + ${materialSellPrice} * ${materialWeight} + ${productionCost} = ${totalCost}
+                Main Gemstone (${gemstoneName}) + Sub Gemstone (${subGemstoneName} * ${subGemstoneQuantity} ) + ${materialName} * ${materialWeight} mace + Production Cost = ${gemstonePrice} + ${subGemstonePrice} + ${materialSellPrice} * ${materialWeight} + ${productionCost} = ${totalCost}
             `.trim();
         
             formik.setFieldValue('quote_content', quoteContent);

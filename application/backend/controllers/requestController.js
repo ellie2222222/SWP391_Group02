@@ -366,7 +366,7 @@ const createOrderRequest = async (req, res) => {
   const { authorization } = req.headers;
   const token = authorization.split(" ")[1];
   const { _id } = jwt.verify(token, process.env.SECRET);
-  const { jewelry_id } = req.body;
+  const { jewelry_id, description } = req.body;
 
   // Validate jewelry ID
   if (!mongoose.Types.ObjectId.isValid(jewelry_id)) {
@@ -382,7 +382,7 @@ const createOrderRequest = async (req, res) => {
     // Initialize all fields with default or null values
     const newRequest = {
       user_id: _id,
-      request_description: 'Sample Request',
+      request_description: description || '',
       jewelry_id,
       request_status: 'pending',
       quote_content: null,
@@ -403,6 +403,7 @@ const createOrderRequest = async (req, res) => {
 
     // Add to the database
     const request = await Request.create(newRequest);
+    console.log(request)
     res.status(201).json(request);
   } catch (error) {
     console.error('Error creating order request:', error);
