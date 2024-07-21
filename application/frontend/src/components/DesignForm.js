@@ -5,7 +5,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
-import axiosInstance from '../utils/axiosInstance';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 const CustomButton1 = styled(Button)({

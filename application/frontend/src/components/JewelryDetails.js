@@ -124,6 +124,7 @@ const JewelryDetails = () => {
     const fetchJewelry = async () => {
       try {
         const response = await axiosInstance.get(`/jewelries/${id}`);
+        console.log(response.data)
         setProduct(response.data);
         setLoading(false);
       } catch (error) {
@@ -142,8 +143,25 @@ const JewelryDetails = () => {
     }
 
     try {
+      const newJewelryResponse = await axiosInstance.post('/jewelries', {
+        // Thêm dữ liệu cần thiết để tạo jewelry
+        name:product.name,
+        description:product.description,
+        price:product.price,
+        gemstone_id:product?.gemstone_id?._id ?? '',
+        category:product.category,
+        material_id:product.material_id._id,
+        material_weight:product.material_weight,
+        type: 'Custom',
+        available: false,
+        subgemstone_id:product?.subgemstone_id?._id ?? '',
+        subgemstone_quantity:product.subgemstone_quantity,
+        images: product.images 
+        
+      });
+      const newJewelryId = newJewelryResponse.data._id;
       await axiosInstance.post('/requests/order-requests', {
-        jewelry_id: id,
+        jewelry_id: newJewelryId,
         ...formData
       });
       setOpen(false);
@@ -206,7 +224,7 @@ const JewelryDetails = () => {
       </Link>
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} margin='20px 0 50px 0' gap="1em" sx={{ height: { md: 500, xs: 'auto' } }}>
         <Box flex={1} sx={{ height: '100%' }}>
-          <img src='https://www.tierra.vn/files/halo-A7tL5Eltco.webp' alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </Box>
         <Box flex={1} display="flex" flexDirection="column" justifyContent="space-between" gap='1em'>
           <Box>

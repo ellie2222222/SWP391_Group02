@@ -36,7 +36,7 @@ const validateInputData = (data) => {
     if (gemstone_id && gemstone_id !== '' && gemstone_id !== 'undefined' && !mongoose.Types.ObjectId.isValid(gemstone_id)) {
         validationErrors.push('Invalid gemstone ID');
     }
-    
+
     if (material_id && !mongoose.Types.ObjectId.isValid(material_id)) {
         validationErrors.push('Invalid material ID');
     }
@@ -79,8 +79,7 @@ const createJewelry = async (req, res) => {
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
         }
-
-        const images = [];
+        const images =[];
         const image_public_ids = [];
 
         if (req.files && req.files.length > 0) {
@@ -101,9 +100,10 @@ const createJewelry = async (req, res) => {
             });
 
             await Promise.all(uploadPromises);
-        } else {
-            return res.status(400).json({ error: 'No files uploaded' });
         }
+        // else {
+        //     return res.status(400).json({ error: 'No files uploaded' });
+        // }
 
         const newJewelry = new Jewelry({
             name,
@@ -121,12 +121,12 @@ const createJewelry = async (req, res) => {
 
         if (gemstone_id) {
             newJewelry.gemstone_id = gemstone_id;
-        }else{
+        } else {
             newJewelry.gemstone_id = null;
         }
         if (subgemstone_id) {
             newJewelry.subgemstone_id = subgemstone_id;
-        }else{
+        } else {
             newJewelry.subgemstone_id = null;
         }
 
@@ -143,7 +143,7 @@ const createJewelry = async (req, res) => {
 const updateJewelry = async (req, res) => {
     try {
         let { name, description, price, gemstone_id, material_id, material_weight, subgemstone_id, subgemstone_quantity, category, type, available } = req.body;
-        
+
         const validationErrors = validateInputData(req.body);
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
