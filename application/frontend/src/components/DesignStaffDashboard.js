@@ -207,6 +207,7 @@ export default function DesignStaffDashboard() {
                             <CustomTableCell sx={{ fontWeight: 'bold' }}>Status Update Date</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Description</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Jewelry</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>User Feedback Design</CustomTableCell>
                             <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
                         </TableRow>
                     </TableHead>
@@ -230,6 +231,13 @@ export default function DesignStaffDashboard() {
                                         <CustomButton1 color="primary" onClick={() => handleJewelryDetailOpen(request)}>
                                             Detail
                                         </CustomButton1>
+                                    </CustomTableCell>
+                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>
+                                        {request.user_feedback_design && request.user_feedback_design.length > 0
+                                            ? request.user_feedback_design.map((feedback, index) => (
+                                                <Typography variant='h6' key={index}>Feedback {index + 1}: {feedback}</Typography>
+                                            ))
+                                            : 'N/A'}
                                     </CustomTableCell>
                                     <CustomTableCell>
                                         <CustomButton1 onClick={() => handleUpdateDesignOpen(request)}>Update Design</CustomButton1>

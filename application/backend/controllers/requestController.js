@@ -491,7 +491,7 @@ const managerFeedbackQuote = async (req, res) => {
 const userFeedbackDesign = async (req, res) => {
   try {
     const { id } = req.params;
-    const { user_design_feedback } = req.body;
+    const { user_feedback_design } = req.body;
 
     // Validate request ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -504,15 +504,15 @@ const userFeedbackDesign = async (req, res) => {
       return res.status(404).json({ error: "No such request" });
     }
 
-    // Check if user_design_feedback is provided
-    if (!user_design_feedback) {
+    // Check if user_feedback_design is provided
+    if (!user_feedback_design) {
       return res.status(400).json({ error: "Feedback content is required" });
     }
 
     // Update the user feedback for design
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
-      { $push: { user_feedback_design: user_design_feedback } }, // Ensure this matches your schema field name
+      { $push: { user_feedback_design: user_feedback_design } }, // Ensure this matches your schema field name
       { new: true, runValidators: true }
     );
 

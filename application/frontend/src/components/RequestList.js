@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import Check from '@mui/icons-material/Check';
 import { ToastContainer, toast } from 'react-toastify';
 import UserFeedbackQuoteForm from './UserFeedbackQuoteForm';
+import UserFeedbackDesignForm from './UserFeedbackDesignForm';
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
   backgroundColor: '#b48c72',
@@ -73,6 +74,7 @@ const RequestList = () => {
   const [error, setError] = useState('');
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+  const [isDesignFeedbackDialogOpen, setIsDesignFeedbackDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -166,6 +168,14 @@ const RequestList = () => {
     setSelectedRequest(request);
     setIsFeedbackDialogOpen(true);
   };
+  const handleCloseDesignFeedBackDialog = () => {
+    setIsDesignFeedbackDialogOpen(false);
+    setSelectedRequest(null);
+  };
+  const handleOpenDesignFeedbackDialog = (request) => {
+    setSelectedRequest(request);
+    setIsDesignFeedbackDialogOpen(true);
+  };
 
   const handleRejectRequest = async (values) => {
     try {
@@ -179,6 +189,20 @@ const RequestList = () => {
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
       toast.error('Failed to reject the quote.');
+    }
+  };
+  const handleRejectDesignRequest = async (values) => {
+    try {
+      await axiosInstance.patch(`/requests/user-fb-design/${selectedRequest._id}`, values);
+      await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
+      setError('');
+      fetchRequests(page);
+      handleCloseDesignFeedBackDialog();
+      toast.success('Design Reject successfully!');
+    } catch (error) {
+      if (error.response === undefined) setError(error.message);
+      else setError(error.response.data.error);
+      toast.error('Failed to reject the design.');
     }
   };
 
@@ -243,7 +267,7 @@ const RequestList = () => {
               {request.request_status === 'design_completed' && (
                 <>
                 <CustomButton1 onClick={() => handleAcceptDesignRequest(request._id)} > Accept Design</CustomButton1>
-                <CustomButton1 onClick={() => handleOpenFeedbackDialog(request)}>Reject Design</CustomButton1>
+                <CustomButton1 onClick={() => handleOpenDesignFeedbackDialog(request)}>Reject Design</CustomButton1>
                 </>
               )}
               {request.request_status === 'payment' && (
@@ -333,6 +357,16 @@ const RequestList = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseFeedBackDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={isDesignFeedbackDialogOpen} onClose={handleCloseDesignFeedBackDialog}>
+        <DialogContent>
+          <UserFeedbackDesignForm initialValues={selectedRequest} onSubmit={handleRejectDesignRequest}  />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDesignFeedBackDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>
             Cancel
           </Button>
         </DialogActions>
