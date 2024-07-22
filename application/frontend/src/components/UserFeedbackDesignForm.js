@@ -3,7 +3,6 @@ import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, Typography } from '@mui/material';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
-import useAuth from '../hooks/useAuthContext';
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
     color: '#b48c72', // focused label color
@@ -47,55 +46,39 @@ const CustomButton = styled(Button)({
   },
 });
 
-const UserFeedbackQuoteForm = ({ initialValues,onSubmit }) => {
-  const {user} = useAuth();
+const UserFeedbackDesignForm = ({ initialValues,onSubmit }) => {
   const formik = useFormik({
     initialValues: {
       ...initialValues,
-      manager_feedback_quote: '',
-      user_feedback_quote:'',
-      request_status:'pending',
+      user_feedback_design:'',
+      request_status:'design',
     },
     onSubmit: async (values) => {
       onSubmit(values);
     },
     validationSchema: Yup.object({
-      manager_feedback_quote: user.role ==='manager' ? Yup.string().required('Manager feedback is required') : Yup.string().nullable() ,
-      user_feedback_quote:user.role ==='user' ?Yup.string().required('User feedback is required') : Yup.string().nullable() ,
+        user_feedback_design:  Yup.string().required('User feedback is required') ,
     }),
   });
 
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" gutterBottom align='center'>
-       {user.role === 'manager' ? 'Manager Feedback Quote' : 'User Feedback Quote'}
+        User Feedback Design
       </Typography>
       <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-        {user.role ==='manager' && (<CustomTextField
-          name="manager_feedback_quote"
-          label="Manager Feedback Quote"
-          variant="outlined"
-          multiline
-          rows={4}
-          value={formik.values.manager_feedback_quote}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.manager_feedback_quote && Boolean(formik.errors.manager_feedback_quote)}
-          helperText={formik.touched.manager_feedback_quote && formik.errors.manager_feedback_quote}
-        /> )}
-        {user.role === 'user' &&( <CustomTextField
-          name="user_feedback_quote"
+        <CustomTextField
+          name="user_feedback_design"
           label="User Feedback Quote"
           variant="outlined"
           multiline
           rows={4}
-          value={formik.values.user_feedback_quote}
+          value={formik.values.user_feedback_design}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          error={formik.touched.user_feedback_quote && Boolean(formik.errors.user_feedback_quote)}
-          helperText={formik.touched.user_feedback_quote && formik.errors.user_feedback_quote}
-        />)}
-       
+          error={formik.touched.user_feedback_design && Boolean(formik.errors.user_feedback_design)}
+          helperText={formik.touched.user_feedback_design && formik.errors.user_feedback_design}
+        />
         <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
           Submit
         </CustomButton>
@@ -104,4 +87,4 @@ const UserFeedbackQuoteForm = ({ initialValues,onSubmit }) => {
   );
 };
 
-export default UserFeedbackQuoteForm;
+export default UserFeedbackDesignForm;
