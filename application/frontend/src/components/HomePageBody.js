@@ -5,7 +5,7 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import VerifiedIcon from '@mui/icons-material/Verified';
 
 const Banner = styled(Box) ({
-    backgroundImage: 'url(https://www.tierra.vn/files/2560x/main-banner-homepage-copy-r8w7lY2k3z.webp)',
+    backgroundImage: 'url(https://www.tierra.vn/wp-content/uploads/2024/07/CAT-TSKC-1-scaled.webp)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     height: '40vw', // Adjust the height to be relative to the viewport
@@ -21,20 +21,20 @@ const Banner = styled(Box) ({
 
 const items = [
     {
-        image: 'https://www.tierra.vn/files/450x/banner-homepage-2-EYD97kmwoZ.webp', // Replace with actual image URL
+        image: 'https://www.tierra.vn/wp-content/uploads/2024/07/NKC1712.webp', // Replace with actual image URL
         title: 'Nhẫn cầu hôn',
         discount: 'Giảm ngay 15%',
         actionText: 'Khám phá ngay'
     },
     {
-        image: 'https://www.tierra.vn/files/450x/banner-homepage-1--qjEoES5diQ.webp', // Replace with actual image URL
+        image: 'https://www.tierra.vn/wp-content/uploads/2024/07/NCF0105.webp', // Replace with actual image URL
         title: 'Trang sức kim cương',
         discount: 'Giảm ngay 15%',
         actionText: 'Khám phá ngay'
     },
     {
-        image: 'https://www.tierra.vn/files/450x/banner-homepage-2--orMpIUzaGr.webp', // Replace with actual image URL
-        title: 'Nhẫn nam',
+        image: 'https://www.tierra.vn/wp-content/uploads/2024/07/VTA8111.webp', // Replace with actual image URL
+        title: 'Vòng tay',
         discount: 'Giảm ngay 15%',
         actionText: 'Khám phá ngay'
     }
@@ -43,19 +43,19 @@ const items = [
 const ringItems = [
     {
         label: 'Solitaire',
-        image: 'https://www.tierra.vn/files/halo-A7tL5Eltco.webp'
+        image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH9916_4.webp'
     },
     {
         label: 'Halo',
-        image: 'https://www.tierra.vn/files/halo-A7tL5Eltco.webp'
+        image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH9907_4.webp'
     },
     {
         label: 'Best selling',
-        image: 'https://www.tierra.vn/files/halo-A7tL5Eltco.webp'
+        image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH9906_4.webp'
     },
     {
         label: 'New collection',
-        image: 'https://www.tierra.vn/files/halo-A7tL5Eltco.webp'
+        image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH8210_4.webp '
     }
 ];
 
