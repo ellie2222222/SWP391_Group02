@@ -21,13 +21,13 @@ const Banner = styled(Box) ({
 
 const items = [
     {
-        image: 'https://www.tierra.vn/wp-content/uploads/2024/07/NKC1712.webp', // Replace with actual image URL
+        image: 'https://www.tierra.vn/wp-content/uploads/2024/07/BANNER-HOMEPAGE-2.webp', // Replace with actual image URL
         title: 'Nhẫn cầu hôn',
         discount: 'Giảm ngay 15%',
         actionText: 'Khám phá ngay'
     },
     {
-        image: 'https://www.tierra.vn/wp-content/uploads/2024/07/NCF0105.webp', // Replace with actual image URL
+        image: 'https://www.tierra.vn/wp-content/uploads/2024/07/BANNER-TRANG-CHU-2.webp', // Replace with actual image URL
         title: 'Trang sức kim cương',
         discount: 'Giảm ngay 15%',
         actionText: 'Khám phá ngay'
@@ -153,7 +153,7 @@ const HomePageBody = () => {
                         <Grid item xs={6} md={4} sx={{ padding: '30px' }}>
                             <CardMedia
                                 component="img"
-                                image="https://www.tierra.vn/files/oh-nch-homepage-mobile-kpxZd0aqlc.webp"  // Replace with actual image URL or path
+                                image="https://www.tierra.vn/wp-content/uploads/2024/07/nhan-cuoi-eternity.webp"  // Replace with actual image URL or path
                                 alt="Nhẫn Cầu Hôn"
                             />
                         </Grid>
@@ -161,7 +161,7 @@ const HomePageBody = () => {
                         <Grid item xs={6} md={4}>
                             <CardMedia
                                 component="img"
-                                image="https://www.tierra.vn/files/oh-nch-homepage-mobile-kpxZd0aqlc.webp"  // Replace with actual image URL or path
+                                image="https://www.tierra.vn/wp-content/uploads/2024/07/Banner-trang-chu-1.webp"  // Replace with actual image URL or path
                                 alt="Nhẫn Cầu Hôn trên tay"
                             />
                         </Grid>
@@ -212,7 +212,7 @@ const HomePageBody = () => {
                         <Grid item xs={6} md={4} sx={{ padding: '30px' }}>
                             <CardMedia
                                 component="img"
-                                image="https://www.tierra.vn/files/600x/banner-bta-mobile-2lQtsfIA8D.webp"  // Replace with actual image URL or path
+                                image="https://www.tierra.vn/wp-content/uploads/2024/07/banner-homepage-1.webp"  // Replace with actual image URL or path
                                 alt="Nhẫn Cầu Hôn"
                             />
                         </Grid>
@@ -220,7 +220,7 @@ const HomePageBody = () => {
                         <Grid item xs={6} md={4}>
                             <CardMedia
                                 component="img"
-                                image="https://www.tierra.vn/files/600x/banner-bta-mobile-2lQtsfIA8D.webp"  // Replace with actual image URL or path
+                                image="https://www.tierra.vn/wp-content/uploads/2024/07/COVER-COLLECTION.webp"  // Replace with actual image URL or path
                                 alt="Nhẫn Cầu Hôn trên tay"
                             />
                         </Grid>
@@ -231,7 +231,7 @@ const HomePageBody = () => {
                 <Grid container spacing={4}>
                     {/* Left Side - Image */}
                     <Grid item xs={12} md={6}>
-                        <Box component="img" src="https://www.tierra.vn/files/11-cuahang-Re1KmV2Ptu.webp" alt="Jewelry Store" sx={{ width: '100%', borderRadius: 0 }} />
+                        <Box component="img" src="https://www.tierra.vn/wp-content/uploads/2024/03/11-cuahang-Re1KmV2Ptu.webp" alt="Jewelry Store" sx={{ width: '100%', borderRadius: 0 }} />
                     </Grid>
                     {/* Right Side - Text and Icons */}
                     <Grid item xs={12} md={6}>
