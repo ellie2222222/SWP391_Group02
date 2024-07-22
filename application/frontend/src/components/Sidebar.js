@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import Button from '@mui/material/Button';
 import useAuth from '../hooks/useAuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -247,7 +248,7 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
-                    { (user.role === 'manager' || user.role === 'admin') && (
+                    {user.role === 'admin' && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
                             <Link to='/admin/blogs'>
                                 <CustomListItemButton>
@@ -275,7 +276,7 @@ export default function Sidebar() {
                                 <Link to='/admin/warranty-request'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
-                                            <PeopleIcon fontSize='large' />
+                                            <VerifiedIcon fontSize='large' />
                                         </CustomListItemIcon>
                                         <CustomListItemText primary="Warranty" sx={{ opacity: open ? 1 : 0 }} />
                                     </CustomListItemButton>

@@ -163,8 +163,8 @@ export default function QuoteForm({ initialValues, onSubmit }) {
 
     return (
         <Container maxWidth="sm">
-            <Typography variant="h4" gutterBottom>
-                Quote
+            <Typography variant="h4" gutterBottom align='center'>
+                Quote Form
             </Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
                 <CustomTextField

@@ -1,17 +1,75 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, styled } from '@mui/material';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, Dialog, DialogActions, DialogContent, CircularProgress } from '@mui/material';
 import * as Yup from 'yup';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { styled } from '@mui/system';
+import QuoteForm from './QuoteForm'; // Adjust the import path as needed
+import ProductionForm from './ProductionForm'; // Adjust the import path as needed
+import WarrantyForm from './WarrantyForm'; // Adjust the import path as needed
+import axiosInstance from '../utils/axiosInstance';
+import { toast } from 'react-toastify';
+import DesignForm from './DesignForm';
 
-const convertToInputDateFormat = (dateStr) => {
-    const date = new Date(dateStr);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${year}-${month}-${day}`;
-};
+const CustomTextField = styled(TextField)({
+    '& label.Mui-focused': {
+        color: '#b48c72',
+    },
+    '& .MuiInput-underline:after': {
+        borderBottomColor: '#b48c72',
+    },
+    '& .MuiOutlinedInput-root': {
+        fontSize: "1.3rem",
+        '& fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&:hover fieldset': {
+            borderColor: '#b48c72',
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: '#b48c72',
+        },
+    },
+    "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+});
+
+const CustomFormControl = styled(FormControl)({
+    "& .MuiInputLabel-root": {
+        fontSize: "1.3rem",
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+    "& .MuiOutlinedInput-root": {
+        fontSize: "1.3rem",
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#b48c72",
+        },
+    },
+    "& .MuiFormHelperText-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+    "& .MuiTypography-root": {
+        fontSize: "1.2rem",
+        marginLeft: 0,
+    },
+});
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -20,212 +78,226 @@ const CustomButton1 = styled(Button)({
     width: '100%',
     fontSize: '1.3rem',
     '&:hover': {
-        color: '#b48c72',
+        color: '#b48c72', // Change text color on hover
         backgroundColor: 'transparent',
-    },
-});
-
-const CustomTextField = styled(TextField)({
-    width: '100%',
-    variant: "outlined",
-    padding: "0",
-    "& .MuiOutlinedInput-root": {
-        fontSize: '1.3rem',
-        "&:hover fieldset": {
-            borderColor: "#b48c72",
-        },
-        "&.Mui-focused fieldset": {
-            borderColor: "#b48c72",
-        },
-    },
-    "& .MuiInputLabel-root": {
-        fontSize: '1.3rem',
-        "&.Mui-focused": {
-            color: "#b48c72",
-        },
-    },
-});
-
-const CustomFormControl = styled(FormControl)({
-    minWidth: 120,
-    "& .MuiInputLabel-root": {
-        fontSize: '1.3rem',
-        "&.Mui-focused": {
-            color: "#b48c72",
-        },
-    },
-    "& .MuiOutlinedInput-root": {
-        fontSize: '1.3rem',
-        "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#b48c72",
-        },
-        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#b48c72",
-        },
     },
 });
 
 const CustomMenuItem = styled(MenuItem)({
     fontSize: '1.3rem',
-})
+});
 
-const RequestForm = ({ initialValues, onSubmit, role }) => {
-    const filterBlankValues = (values) => {
-        const filteredValues = {};
-        Object.keys(values).forEach((key) => {
-            if (values[key] !== '' && values[key] !== null && values[key] !== undefined) {
-                filteredValues[key] = values[key];
-            }
-        });
-        return filteredValues;
-    };
-
-    const filteredInitialValues = filterBlankValues({
-        ...initialValues,
-        user_id: initialValues.user_id ? initialValues.user_id._id : '',
-        production_start_date: initialValues.production_start_date ? convertToInputDateFormat(new Date(initialValues.production_start_date).toLocaleDateString()) : '',
-        production_end_date: initialValues.production_end_date ? convertToInputDateFormat(new Date(initialValues.production_end_date).toLocaleDateString()) : ''
-    });
+export default function RequestForm({ initialValues, onSubmit, fetchData, closeAllDialogs }) {
+    const [isQuoteFormOpen, setIsQuoteFormOpen] = useState(false);
+    const [isDesignFormOpen, setIsDesignFormOpen] = useState(false);
+    const [isProductionFormOpen, setIsProductionFormOpen] = useState(false);
+    const [isWarrantyFormOpen, setIsWarrantyFormOpen] = useState(false);
 
     const formik = useFormik({
-        initialValues: filteredInitialValues,
-        validationSchema: Yup.object({
-            user_id: Yup.string().required("Required."),
-            request_description: Yup.string().required("Required."),
-            request_status: Yup.string().required("Required."),
-            quote_amount: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
-            quote_content: Yup.string(),
-            production_start_date: Yup.date(),
-            production_end_date: Yup.date(),
-            production_cost: Yup.number().typeError("Must be a number").positive("Must be greater than 0"),
-        }),
+        initialValues: {
+            ...initialValues,
+        },
         onSubmit: async (values) => {
-            await onSubmit(values);
-        }
+            return onSubmit(values);
+        },
+        validationSchema: Yup.object({
+            request_status: Yup.string().required('Required.'),
+        }),
     });
+
+    const handleSubFormSubmission = async (values) => {
+        try {
+            const response = await axiosInstance.patch(`/requests/${initialValues._id}`, values);
+            toast.success('Update successfully', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
+            fetchData();
+            closeAllDialogs();
+        } catch (error) {
+            toast.error(error.response.data.error || 'Update fail', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
+            console.error(error.response ? error.response.data.error : error.message);
+        }
+    }
+
+    const handleUpdateJewelryDesign = async (values) => {
+        try {
+            await axiosInstance.patch(`/jewelries/${initialValues.jewelry_id._id}`, values);
+        
+            toast.success('Design update successfully', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
+            fetchData();
+        } catch (error) {
+            console.error('Error while updating design', error);
+            toast.error('Design update fail', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
+        }
+    }
+
+    const handleQuoteFormSubmit = async (values) => {
+        setIsQuoteFormOpen(false);
+        formik.setFieldValue('quote', values);
+        handleSubFormSubmission(values);
+    };
+    
+    const handleDesignFormSubmit = async (values, designData) => {
+        setIsDesignFormOpen(false);
+        formik.setFieldValue('quote', values);
+        handleUpdateJewelryDesign(designData);
+        handleSubFormSubmission(values);
+    };
+
+    const handleProductionFormSubmit = async (values) => {
+        setIsProductionFormOpen(false);
+        formik.setFieldValue('production', values);
+        handleSubFormSubmission(values);
+    };
+
+    const handleWarrantyFormSubmit = async (values) => {
+        setIsWarrantyFormOpen(false);
+        formik.setFieldValue('warranty', values);
+        handleSubFormSubmission(values);
+    };
 
     return (
         <Container maxWidth="sm">
             <Typography variant="h4" gutterBottom align='center'>
                 Edit Request
             </Typography>
-            <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
-                <CustomTextField
-                    name="user_id"
-                    label="User ID"
-                    variant="outlined"
-                    value={formik.values.user_id}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.user_id && Boolean(formik.errors.user_id)}
-                    helperText={formik.touched.user_id && formik.errors.user_id}
-                    InputProps={{ readOnly: role !== 'manager' }}
-                />
-                <CustomTextField
-                    name="request_description"
-                    label="Request Description"
-                    variant="outlined"
-                    value={formik.values.request_description}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.request_description && Boolean(formik.errors.request_description)}
-                    helperText={formik.touched.request_description && formik.errors.request_description}
-                    InputProps={{ readOnly: role !== 'manager' }}
-                />
+            <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { width: '100%' } }}>
                 <CustomFormControl variant="outlined" fullWidth>
-                    <InputLabel id="request-status-label">Request Status</InputLabel>
+                    <InputLabel id="request_status">Request Status</InputLabel>
                     <Select
-                        labelId="request-status-label"
                         name="request_status"
                         value={formik.values.request_status}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         label="Request Status"
                         error={formik.touched.request_status && Boolean(formik.errors.request_status)}
-                        readOnly={role !== 'manager'}
                     >
                         <CustomMenuItem value="pending">Pending</CustomMenuItem>
-                        <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
-                        <CustomMenuItem value="completed">Completed</CustomMenuItem>
                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
+                        <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
                         <CustomMenuItem value="deposit">Deposit</CustomMenuItem>
                         <CustomMenuItem value="design">Design</CustomMenuItem>
+                        <CustomMenuItem value="design_completed">Design Completed</CustomMenuItem>
                         <CustomMenuItem value="production">Production</CustomMenuItem>
                         <CustomMenuItem value="payment">Payment</CustomMenuItem>
                         <CustomMenuItem value="warranty">Warranty</CustomMenuItem>
                         <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
+                        <CustomMenuItem value="completed">Completed</CustomMenuItem>
                     </Select>
                     {formik.touched.request_status && formik.errors.request_status && (
                         <Typography variant="caption" color="red">{formik.errors.request_status}</Typography>
                     )}
                 </CustomFormControl>
-                <CustomTextField
-                    name="quote_amount"
-                    label="Quote Amount"
-                    type="number"
-                    variant="outlined"
-                    value={formik.values.quote_amount}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.quote_amount && Boolean(formik.errors.quote_amount)}
-                    helperText={formik.touched.quote_amount && formik.errors.quote_amount}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'sale_staff' }}
-                />
-                <CustomTextField
-                    name="quote_content"
-                    label="Quote Content"
-                    variant="outlined"
-                    value={formik.values.quote_content}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.quote_content && Boolean(formik.errors.quote_content)}
-                    helperText={formik.touched.quote_content && formik.errors.quote_content}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'sale_staff' }}
-                />
-                <CustomTextField
-                    name="production_start_date"
-                    label="Production Start Date"
-                    type="date"
-                    InputLabelProps={{ shrink: true }}
-                    variant="outlined"
-                    value={formik.values.production_start_date}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.production_start_date && Boolean(formik.errors.production_start_date)}
-                    helperText={formik.touched.production_start_date && formik.errors.production_start_date}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' }}
-                />
-                <CustomTextField
-                    name="production_end_date"
-                    label="Production End Date"
-                    type="date"
-                    InputLabelProps={{ shrink: true }}
-                    variant="outlined"
-                    value={formik.values.production_end_date}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.production_end_date && Boolean(formik.errors.production_end_date)}
-                    helperText={formik.touched.production_end_date && formik.errors.production_end_date}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' }}
-                />
-                <CustomTextField
-                    name="production_cost"
-                    label="Production Cost"
-                    type="number"
-                    variant="outlined"
-                    value={formik.values.production_cost}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.production_cost && Boolean(formik.errors.production_cost)}
-                    helperText={formik.touched.production_cost && formik.errors.production_cost}
-                    InputProps={{ readOnly: role !== 'manager' && role !== 'production_staff' }}
-                />
-                <CustomButton1 type="submit" variant="contained" sx={{ mt: 2 }}>
+                <Box display='flex' gap='1rem'>
+                    <CustomButton1
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 2 }}
+                        onClick={() => setIsQuoteFormOpen(true)}
+                    >
+                        Quote
+                    </CustomButton1>
+                    <CustomButton1
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 2 }}
+                        onClick={() => setIsDesignFormOpen(true)}
+                    >
+                        Design
+                    </CustomButton1>
+                </Box>
+                <Box display='flex' gap='1rem'>
+                    <CustomButton1
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 2 }}
+                        onClick={() => setIsProductionFormOpen(true)}
+                    >
+                        Production
+                    </CustomButton1>
+                    <CustomButton1
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 2 }}
+                        onClick={() => setIsWarrantyFormOpen(true)}
+                    >
+                        Warranty
+                    </CustomButton1>
+                </Box>
+                <CustomButton1 type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
                     Submit
                 </CustomButton1>
             </Box>
+            <Dialog open={isQuoteFormOpen} onClose={() => setIsQuoteFormOpen(false)} fullWidth maxWidth="sm">
+                <DialogContent>
+                    <QuoteForm
+                        initialValues={initialValues}
+                        onSubmit={handleQuoteFormSubmit}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsQuoteFormOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={isDesignFormOpen} onClose={() => setIsDesignFormOpen(false)} fullWidth maxWidth="sm">
+                <DialogContent>
+                    <DesignForm
+                        initialValues={initialValues}
+                        onSubmit={handleDesignFormSubmit}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsDesignFormOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={isProductionFormOpen} onClose={() => setIsProductionFormOpen(false)} fullWidth maxWidth="sm">
+                <DialogContent>
+                    <ProductionForm
+                        initialValues={initialValues}
+                        onSubmit={handleProductionFormSubmit}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsProductionFormOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={isWarrantyFormOpen} onClose={() => setIsWarrantyFormOpen(false)} fullWidth maxWidth="sm">
+                <DialogContent>
+                    <WarrantyForm
+                        initialValues={initialValues}
+                        onSubmit={handleWarrantyFormSubmit}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsWarrantyFormOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
-};
-
-export default RequestForm;
+}

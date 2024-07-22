@@ -81,6 +81,14 @@ const StyledIconButton = styled(IconButton)({
     },
 });
 
+const capitalizeWords = (str) => {
+    const words = str.split('_').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    );
+
+    return words.join(' ');
+};
+
 const RequestDashboardContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
@@ -167,13 +175,13 @@ const RequestDashboardContent = () => {
             if (selectedRequest) {
                 await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
             }
-            fetchRequests();
-            handleCloseAllDialogs();
             toast.success('Request saved successfully!', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
                 draggable: true,
             });
+            handleCloseAllDialogs();
+            fetchRequests();
         } catch (error) {
             console.error("There was an error saving the request!", error);
             toast.error(error.response?.data?.error || error.message, {
@@ -192,7 +200,7 @@ const RequestDashboardContent = () => {
         setIsQuoteDetailDialogOpen(false);
         setIsDesignDetailDialogOpen(false);
         setIsProductionDetailDialogOpen(false);
-        setIsDescriptionDetailDialogOpen(false); // Close description dialog
+        setIsDescriptionDetailDialogOpen(false);
     };
 
     const updateQueryParams = (key, value, resetPage = false) => {
@@ -277,13 +285,16 @@ const RequestDashboardContent = () => {
                                     >
                                         <CustomMenuItem value="">All</CustomMenuItem>
                                         <CustomMenuItem value="pending">Pending</CustomMenuItem>
-                                        <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
                                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
+                                        <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
                                         <CustomMenuItem value="deposit">Deposit</CustomMenuItem>
                                         <CustomMenuItem value="design">Design</CustomMenuItem>
+                                        <CustomMenuItem value="design_completed">Design Completed</CustomMenuItem>
                                         <CustomMenuItem value="production">Production</CustomMenuItem>
                                         <CustomMenuItem value="payment">Payment</CustomMenuItem>
                                         <CustomMenuItem value="warranty">Warranty</CustomMenuItem>
+                                        <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
+                                        <CustomMenuItem value="completed">Completed</CustomMenuItem>
                                     </Select>
                                 </CustomFormControl>
                             </Box>
@@ -312,21 +323,21 @@ const RequestDashboardContent = () => {
                                             <TableRow key={index}>
                                                 <CustomTableCell sx={{ fontWeight: "bold" }}>{request._id}</CustomTableCell>
                                                 <CustomTableCell>{request.user_id ? request.user_id.email : 'N/A'}</CustomTableCell>
-                                                <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
+                                                <CustomTableCell style={{ textTransform: 'capitalize' }}>{capitalizeWords(request.request_status)}</CustomTableCell>
                                                 <CustomTableCell>
-                                                    <CustomButton1 color="primary" onClick={() => handleDescriptionDetailOpen(request)}>Detail</CustomButton1>
+                                                    <CustomButton1 color="primary" onClick={() => handleDescriptionDetailOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
                                                 <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleJewelryDetailOpen(request)}>Detail</CustomButton1>
+                                                    <CustomButton1 color="primary" onClick={() => handleJewelryDetailOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
                                                 <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleQuoteDetailOpen(request)}>Detail</CustomButton1>
+                                                    <CustomButton1 color="primary" onClick={() => handleQuoteDetailOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
                                                 <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleDesignDetailOpen(request)}>Detail</CustomButton1>
+                                                    <CustomButton1 color="primary" onClick={() => handleDesignDetailOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
                                                 <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleProductionDetailOpen(request)}>Detail</CustomButton1>
+                                                    <CustomButton1 color="primary" onClick={() => handleProductionDetailOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
                                                 <CustomTableCell>
                                                     <IconButton color="primary" onClick={() => handleEditClick(request)}>
@@ -344,6 +355,16 @@ const RequestDashboardContent = () => {
                                         )}
                                     </TableBody>
                                 </Table>
+                                <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
+                                    <DialogContent>
+                                        <RequestForm initialValues={selectedRequest} onSubmit={handleSubmit} fetchData={fetchRequests} closeAllDialogs={handleCloseAllDialogs} />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72", fontSize: '1.3rem' }}>
+                                            Cancel
+                                        </Button>
+                                    </DialogActions>
+                                </Dialog>
                             </TableContainer>
                             <Box display="flex" justifyContent="center" mt={2}>
                                 <Stack spacing={2}>
@@ -364,42 +385,33 @@ const RequestDashboardContent = () => {
                     {user.role === 'production_staff' && <ProductionStaffDashboard />}
                 </>
             )}
-            <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
-                <DialogContent>
-                    <RequestForm initialValues={selectedRequest} role={user.role} onSubmit={handleSubmit} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72", fontSize: '1.3rem' }}>
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
             <Dialog open={isJewelryDetailDialogOpen} onClose={handleCloseAllDialogs}>
                 <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Jewelry Detail</DialogTitle>
                 <DialogContent>
-                    {selectedRequest && selectedRequest.jewelry_id && (
+                    {selectedRequest && selectedRequest?.jewelry_id && (
                         <>
-                            <LargeTypography marginBottom="10px">Name: {selectedRequest.jewelry_id.name}</LargeTypography>
-                            <LargeTypography marginBottom="10px">Price: {selectedRequest.jewelry_id.price} VND</LargeTypography>
-                            {selectedRequest.jewelry_id.gemstone_id && (
+                            <LargeTypography marginBottom="10px">Name: {selectedRequest?.jewelry_id?.name}</LargeTypography>
+                            <LargeTypography marginBottom="10px">Price: {selectedRequest?.jewelry_id?.price} VND</LargeTypography>
+                            {selectedRequest?.jewelry_id?.gemstone_id && (
                                 <>
-                                    <LargeTypography marginBottom="10px">Gemstone: {selectedRequest.jewelry_id.gemstone_id.name}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Carat: {selectedRequest.jewelry_id.gemstone_id.carat}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Shape: {selectedRequest.jewelry_id.gemstone_id.cut}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Color: {selectedRequest.jewelry_id.gemstone_id.color}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Clarity: {selectedRequest.jewelry_id.gemstone_id.clarity}</LargeTypography>
+                                    <LargeTypography marginBottom="10px">Gemstone: {selectedRequest?.jewelry_id?.gemstone_id.name}</LargeTypography>
+                                    <LargeTypography marginBottom="10px">Gemstone Carat: {selectedRequest?.jewelry_id?.gemstone_id.carat}</LargeTypography>
+                                    <LargeTypography marginBottom="10px">Gemstone Shape: {selectedRequest?.jewelry_id?.gemstone_id.cut}</LargeTypography>
+                                    <LargeTypography marginBottom="10px">Gemstone Color: {selectedRequest?.jewelry_id?.gemstone_id.color}</LargeTypography>
+                                    <LargeTypography marginBottom="10px">Gemstone Clarity: {selectedRequest?.jewelry_id?.gemstone_id.clarity}</LargeTypography>
                                 </>
                             )}
-                            <LargeTypography marginBottom="10px">Gemstone Weight: {selectedRequest.jewelry_id.gemstone_weight} kg</LargeTypography>
-                            {selectedRequest.jewelry_id.material_id && (
+                            <LargeTypography marginBottom="10px">Gemstone Weight: {selectedRequest?.jewelry_id?.gemstone_weight} kg</LargeTypography>
+                            {selectedRequest?.jewelry_id?.material_id && (
                                 <>
-                                    <LargeTypography marginBottom="10px">Materials: {selectedRequest.jewelry_id.material_id.name}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Material Carat: {selectedRequest.jewelry_id.material_id.carat}</LargeTypography>
+                                    <LargeTypography marginBottom="10px">Materials: {selectedRequest?.jewelry_id?.material_id.name}</LargeTypography>
+                                    <LargeTypography marginBottom="10px">Material Carat: {selectedRequest?.jewelry_id?.material_id.carat}</LargeTypography>
                                 </>
                             )}
-                            <LargeTypography marginBottom="10px">Material Weight: {selectedRequest.jewelry_id.material_weight} kg</LargeTypography>
-                            <LargeTypography marginBottom="10px">Category: {selectedRequest.jewelry_id.category}</LargeTypography>
-                            {selectedRequest.jewelry_id.images.map((image, index) => (
+                            <LargeTypography marginBottom="10px">Material Weight: {selectedRequest?.jewelry_id?.material_weight} kg</LargeTypography>
+                            <LargeTypography marginBottom="10px">Category: {selectedRequest?.jewelry_id?.category}</LargeTypography>
+                            {selectedRequest?.jewelry_id?.images.map((image, index) => (
                                 <CardMedia
                                     key={index}
                                     component="img"
@@ -432,6 +444,15 @@ const RequestDashboardContent = () => {
             <Dialog open={isDesignDetailDialogOpen} onClose={handleCloseAllDialogs}>
                 <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Design Detail</DialogTitle>
                 <DialogContent>
+                    {selectedRequest?.jewelry_id?.images.map((image, index) => (
+                        <CardMedia
+                            key={index}
+                            component="img"
+                            alt="Jewelry"
+                            image={image}
+                            sx={{ width: '100%', margin: '0px' }}
+                        />
+                    ))}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>

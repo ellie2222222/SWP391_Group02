@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, styled, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination, Stack } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Box, Container, Typography, styled, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination, Stack, TextField, InputAdornment } from '@mui/material';
+import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import BlogForm from '../components/BlogForm';
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,7 +12,7 @@ const CustomButton1 = styled(Button)({
     backgroundColor: '#b48c72',
     color: '#fff',
     width: '100%',
-    fontSize: '1rem',
+    fontSize: '1.3rem',
     '&:hover': {
         color: '#b48c72',
         backgroundColor: 'transparent',
@@ -38,8 +38,30 @@ const CustomTableCell = styled(TableCell)({
     fontSize: '1.3rem',
 });
 
+const CustomTextField = styled(TextField)({
+    width: '100%',
+    variant: "outlined",
+    padding: "0",
+    "& .MuiOutlinedInput-root": {
+        fontSize: '1.3rem',
+        "&:hover fieldset": {
+            borderColor: "#b48c72",
+        },
+        "&.Mui-focused fieldset": {
+            borderColor: "#b48c72",
+        },
+    },
+    "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
+});
+
 const BlogCreate = () => {
     const [blogs, setBlogs] = useState([]);
+    const [search, setSearch] = useState('');
     const [total, setTotal] = useState(0);
     const [selectedBlog, setSelectedBlog] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,7 +73,7 @@ const BlogCreate = () => {
         try {
             const response = await axiosInstance.get('/blogs', {
                 params: {
-                    page,
+                    ...Object.fromEntries(searchParams),
                 },
             });
 
@@ -60,6 +82,11 @@ const BlogCreate = () => {
             setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error("There was an error fetching the blogs!", error);
+            toast.error('There was an error fetching blogs', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         }
     };
 
@@ -74,6 +101,16 @@ const BlogCreate = () => {
             newSearchParams.set('page', '1');
         }
         setSearchParams(newSearchParams);
+    };
+
+    const handleSearchClick = () => {
+        updateQueryParams('search', search, true);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleSearchClick();
+        }
     };
 
     const handlePageChange = (event, newPage) => {
@@ -99,10 +136,18 @@ const BlogCreate = () => {
         try {
             await axiosInstance.delete(`/blogs/${id}`);
             fetchBlogs();
-            toast.success('Blog post deleted successfully');
+            toast.success('Blog post deleted successfully', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         } catch (error) {
             console.error('Error deleting blog:', error);
-            toast.error('Failed to delete blog post');
+            toast.error('Failed to delete blog post', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         }
     };
 
@@ -117,16 +162,28 @@ const BlogCreate = () => {
         try {
             if (selectedBlog) {
                 await axiosInstance.patch(`/blogs/${selectedBlog._id}`, values);
-                toast.success('Blog post updated successfully');
+                toast.success('Blog post updated successfully', {
+                    autoClose: 5000, // Auto close after 5 seconds
+                    closeOnClick: true,
+                    draggable: true,
+                })
             } else {
                 await axiosInstance.post('/blogs', values);
-                toast.success('Blog post added successfully');
+                toast.success('Blog post added successfully', {
+                    autoClose: 5000, // Auto close after 5 seconds
+                    closeOnClick: true,
+                    draggable: true,
+                })
             }
             fetchBlogs();
             setIsDialogOpen(false);
         } catch (error) {
             console.error("There was an error saving the blog!", error);
-            toast.error(error.response?.data?.error || error.message);
+            toast.error("There was an error saving the blog!", {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         }
     };
 
@@ -136,19 +193,38 @@ const BlogCreate = () => {
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                 <DrawerHeader />
                 <Container>
-                    <Typography variant="h4" gutterBottom>Manage Blogs</Typography>
+                    <Box mb={2}>
+                        <CustomTextField
+                            label="Search by blog title"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            onKeyDown={handleKeyDown}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <StyledIconButton color="inherit" onClick={handleSearchClick}>
+                                            <Search fontSize="large" />
+                                        </StyledIconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </Box>
 
+                    <Box mb={2}>
+                        <Typography variant='h5'>There are a total of {total} result(s)</Typography>
+                    </Box>
+                        
                     <CustomButton1 startIcon={<Add />} variant="contained" color="primary" onClick={handleAddClick}>
                         Add Blog
                     </CustomButton1>
 
-                    <TableContainer component={Paper} sx={{ mt: 3 }}>
+                    <TableContainer component={Paper} sx={{ mt: 2 }}>
                         <Table>
                             <TableHead>
                                 <TableRow>
                                     <CustomTableCell>Title</CustomTableCell>
                                     <CustomTableCell>Content</CustomTableCell>
-                                    <CustomTableCell>Images</CustomTableCell>
                                     <CustomTableCell align="center">Actions</CustomTableCell>
                                 </TableRow>
                             </TableHead>
@@ -158,22 +234,12 @@ const BlogCreate = () => {
                                         <TableRow key={blog._id}>
                                             <CustomTableCell>{blog.blog_title}</CustomTableCell>
                                             <CustomTableCell>{truncateText(blog.blog_content, 100)}</CustomTableCell>
-                                            <TableCell>
-                                                {blog.images && blog.images[0] && (
-                                                    <CardMedia
-                                                        component="img"
-                                                        alt="Blog"
-                                                        image={blog.images[0]}
-                                                        sx={{ width: '100%', maxHeight: '150px' }}
-                                                    />
-                                                )}
-                                            </TableCell>
                                             <TableCell align="center">
                                                 <StyledIconButton onClick={() => handleEditClick(blog)}>
-                                                    <Edit />
+                                                    <Edit fontSize='large'/>
                                                 </StyledIconButton>
                                                 <StyledIconButton onClick={() => handleDeleteClick(blog._id)}>
-                                                    <Delete />
+                                                    <Delete fontSize='large'/>
                                                 </StyledIconButton>
                                             </TableCell>
                                         </TableRow>
@@ -197,12 +263,12 @@ const BlogCreate = () => {
                                 onChange={handlePageChange}
                                 showFirstButton
                                 showLastButton
+                                size='large'
                             />
                         </Stack>
                     </Box>
 
                     <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-                        <DialogTitle>{selectedBlog ? 'Edit Blog' : 'Add Blog'}</DialogTitle>
                         <DialogContent>
                             <BlogForm
                                 initialValues={selectedBlog || { blog_title: '', blog_content: '', images: [] }}
@@ -210,7 +276,7 @@ const BlogCreate = () => {
                             />
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                            <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72'}}>
                                 Cancel
                             </Button>
                         </DialogActions>

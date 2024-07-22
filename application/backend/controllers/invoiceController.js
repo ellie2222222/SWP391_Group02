@@ -75,8 +75,8 @@ const createInvoice = async (req, res) => {
 const getInvoiceById = async (req, res) => {
     const { id } = req.params;
 
-    if (!isValidObjectId(id)) {
-        return res.status(400).json({ message: 'Invalid invoice ID format' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid invoice ID' })
     }
 
     try {
@@ -95,6 +95,10 @@ const getInvoiceById = async (req, res) => {
 // Get an Invoice by Request ID
 const getInvoiceByRequestId = async (req, res) => {
     const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid invoice ID' })
+    }
 
     try {
         const transaction = await Transaction.findOne({
@@ -170,7 +174,7 @@ const updateInvoiceById = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    if (!isValidObjectId(id) || ('request_id' in updates && !isValidObjectId(updates.request_id))) {
+    if (!mongoose.Types.ObjectId.isValid(id) || ('request_id' in updates && !mongoose.Types.ObjectId.isValid(updates.request_id))) {
         return res.status(400).json({ message: 'Invalid invoice ID or request_id format' });
     }
 

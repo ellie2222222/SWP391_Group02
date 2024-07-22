@@ -14,8 +14,8 @@ const getRequests = async (req, res) => {
     // Construct base query object
     let query = {};
     if (request_status) {
-      query.request_status = new RegExp(request_status, 'i'); // Case-insensitive search
-    }
+      query.request_status = request_status;
+  }  
 
     const skip = (page - 1) * limit;
 
@@ -58,14 +58,11 @@ const getRequests = async (req, res) => {
         ]
       });
 
-    // Filter out requests where user_id didn't match the search
-    const filteredRequests = requests.filter(request => request.user_id);
-
     // Count total requests for pagination
     const totalRequests = await Request.countDocuments(query);
 
     res.status(200).json({
-      requests: filteredRequests,
+      requests,
       total: totalRequests,
       totalPages: Math.ceil(totalRequests / limit),
       currentPage: parseInt(page),

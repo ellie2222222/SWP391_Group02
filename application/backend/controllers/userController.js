@@ -143,7 +143,7 @@ const assignRole = async (req, res) => {
 // get all users
 // get all users
 const getUsers = async (req, res) => {
-  const { search, sort, role, page = 1 } = req.query;
+  const { search, sort, role, page = 1, limit = 10 } = req.query;
 
   try {
     let query = {};
@@ -166,7 +166,6 @@ const getUsers = async (req, res) => {
       sortField[field] = order === 'asc' ? 1 : -1;
     }
 
-    const limit = 10;
     const skip = (page - 1) * limit;
 
     const users = await User.find(query)

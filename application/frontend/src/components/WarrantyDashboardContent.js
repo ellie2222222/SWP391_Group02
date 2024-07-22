@@ -79,6 +79,7 @@ export default function WarrantyDashboardContent() {
             const response = await axiosInstance.get('/requests', {
                 params: {
                     ...Object.fromEntries(searchParams),
+                    request_status: 'warranty'
                 },
             });
             setRequests(response.data.requests);
@@ -234,12 +235,12 @@ export default function WarrantyDashboardContent() {
                                             </CustomTableCell>
                                             <CustomTableCell>
                                                 <CustomButton1 color="primary" onClick={() => handleJewelryDetailOpen(request)}>
-                                                    Detail
+                                                    Details
                                                 </CustomButton1>
                                             </CustomTableCell>
                                             <CustomTableCell>
                                                 <CustomButton1 color="primary" onClick={() => handleRequestDetailOpen(request)}>
-                                                    Detail
+                                                    Details
                                                 </CustomButton1>
                                             </CustomTableCell>
                                             <CustomTableCell>
@@ -346,7 +347,6 @@ export default function WarrantyDashboardContent() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <ToastContainer />
         </Container>
     );

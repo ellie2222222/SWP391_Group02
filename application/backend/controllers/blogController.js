@@ -148,12 +148,12 @@ const updateBlog = async (req, res) => {
   };
 
 const getBlogs = async (req, res) => {
-    const { blog_title, page = 1, limit = 12 } = req.query;
+    const { page = 1, limit = 12, search } = req.query;
 
     try {
         let query = {};
-        if (blog_title) {
-            query.blog_title = new RegExp(blog_title, 'i'); // 'i' for case-insensitive search
+        if (search) {
+            query.blog_title = new RegExp(search, 'i'); // 'i' for case-insensitive search
         }
 
         const skip = (page - 1) * limit;

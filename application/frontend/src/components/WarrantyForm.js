@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { styled } from '@mui/system';
 import { format, parseISO } from 'date-fns';
 import axiosInstance from '../utils/axiosInstance';
+import useAuth from '../hooks/useAuthContext';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -59,11 +60,19 @@ const CustomMenuItem = styled(MenuItem)({
     fontSize: '1.3rem',
 })
 
+const convertToInputDateFormat = (dateStr) => {
+    const date = new Date(dateStr);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+};
+
 const WarrantyForm = ({ initialValues, onSubmit }) => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [warrantyStartDate, setWarrantyStartDate] = useState('');
-    const today = new Date().toISOString().split('T')[0];
+    const { user } = useAuth();
 
     useEffect(() => {
         const fetchInvoices = async () => {
@@ -86,30 +95,37 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
         fetchInvoices();
     }, [initialValues._id]);
 
+    let validationSchema;
+    if (user.role === 'manager') {
+        validationSchema = Yup.object({
+            warranty_start_date: Yup.date(),
+            warranty_end_date: Yup.date(),
+            warranty_content: Yup.string(),
+            request_status: Yup.string(),
+        })
+    } else {
+        validationSchema = Yup.object({
+            warranty_start_date: Yup.date().required('Required.'),
+            warranty_end_date: Yup.date().required('Required.'),
+            warranty_content: Yup.string().required('Required.'),
+            request_status: Yup.string().required('Required.'),
+        })
+    }
+
     const formik = useFormik({
         initialValues: {
             warranty_start_date: warrantyStartDate || '',
-            warranty_end_date: initialValues.warranty_end_date ? format(parseISO(initialValues.warranty_end_date), 'yyyy-MM-dd') : '',
+            warranty_end_date: initialValues.warranty_end_date ? convertToInputDateFormat(new Date(initialValues.warranty_end_date).toLocaleDateString()) : '',
             request_status: initialValues.request_status || '',
             warranty_content: initialValues.warranty_content || '',
         },
         enableReinitialize: true,
-        validationSchema: Yup.object({
-            warranty_start_date: Yup.date().required('Required'),
-            warranty_end_date: Yup.date()
-                .required('Required')
-                .when('warranty_start_date', (warranty_start_date, schema) => {
-                    return warranty_start_date ? schema.min(warranty_start_date, 'End date cannot be before start date') : schema;
-                }),
-            request_status: Yup.string().required('Required'),
-        }),
+        validationSchema: validationSchema,
         onSubmit: async (values) => {
             setOpen(false);
             setLoading(true);
             const formattedValues = {
                 ...values,
-                warranty_start_date: format(parseISO(values.warranty_start_date), 'yyyy-MM-dd'),
-                warranty_end_date: format(parseISO(values.warranty_end_date), 'yyyy-MM-dd'),
             };
             
             await onSubmit(formattedValues);
@@ -127,7 +143,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
 
     return (
         <Container>
-            <Typography variant='h4' align='center'>Warranty Form</Typography>
+            <Typography variant='h4' align='center' gutterBottom>Warranty Form</Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
                 <CustomTextField
                     fullWidth
@@ -218,7 +234,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
                     </CustomButton1>
                 </DialogActions>
             </Dialog>
-            <ToastContainer />
+            {/* <ToastContainer /> */}
         </Container>
     );
 };

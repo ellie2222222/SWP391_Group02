@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import { Container, Button, TextField, Typography, MenuItem, Box, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@mui/material';
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
-import { format, parseISO } from 'date-fns';
+import useAuth from '../hooks/useAuthContext';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -69,20 +68,32 @@ const convertToInputDateFormat = (dateStr) => {
 const ProductionForm = ({ initialValues, onSubmit }) => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
+    const { user } = useAuth();
 
     const today = new Date().toISOString().split('T')[0];
+
+    let validationSchema;
+    if (user.role == 'manager') {
+        validationSchema = Yup.object({
+            production_start_date: Yup.date(),
+            production_end_date: Yup.date(),
+            request_status: Yup.string(),
+        })
+    } else {
+        validationSchema = Yup.object({
+            production_start_date: Yup.date().min(today, 'Start date cannot be in the past').required('Required.'),
+            production_end_date: Yup.date().required('Required.'),
+            request_status: Yup.string().required('Required'),
+        })
+    }
+
     const formik = useFormik({
         initialValues: {
             production_start_date: initialValues.production_start_date ? convertToInputDateFormat(new Date(initialValues.production_start_date).toLocaleDateString()) : '',
             production_end_date: initialValues.production_end_date ? convertToInputDateFormat(new Date(initialValues.production_end_date).toLocaleDateString()) : '',
             request_status: initialValues.request_status || ''
         },
-        validationSchema: Yup.object({
-            production_start_date: Yup.date().min(today, 'Start date cannot be in the past').required('Required.'),
-            production_end_date: Yup.date().required('Required.'),
-            request_status: Yup.string()
-                .required('Required'),
-        }),
+        validationSchema: validationSchema,
         onSubmit: async (values) => {
             setOpen(false);
             setLoading(true);

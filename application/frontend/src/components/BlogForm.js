@@ -15,6 +15,7 @@ const CustomTextField = styled(TextField)({
         borderBottomColor: '#b48c72',
     },
     '& .MuiOutlinedInput-root': {
+        fontSize: '1.3rem',
         '& fieldset': {
             borderColor: '#b48c72',
         },
@@ -25,9 +26,16 @@ const CustomTextField = styled(TextField)({
             borderColor: '#b48c72',
         },
     },
+    "& .MuiInputLabel-root": {
+        fontSize: '1.3rem',
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
+    },
 });
 
 const CustomButton = styled(Button)({
+    fontSize: '1.3rem',
     backgroundColor: '#b48c72',
     '&:hover': {
         backgroundColor: '#a57d65',
@@ -121,7 +129,7 @@ const BlogForm = ({ initialValues = { blog_title: '', blog_content: '', blog_ima
 
     return (
         <Container maxWidth="sm">
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" gutterBottom align='center'>
                 {initialValues._id ? 'Edit Blog' : 'Create Blog'}
             </Typography>
             <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
@@ -180,8 +188,7 @@ const BlogForm = ({ initialValues = { blog_title: '', blog_content: '', blog_ima
                     <Typography variant="caption" color="red">{formik.errors.blog_images}</Typography>
                 )}
                 <CustomButton variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '1em', alignItems: 'center' }}>
-                    <AddPhotoAlternateIcon />
-                    <Typography variant='body1'>Upload Images</Typography>
+                    <AddPhotoAlternateIcon fontSize='large' />Upload Images
                     <input
                         type="file"
                         hidden

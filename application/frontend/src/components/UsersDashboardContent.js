@@ -107,7 +107,10 @@ const UserDashboardContent = () => {
                     ...Object.fromEntries(searchParams),
                 },
             });
-            setUsers(response.data.users);
+            
+            const filteredUserList = response.data.users.filter((user) => user.role !== 'admin');
+
+            setUsers(filteredUserList);
             setTotal(response.data.total);
             setTotalPages(response.data.totalPages);
         } catch (error) {
@@ -170,12 +173,20 @@ const UserDashboardContent = () => {
     const handleConfirmDelete = async (id) => {
         try {
             await axiosInstance.delete(`/users/${id}`);
-            fetchUsers(); // Refresh the user list
-            setIsDeleteDialogOpen(false); // Close the dialog
-            toast.success('User deleted successfully!');
+            fetchUsers()
+            setIsDeleteDialogOpen(false);
+            toast.success('User deleted successfully!', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } catch (error) {
             console.error("There was an error deleting the user!", error);
-            toast.error('Failed to delete user. Please try again.');
+            toast.error('Failed to delete user. Please try again.', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         }
     };
 
@@ -224,7 +235,6 @@ const UserDashboardContent = () => {
                                 onChange={(event) => handleFilterChange('role', event.target.value)}
                             >
                                 <CustomMenuItem value=""><em>None</em></CustomMenuItem>
-                                <CustomMenuItem value="admin">Admin</CustomMenuItem>
                                 <CustomMenuItem value="user">User</CustomMenuItem>
                                 <CustomMenuItem value="manager">Manager</CustomMenuItem>
                                 <CustomMenuItem value="sale_staff">Sale Staff</CustomMenuItem>
@@ -236,7 +246,7 @@ const UserDashboardContent = () => {
                 </Box>
 
                 <Box mb={2}>
-                    <Typography variant='h5'>There are a total of {total} result(s)</Typography>
+                    <Typography variant='h5'>Page {page}: {users.length} result(s)</Typography>
                 </Box>
 
                 <TableContainer component={Paper}>
