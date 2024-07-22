@@ -76,7 +76,7 @@ const RequestList = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const steps = ['pending', 'quote', 'accepted', 'deposit', 'design', 'production', 'payment', 'warranty', 'completed'];
+  const steps = ['pending', 'quote', 'accepted', 'deposit', 'design', 'design_completed', 'production', 'payment', 'warranty', 'completed'];
 
   const fetchRequests = async (pageNumber = 1) => {
     setLoading(true);
@@ -97,6 +97,16 @@ const RequestList = () => {
   const handleAcceptRequest = async (requestId) => {
     try {
       await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit' });
+      setError('');
+      fetchRequests(page); // Fetch the current page again after updating
+    } catch (error) {
+      if (error.response === undefined) setError(error.message);
+      else setError(error.response.data.error);
+    }
+  };
+  const handleAcceptDesignRequest = async (requestId) => {
+    try {
+      await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'production' });
       setError('');
       fetchRequests(page); // Fetch the current page again after updating
     } catch (error) {
@@ -155,22 +165,22 @@ const RequestList = () => {
   const handleOpenFeedbackDialog = (request) => {
     setSelectedRequest(request);
     setIsFeedbackDialogOpen(true);
-};
+  };
 
   const handleRejectRequest = async (values) => {
     try {
-        await axiosInstance.patch(`/requests/user-fb-quote/${selectedRequest._id}`, values);
-        await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
-        setError('');
-        fetchRequests(page);
-        handleCloseFeedBackDialog();
-        toast.success('Quote Reject successfully!');
+      await axiosInstance.patch(`/requests/user-fb-quote/${selectedRequest._id}`, values);
+      await axiosInstance.patch(`/requests/${selectedRequest._id}`, values);
+      setError('');
+      fetchRequests(page);
+      handleCloseFeedBackDialog();
+      toast.success('Quote Reject successfully!');
     } catch (error) {
-        if (error.response === undefined) setError(error.message);
-        else setError(error.response.data.error);
-        toast.error('Failed to reject the quote.');
+      if (error.response === undefined) setError(error.message);
+      else setError(error.response.data.error);
+      toast.error('Failed to reject the quote.');
     }
-};
+  };
 
   useEffect(() => {
     fetchRequests(page);
@@ -206,18 +216,20 @@ const RequestList = () => {
                   {steps.map((label, stepIndex) => {
                     const statusEntry = request.status_history.find(entry => entry.status === label);
                     const timestamp = statusEntry ? new Date(statusEntry.timestamp).toLocaleDateString() : '';
+                    const displayLabel = label === 'design_completed' ? 'Design Completed' : label;
                     return (
                       <Step key={label}>
                         <CustomStepLabel
                           StepIconComponent={(props) => <CustomStepIcon {...props} status={request.request_status} icon={stepIndex + 1} />}
                         >
-                          {label === 'accepted' ? 'quote accept' : label}
+                          {displayLabel === 'accepted' ? 'quote accept' : displayLabel}
                         </CustomStepLabel>
                         <Typography variant='h6' align='center' mt={1} sx={{ fontWeight: '300' }}>{timestamp && `${timestamp}`} </Typography>
                       </Step>
                     );
                   })}
                 </Stepper>
+
               </Box>
             </CardContent>
             <CardActions>
@@ -228,8 +240,11 @@ const RequestList = () => {
                   <CustomButton1 onClick={() => handleOpenFeedbackDialog(request)}>Reject Quote</CustomButton1>
                 </>
               )}
-              {request.request_status === 'production' && (
-                <CustomButton1 > Reject Design</CustomButton1>
+              {request.request_status === 'design_completed' && (
+                <>
+                <CustomButton1 onClick={() => handleAcceptDesignRequest(request._id)} > Accept Design</CustomButton1>
+                <CustomButton1 onClick={() => handleOpenFeedbackDialog(request)}>Reject Design</CustomButton1>
+                </>
               )}
               {request.request_status === 'payment' && (
                 <CustomButton1 onClick={() => handlePayment(request, 'final')}>Payment</CustomButton1>

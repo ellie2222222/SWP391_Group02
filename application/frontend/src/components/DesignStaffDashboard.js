@@ -89,7 +89,7 @@ export default function DesignStaffDashboard() {
             await axiosInstance.patch(`/jewelries/${initialValues.jewelry_id._id}`, values);
 
             await axiosInstance.patch(`/requests/${initialValues._id}`, {
-                request_status: values.request_status,
+                request_status: initialValues.request_status,
             });
 
             setIsUpdateDesignDialogOpen(false);

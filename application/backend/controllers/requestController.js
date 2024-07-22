@@ -248,7 +248,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design', 'production', 'warranty', 'payment', 'cancelled', 'user_accepted'];
+    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled', 'user_accepted'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }

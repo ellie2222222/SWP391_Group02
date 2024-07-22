@@ -90,7 +90,7 @@ export default function DesignForm({ initialValues, onSubmit }) {
                 }
             });
             try {
-                await onSubmit(initialValues, formData);
+                 await onSubmit(values, formData);
             } catch (error) {
                 console.error(error)
                 toast.error(error)
@@ -129,7 +129,7 @@ export default function DesignForm({ initialValues, onSubmit }) {
     return (
         <Container>
             <Typography variant='h4' align='center' gutterBottom>Design Form</Typography>
-            <form onSubmit={formik.handleSubmit}>
+            <Box component='form' onSubmit={formik.handleSubmit}>
                 <CustomButton1 variant="contained" component="label" sx={{ mt: 2, display: 'flex', gap: '1em', alignItems: 'center' }}>
                     <AddPhotoAlternateIcon fontSize='large'/> Upload Images
                     <input
@@ -167,8 +167,7 @@ export default function DesignForm({ initialValues, onSubmit }) {
                             error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                         >
                             <CustomMenuItem value="design">Design</CustomMenuItem>
-                            <CustomMenuItem value="production">Complete Design</CustomMenuItem>
-                            <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
+                            <CustomMenuItem value="design_completed">Complete Design</CustomMenuItem>
                         </Select>
                         {formik.touched.request_status && formik.errors.request_status && (
                             <Typography color="error">{formik.errors.request_status}</Typography>
@@ -180,7 +179,7 @@ export default function DesignForm({ initialValues, onSubmit }) {
                         {loading ? <CircularProgress size={24} /> : 'Submit'}
                     </CustomButton1>
                 </Box>
-            </form>
+            </Box>
             <Dialog
                 open={open}
                 onClose={handleClose}
