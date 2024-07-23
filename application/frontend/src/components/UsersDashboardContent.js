@@ -165,31 +165,6 @@ const UserDashboardContent = () => {
         setIsDialogOpen(true);
     };
 
-    const handleDeleteClick = (id) => {
-        setDeleteUserId(id);
-        setIsDeleteDialogOpen(true);
-    };
-
-    const handleConfirmDelete = async (id) => {
-        try {
-            await axiosInstance.delete(`/users/${id}`);
-            fetchUsers()
-            setIsDeleteDialogOpen(false);
-            toast.success('User deleted successfully!', {
-                autoClose: 5000, // Auto close after 5 seconds
-                closeOnClick: true,
-                draggable: true,
-            });
-        } catch (error) {
-            console.error("There was an error deleting the user!", error);
-            toast.error('Failed to delete user. Please try again.', {
-                autoClose: 5000, // Auto close after 5 seconds
-                closeOnClick: true,
-                draggable: true,
-            });
-        }
-    };
-
     const handleSubmit = async (values) => {
         try {
             await axiosInstance.patch(`/users/role-assignment/${selectedUser._id}`, values);
@@ -276,15 +251,12 @@ const UserDashboardContent = () => {
                                             <StyledIconButton color="primary" onClick={() => handleEditClick(user)}>
                                                 <Edit fontSize='large' />
                                             </StyledIconButton>
-                                            <StyledIconButton color="secondary" onClick={() => handleDeleteClick(user._id)}>
-                                                <Delete fontSize='large' />
-                                            </StyledIconButton>
                                         </CustomTableCell>
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <CustomTableCell align='center' colSpan={6}>
+                                    <CustomTableCell align='center' colSpan={7}>
                                         <Typography variant="h6">No users found</Typography>
                                     </CustomTableCell>
                                 </TableRow>
@@ -314,23 +286,6 @@ const UserDashboardContent = () => {
                         <Button onClick={() => setIsDialogOpen(false)} sx={{ color: "#b48c72", fontSize: '1.3rem' }}>
                             Cancel
                         </Button>
-                    </DialogActions>
-                </Dialog>
-
-                <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)}>
-                    <DialogTitle align='center'>Delete User</DialogTitle>
-                    <DialogContent>
-                        <Typography variant="p" sx={{ fontSize: '1.3rem' }}>
-                            Are you sure you want to delete this user?
-                        </Typography>
-                    </DialogContent>
-                    <DialogActions>
-                        <CustomButton onClick={() => setIsDeleteDialogOpen(false)} variant="contained">
-                            Cancel
-                        </CustomButton>
-                        <CustomButton onClick={() => handleConfirmDelete(deleteUserId)} variant="contained">
-                            Delete
-                        </CustomButton>
                     </DialogActions>
                 </Dialog>
             </Container>

@@ -113,7 +113,7 @@ export default function RequestForm({ initialValues, onSubmit, fetchData, closeA
                 closeOnClick: true,
                 draggable: true,
             });
-            fetchData();
+            // fetchData();
             closeAllDialogs();
         } catch (error) {
             toast.error(error.response.data.error || 'Update fail', {
@@ -134,7 +134,7 @@ export default function RequestForm({ initialValues, onSubmit, fetchData, closeA
                 closeOnClick: true,
                 draggable: true,
             });
-            fetchData();
+            // fetchData();
         } catch (error) {
             console.error('Error while updating design', error);
             toast.error('Design update fail', {
@@ -148,26 +148,30 @@ export default function RequestForm({ initialValues, onSubmit, fetchData, closeA
     const handleQuoteFormSubmit = async (values) => {
         setIsQuoteFormOpen(false);
         formik.setFieldValue('quote', values);
-        handleSubFormSubmission(values);
+        await handleSubFormSubmission(values);
+        fetchData();
     };
     
     const handleDesignFormSubmit = async (values, designData) => {
         setIsDesignFormOpen(false);
         formik.setFieldValue('quote', values);
-        handleUpdateJewelryDesign(designData);
-        handleSubFormSubmission(values);
+        await handleUpdateJewelryDesign(designData);
+        await handleSubFormSubmission(values);
+        fetchData();
     };
 
     const handleProductionFormSubmit = async (values) => {
         setIsProductionFormOpen(false);
         formik.setFieldValue('production', values);
-        handleSubFormSubmission(values);
+        await handleSubFormSubmission(values);
+        fetchData();
     };
 
     const handleWarrantyFormSubmit = async (values) => {
         setIsWarrantyFormOpen(false);
         formik.setFieldValue('warranty', values);
-        handleSubFormSubmission(values);
+        await handleSubFormSubmission(values);
+        fetchData();
     };
 
     return (

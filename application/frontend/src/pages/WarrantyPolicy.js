@@ -25,15 +25,15 @@ const WarrantyPolicy = () => {
                                 <TableBody>
                                     <TableRow>
                                         <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">Cleaning products at the store</Typography></TableCell>
-                                        <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">Lifetime</Typography></TableCell>
+                                        <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">02 years</Typography></TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">Polishing and re-plating</Typography></TableCell>
-                                        <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">Lifetime</Typography></TableCell>
+                                        <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">02 years</Typography></TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">Adjusting products size</Typography></TableCell>
-                                        <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">Lifetime</Typography></TableCell>
+                                        <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">02 years</Typography></TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell sx={{ width: '50%' }} align='center'><Typography variant="h5">Straightening ring</Typography></TableCell>

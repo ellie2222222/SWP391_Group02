@@ -246,9 +246,9 @@ const BlogCreate = () => {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell align="center" colSpan={4}>
+                                        <CustomTableCell align="center" colSpan={4}>
                                             <Typography variant="h6">No blogs found</Typography>
-                                        </TableCell>
+                                        </CustomTableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

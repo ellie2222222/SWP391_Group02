@@ -42,10 +42,9 @@ function App() {
         <Route path='/products/:id' element={<Details />} />
 
         <Route path='/blogs' element={<Blogs />}></Route>
-        <Route path='/blog/:id' element={<BlogContents />}></Route>
+        <Route path='/blog/:id' element={<BlogContents />} />
 
-        <Route path='/aboutus' element={<About />}></Route>
-        <Route path='/profile/:id' element={<Profile />} />
+        <Route path='/about-us' element={<About />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -58,26 +57,25 @@ function App() {
         <Route path="/gold-price" element={<GoldPrice />} />
 
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<JewelryDashboard />} />
-          <Route path="/admin/users" element={<UsersDashboard />} />
-          <Route path="/admin/requests" element={<RequestDashboard />} />
-          <Route path="/admin/quote-request" element={<QuotedRequest />} />
-          <Route path="/admin/warranty-request" element={<WarrantyDashboard />} />
-          <Route path="/admin/gemstones" element={<Gemstones />}></Route>
-          <Route path="/admin/materials" element={<Material />}></Route>
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/invoices" element={<InvoiceDashboard />} />
-          <Route path='/admin/blogs' element={<BlogCreate />}></Route>
+          <Route path="/management" element={<JewelryDashboard />} />
+          <Route path="/management/users" element={<UsersDashboard />} />
+          <Route path="/management/requests" element={<RequestDashboard />} />
+          <Route path="/management/quote-request" element={<QuotedRequest />} />
+          <Route path="/management/warranty-request" element={<WarrantyDashboard />} />
+          <Route path="/management/gemstones" element={<Gemstones />}></Route>
+          <Route path="/management/materials" element={<Material />}></Route>
+          <Route path="/management/dashboard" element={<Dashboard />} />
+          <Route path="/management/invoices" element={<InvoiceDashboard />} />
+          <Route path='/management/blogs' element={<BlogCreate />}></Route>
         </Route>
 
         <Route element={<UserRoute />}>
           <Route path="/requests" element={<Requests />} />
-          <Route path='/products/:id/payment-status' element={<Payment />} />
-        </Route>
-
-        <Route element={<AuthRoute />}>
           <Route path="/request" element={<CustomRequest />} />
+          <Route path='/products/:id/payment-status' element={<Payment />} />
+          <Route path='/profile/:id' element={<Profile />} />
         </Route>
+        
       </Routes>
     </div>
   );

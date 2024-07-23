@@ -17,7 +17,7 @@ const createInvoice = async (req, res) => {
         if (!transaction) {
             return res.status(404).json({ error: 'Transaction not found' });
         }
-        const requestId = transaction.request_id;
+        const requestId = transaction.request_id._id;
 
         // Check if an invoice transaction of the same type already exists for this request
         const existingDepositInvoice = await Invoice.exists({
@@ -59,16 +59,33 @@ const createInvoice = async (req, res) => {
             );
         }
 
+        // Update status history
+        if (updatedRequest) {
+            const now = new Date();
+            const statusIndex = updatedRequest.status_history.findIndex(entry => entry.status === updatedRequest.request_status);
+
+            if (statusIndex !== -1) {
+                if (!updatedRequest.status_history[statusIndex].timestamp) {
+                    updatedRequest.status_history[statusIndex].timestamp = now;
+                }
+            } else {
+                updatedRequest.status_history.push({ status: updatedRequest.request_status, timestamp: now });
+            }
+
+            await updatedRequest.save();
+        }
+
         // Create the invoice
         const invoice = new Invoice({ transaction_id, payment_method, payment_gateway, total_amount });
         await invoice.save();
 
-        res.status(201).json(invoice);
+        res.status(201).json({ invoice, updatedRequest });
     } catch (error) {
         console.error('Error creating invoice:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 
 
 // Get an Invoice by ID

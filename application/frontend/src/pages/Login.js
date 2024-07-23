@@ -113,7 +113,7 @@ const Login = () => {
       if (role === 'user') {
         navigate('/');
       } else {
-        navigate('/admin');
+        navigate('/management');
       }
     } catch (error) {
       if (error.response === undefined) setError(error.message);

@@ -34,7 +34,7 @@ const BlogLists = () => {
   if (blogsData.blogs.length <= 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <Typography variant="h5">There are no blogs available.</Typography>
+        <Typography variant="h2">There are no blogs available at the moment.</Typography>
       </Box>
     );
   }

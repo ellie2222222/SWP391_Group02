@@ -90,6 +90,7 @@ const AdminContent = () => {
     const [selectedJewelry, setSelectedJewelry] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [type, setType] = useState("");
@@ -99,6 +100,7 @@ const AdminContent = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [searchParams, setSearchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
+    const [jewelryToDelete, setJewelryToDelete] = useState(null);
 
 
     const fetchJewelries = async () => {
@@ -182,9 +184,14 @@ const AdminContent = () => {
         setSelectedJewelry(null);
     };
 
-    const handleDeleteClick = async (id) => {
+    const handleDeleteClick = (jewelry) => {
+        setJewelryToDelete(jewelry);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
         try {
-            await axiosInstance.delete(`/jewelries/${id}`);
+            await axiosInstance.delete(`/jewelries/${jewelryToDelete._id}`);
             fetchJewelries();
             toast.success('Jewelry item deleted successfully', {
                 autoClose: 5000, // Auto close after 5 seconds
@@ -198,6 +205,9 @@ const AdminContent = () => {
                 closeOnClick: true,
                 draggable: true,
             });
+        } finally {
+            setIsDeleteDialogOpen(false);
+            setJewelryToDelete(null);
         }
     };
 
@@ -412,21 +422,44 @@ const AdminContent = () => {
                     <DialogContent>
                         {selectedJewelry && (
                             <Box>
-                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Description: {selectedJewelry.description}</Typography>
-                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Price: {selectedJewelry.price}</Typography>
-                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Category: {selectedJewelry.category}</Typography>
-                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Type: {selectedJewelry.type}</Typography>
-                                <Typography variant="body1" sx={{fontSize: '1.3rem'}}>Available: {selectedJewelry.available ? 'Yes' : 'No'}</Typography>
+                                <Typography variant="body1" sx={{ fontSize: '1.3rem' }}>Description: {selectedJewelry.description}</Typography>
+                                <Typography variant="body1" sx={{ fontSize: '1.3rem' }}>Price: {selectedJewelry.price}</Typography>
+                                <Typography variant="body1" sx={{ fontSize: '1.3rem' }}>Category: {selectedJewelry.category}</Typography>
+                                <Typography variant="body1" sx={{ fontSize: '1.3rem' }}>Type: {selectedJewelry.type}</Typography>
+                                <Typography variant="body1" sx={{ fontSize: '1.3rem' }}>Available: {selectedJewelry.available ? 'Yes' : 'No'}</Typography>
                             </Box>
                         )}
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseDetailsDialog} sx={{ color: '#b48c72', fontSize: '1.3rem'}}>
+                        <Button onClick={handleCloseDetailsDialog} sx={{ color: '#b48c72', fontSize: '1.3rem' }}>
                             Close
                         </Button>
                     </DialogActions>
                 </Dialog>
+
+                <Dialog
+                    open={isDeleteDialogOpen}
+                    onClose={() => setIsDeleteDialogOpen(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title" align='center' variant='h5'>{"Confirm Delete"}</DialogTitle>
+                    <DialogContent>
+                        <Typography sx={{ fontSize: '1.3rem' }}>
+                            Are you sure you want to delete this jewelry item?
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setIsDeleteDialogOpen(false)}  sx={{ color: '#b48c72', fontSize: '1.3rem' }}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleConfirmDelete}  sx={{ color: '#b48c72', fontSize: '1.3rem' }} autoFocus>
+                            Confirm
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Container>
+
             <ToastContainer />
         </Box>
     );

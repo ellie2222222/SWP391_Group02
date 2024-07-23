@@ -85,7 +85,7 @@ const CustomRequestForm = () => {
 
     return (
         <Container>
-            <Box padding="40px 0" minHeight="60vh">
+            <Box padding="40px 0" minHeight="80vh">
                 <Typography variant="h2" component="h1" marginBottom="20px">Custom Jewelry Request</Typography>
                 <Typography variant='h4' sx={{ fontWeight: 300 }} marginBottom="20px">Please tell us about your design; describe any changes you'd like to make to an existing design on this website or a completely custom item idea.</Typography>
                 <CustomTextField

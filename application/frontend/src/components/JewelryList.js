@@ -105,8 +105,12 @@ const JewelryList = () => {
       setTotal(response.data.total)
       setTotalPages(response.data.totalPages);
     } catch (error) {
-      console.error('There was an error fetching the products!', error);
-      toast.error(error.response?.data?.error || error.message);
+      console.error('There was an error fetching products!', error);
+      toast.error('There was an error fetching products!', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+    });
     } finally {
       setLoading(false);
     }
@@ -268,7 +272,7 @@ const JewelryList = () => {
         ))
         ) : (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh" width="100%">
-          <Typography variant="h6">No products found</Typography>
+          <Typography variant="h2">No products found</Typography>
         </Box>
           )}
       </Grid>

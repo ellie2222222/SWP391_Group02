@@ -171,7 +171,7 @@ export default function Sidebar() {
                 <Divider />
                 <List>
                     <ListItem key="Jewelry" disablePadding sx={{ display: 'block' }}>
-                        <Link to='/admin'>
+                        <Link to='/management'>
                             <CustomListItemButton>
                                 <CustomListItemIcon>
                                     <LocalOfferIcon fontSize='large' />
@@ -182,7 +182,7 @@ export default function Sidebar() {
                     </ListItem>
                     {user.role !== 'admin' && user.role !== 'user' && (
                         <ListItem key="My Requests" disablePadding sx={{ display: 'block' }}>
-                            <Link to='/admin/requests'>
+                            <Link to='/management/requests'>
                                 <CustomListItemButton>
                                     <CustomListItemIcon>
                                         <ShoppingCartIcon fontSize='large' />
@@ -195,7 +195,7 @@ export default function Sidebar() {
                     {user.role === 'manager' && (
                         <div>
                             <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/dashboard'>
+                                <Link to='/management/dashboard'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <Dashboard fontSize='large' />
@@ -205,7 +205,7 @@ export default function Sidebar() {
                                 </Link>
                             </ListItem>
                             <ListItem key="Quote Requests" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/quote-request'>
+                                <Link to='/management/quote-request'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <RequestQuoteIcon fontSize='large' />
@@ -215,7 +215,7 @@ export default function Sidebar() {
                                 </Link>
                             </ListItem>
                             <ListItem key="Gemstones" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/gemstones'>
+                                <Link to='/management/gemstones'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <Diamond fontSize='large' />
@@ -225,7 +225,7 @@ export default function Sidebar() {
                                 </Link>
                             </ListItem>
                             <ListItem key="Materials" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/materials'>
+                                <Link to='/management/materials'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <Diamond fontSize='large' />
@@ -238,7 +238,7 @@ export default function Sidebar() {
                     )}
                     {user.role === 'admin' && (
                         <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
-                            <Link to='/admin/users'>
+                            <Link to='/management/users'>
                                 <CustomListItemButton>
                                     <CustomListItemIcon>
                                         <PeopleIcon fontSize='large' />
@@ -250,7 +250,7 @@ export default function Sidebar() {
                     )}
                     {user.role === 'admin' && (
                         <ListItem key="Blogs" disablePadding sx={{ display: 'block' }}>
-                            <Link to='/admin/blogs'>
+                            <Link to='/management/blogs'>
                                 <CustomListItemButton>
                                     <CustomListItemIcon>
                                         <FeedIcon fontSize='large' />
@@ -263,7 +263,7 @@ export default function Sidebar() {
                     {(user.role === 'sale_staff' || user.role === 'manager') && (
                         <div>
                             <ListItem key="invoices" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/invoices'>
+                                <Link to='/management/invoices'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <ReceiptIcon fontSize='large' />
@@ -273,7 +273,7 @@ export default function Sidebar() {
                                 </Link>
                             </ListItem>
                             <ListItem key="Warranty" disablePadding sx={{ display: 'block' }}>
-                                <Link to='/admin/warranty-request'>
+                                <Link to='/management/warranty-request'>
                                     <CustomListItemButton>
                                         <CustomListItemIcon>
                                             <VerifiedIcon fontSize='large' />

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
-import {jwtDecode} from 'jwt-decode';
-import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import axiosInstance from '../utils/axiosInstance';
 
 const AuthContext = createContext();
 
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
         const refreshAuthToken = async () => {
             try {
-                const response = await axios.post('http://localhost:4000/api/user/refresh-token', {}, { withCredentials: true });
+                const response = await axiosInstance.post('/user/refresh-token', {}, { withCredentials: true });
                 const { token, existToken } = response.data;
 
                 if (existToken) {
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
             if (token) {
                 const decoded = jwtDecode(token);
                 const currentTime = Date.now() / 1000;
-                
+
                 // If token is about to expire in the next minute, refresh it
                 if (decoded.exp - currentTime < 60) {
                     await refreshAuthToken();
@@ -69,11 +69,9 @@ export const AuthProvider = ({ children }) => {
         return () => clearInterval(intervalId);
     }, []);
 
-    const baseUrl = 'http://localhost:4000/api/user';
-
     const login = async (email, password) => {
         try {
-            const response = await axios.post(baseUrl + '/login', { email, password }, { withCredentials: true });
+            const response = await axiosInstance.post('/user/login', { email, password }, { withCredentials: true });
             const { token } = response.data;
             const decoded = jwtDecode(token);
             localStorage.setItem('token', token);
@@ -87,7 +85,7 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (userData) => {
         try {
-            const response = await axios.post(baseUrl + '/signup', userData, { withCredentials: true });
+            const response = await axiosInstance.post('/user/signup', userData, { withCredentials: true });
             const { token } = response.data;
             const decoded = jwtDecode(token);
             localStorage.setItem('token', token);
@@ -104,13 +102,13 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-          await axios.post(baseUrl + '/logout', {}, { withCredentials: true });
-          localStorage.removeItem('token'); // Remove the token from local storage
-          setUser(null);
+            await axiosInstance.post('/user/logout', {}, { withCredentials: true });
+            localStorage.removeItem('token'); // Remove the token from local storage
+            setUser(null);
         } catch (error) {
-          console.error('Logout error:', error);
+            console.error('Logout error:', error);
         }
-      };
+    };
 
     return (
         <AuthContext.Provider value={{ user, login, signup, logout, loading }}>

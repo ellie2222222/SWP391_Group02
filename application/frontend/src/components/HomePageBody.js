@@ -18,25 +18,21 @@ const Banner = styled(Box) ({
     textAlign: 'center',
 });
 
-
 const items = [
     {
         image: 'https://www.tierra.vn/wp-content/uploads/2024/07/BANNER-HOMEPAGE-2.webp', // Replace with actual image URL
-        title: 'Nhẫn cầu hôn',
-        discount: 'Giảm ngay 15%',
-        actionText: 'Khám phá ngay'
+        title: 'Engagement Rings',
+        actionText: 'Explore Now'
     },
     {
         image: 'https://www.tierra.vn/wp-content/uploads/2024/07/BANNER-TRANG-CHU-2.webp', // Replace with actual image URL
-        title: 'Trang sức kim cương',
-        discount: 'Giảm ngay 15%',
-        actionText: 'Khám phá ngay'
+        title: 'Diamond Jewelry',
+        actionText: 'Explore Now'
     },
     {
         image: 'https://www.tierra.vn/wp-content/uploads/2024/07/VTA8111.webp', // Replace with actual image URL
-        title: 'Vòng tay',
-        discount: 'Giảm ngay 15%',
-        actionText: 'Khám phá ngay'
+        title: 'Bracelets',
+        actionText: 'Explore Now'
     }
 ];
 
@@ -50,12 +46,12 @@ const ringItems = [
         image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH9907_4.webp'
     },
     {
-        label: 'Best selling',
+        label: 'Best Selling',
         image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH9906_4.webp'
     },
     {
-        label: 'New collection',
-        image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH8210_4.webp '
+        label: 'New Collection',
+        image: 'https://tierra.vn/wp-content/uploads/2024/07/NCH8210_4.webp'
     }
 ];
 
@@ -63,17 +59,17 @@ const CustomButton = styled(Button)({
     color: '#000',
     textTransform: 'uppercase',
     width: '100%',
-    height: '100%', // Chiếm toàn bộ chiều cao của Grid item
+    height: '100%', // Take full height of Grid item
     fontSize: '1.6rem',
     fontWeight: '400',
     '&:hover': {
-        backgroundColor: 'transparent', // Xóa hiệu ứng viền mặc định
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        backgroundColor: 'transparent', // Remove default border effect
+        color: '#b48c72', // Change text color on hover
         borderRadius: '0',
     },
     '&.active': {
-        backgroundColor: 'transparent', // Xóa hiệu ứng viền mặc định
-        color: '#b48c72', // Thay đổi màu chữ khi active
+        backgroundColor: 'transparent', // Remove default border effect
+        color: '#b48c72', // Change text color when active
         borderRadius: '0',
     },
 });
@@ -85,19 +81,18 @@ const CustomButton1 = styled(Button)({
     width: '100%',
     fontSize:'1.6rem',
     '&:hover': {
-        color: '#b48c72', // Thay đổi màu chữ khi hover
+        color: '#b48c72', // Change text color on hover
         border: '1px solid #b48c72',
         backgroundColor: 'transparent',
     },
 });
 
 const HomePageBody = () => {
-    
-
     return (
         <Box>
             {/* Banner Section */}
             <Banner>
+                {/* Add any content or text here if needed */}
             </Banner>
             {/* Rest of the content */}
             <Container sx={{ paddingTop: '40px', paddingBottom: '40px' }}>
@@ -113,9 +108,6 @@ const HomePageBody = () => {
                                 <CardContent>
                                     <Typography variant="h4" component="div">
                                         {item.title}
-                                    </Typography>
-                                    <Typography variant="h6" color="textSecondary">
-                                        {item.discount}
                                     </Typography>
                                     <Box mt={2}>
                                         <CustomButton variant="text" color="primary">
@@ -139,13 +131,13 @@ const HomePageBody = () => {
                         <Grid item xs={12} md={4} marginBottom="20px">
                             <Box>
                                 <Typography variant="h3" gutterBottom>
-                                    Nhẫn Cầu Hôn
+                                    Engagement Rings
                                 </Typography>
                                 <Typography variant="h5" color="textSecondary" paragraph>
-                                    Một chiếc nhẫn lấp lánh trao tay, mở ra hành trình yêu thương viên mãn.
+                                    A sparkling ring to be given, marking the beginning of a lifelong love journey.
                                 </Typography>
                                 <CustomButton1 variant="outlined" color="primary">
-                                    XEM THÊM
+                                    VIEW MORE
                                 </CustomButton1>
                             </Box>
                         </Grid>
@@ -154,7 +146,7 @@ const HomePageBody = () => {
                             <CardMedia
                                 component="img"
                                 image="https://www.tierra.vn/wp-content/uploads/2024/07/nhan-cuoi-eternity.webp"  // Replace with actual image URL or path
-                                alt="Nhẫn Cầu Hôn"
+                                alt="Engagement Ring"
                             />
                         </Grid>
                         {/* Image 2 */}
@@ -162,7 +154,7 @@ const HomePageBody = () => {
                             <CardMedia
                                 component="img"
                                 image="https://www.tierra.vn/wp-content/uploads/2024/07/Banner-trang-chu-1.webp"  // Replace with actual image URL or path
-                                alt="Nhẫn Cầu Hôn trên tay"
+                                alt="Engagement Ring on hand"
                             />
                         </Grid>
                     </Grid>
@@ -201,7 +193,7 @@ const HomePageBody = () => {
                                     Custom Ring
                                 </Typography>
                                 <Typography variant="h5" color="textSecondary" paragraph>
-                                    Một chiếc nhẫn lấp lánh trao tay, mở ra hành trình yêu thương viên mãn.
+                                    A sparkling ring to be given, marking the beginning of a lifelong love journey.
                                 </Typography>
                                 <CustomButton1 variant="outlined" color="primary">
                                     Custom
@@ -213,7 +205,7 @@ const HomePageBody = () => {
                             <CardMedia
                                 component="img"
                                 image="https://www.tierra.vn/wp-content/uploads/2024/07/banner-homepage-1.webp"  // Replace with actual image URL or path
-                                alt="Nhẫn Cầu Hôn"
+                                alt="Custom Ring"
                             />
                         </Grid>
                         {/* Image 2 */}
@@ -221,7 +213,7 @@ const HomePageBody = () => {
                             <CardMedia
                                 component="img"
                                 image="https://www.tierra.vn/wp-content/uploads/2024/07/COVER-COLLECTION.webp"  // Replace with actual image URL or path
-                                alt="Nhẫn Cầu Hôn trên tay"
+                                alt="Custom Ring on hand"
                             />
                         </Grid>
                     </Grid>
@@ -237,26 +229,19 @@ const HomePageBody = () => {
                     <Grid item xs={12} md={6}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
                             <Typography variant="h3" component="div" mb={4}>
-                                Dịch vụ của chúng tôi
+                                Our Services
                             </Typography>
                             <Box display="flex" alignItems="center" mb={2}>
-                                <LocalShippingIcon sx={{ mr: 1 }} />
-                                <Typography variant="h5">Giao hàng miễn phí toàn quốc</Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" mb={2}>
                                 <SwapHorizIcon sx={{ mr: 1 }} />
-                                <Typography variant="h5">Chế độ thu đổi đến 100%</Typography>
+                                <Typography variant="h5">Exchange policy up to 100%</Typography>
                             </Box>
                             <Box display="flex" alignItems="center" mb={2}>
                                 <VerifiedIcon sx={{ mr: 1 }} />
-                                <Typography variant="h5">Bảo hành trọn đời</Typography>
+                                <Typography variant="h5">Lifetime warranty</Typography>
                             </Box>
                             <Typography variant="h5" mb={4}>
-                                Tìm cửa hàng gần bạn
+                                Find a store near you
                             </Typography>
-                            <CustomButton1 color="primary">
-                                ĐẶT LỊCH HẸN
-                            </CustomButton1>
                         </Box>
                     </Grid>
                 </Grid>

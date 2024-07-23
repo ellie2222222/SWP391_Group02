@@ -104,11 +104,19 @@ export default function QuotedRequestDashBoard() {
             setError('');
             fetchRequests();
             handleCloseDialog();
-            toast.success('Quote approved successfully!');
+            toast.success('Quote approved successfully!', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } catch (error) {
             if (error.response === undefined) setError(error.message);
             else setError(error.response.data.error);
-            toast.error('Failed to approve the quote.');
+            toast.error('Failed to approve the quote.', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         }
     };
     const handleRejectRequest = async (values) => {
@@ -118,11 +126,19 @@ export default function QuotedRequestDashBoard() {
             setError('');
             fetchRequests();
             handleCloseFeedBackDialog();
-            toast.success('Quote Reject successfully!');
+            toast.success('Quote Reject successfully!', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         } catch (error) {
             if (error.response === undefined) setError(error.message);
             else setError(error.response.data.error);
-            toast.error('Failed to reject the quote.');
+            toast.error('Failed to reject the quote.', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
         }
     };
 

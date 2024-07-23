@@ -194,7 +194,7 @@ const Navbar = () => {
                   </CustomLink>
                 </CustomListItem>
                 <CustomListItem button onClick={handleDrawerClose}>
-                  <CustomLink to="/aboutus">
+                  <CustomLink to="/about-us">
                     <ListItemText primary="About Us" />
                   </CustomLink>
                 </CustomListItem>
@@ -235,7 +235,7 @@ const Navbar = () => {
                         onClose={handleMenuClose}
                       >
                         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
-                        <MenuItem component={Link} to={`/admin`} onClick={handleMenuClose}>
+                        <MenuItem component={Link} to={`/management`} onClick={handleMenuClose}>
                           Dashboard
                         </MenuItem>
                       </Menu>
@@ -282,7 +282,7 @@ const Navbar = () => {
                 </Link>
               </Grid>
               <Grid item xs>
-                <Link to="/aboutus">
+                <Link to="/about-us">
                   <CustomButton>About Us</CustomButton>
                 </Link>
               </Grid>
@@ -375,7 +375,7 @@ const Navbar = () => {
                       onClose={handleMenuClose}
                     >
                       <MenuItem onClick={handleLogOut}>Logout</MenuItem>
-                      <MenuItem component={Link} to={`/admin`} onClick={handleMenuClose}>
+                      <MenuItem component={Link} to={`/management`} onClick={handleMenuClose}>
                         Dashboard
                       </MenuItem>
                     </Menu>

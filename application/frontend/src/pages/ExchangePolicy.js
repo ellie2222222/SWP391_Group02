@@ -110,7 +110,7 @@ const ExchangePolicy = () => {
                         <Typography variant='body1' align='center'>Table 2.1</Typography>
                     </Box>
                     <Box mt={4}>
-                        <Typography variant='h5'>Note:</Typography>
+                        <Typography variant='h5' sx={{ fontWeight: '900'}}>Note:</Typography>
                         <Typography variant='h5'>Products that are not intact or missing an invoice will be bought back at the current gold price</Typography>
                     </Box>
                 </Box>

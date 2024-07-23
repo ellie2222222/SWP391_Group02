@@ -93,6 +93,11 @@ const RequestList = () => {
       setLoading(false);
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
+      toast.error('There was an error fetching requests!', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     }
   };
 
@@ -100,20 +105,40 @@ const RequestList = () => {
     try {
       await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit' });
       setError('');
-      fetchRequests(page); // Fetch the current page again after updating
+      fetchRequests(page);  
+      toast.success('Accept quote successfully', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     } catch (error) {
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
+      toast.error('Accept quote fail', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     }
   };
   const handleAcceptDesignRequest = async (requestId) => {
     try {
       await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'production' });
       setError('');
-      fetchRequests(page); // Fetch the current page again after updating
+      fetchRequests(page);
+      toast.success('Accept design successfully', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     } catch (error) {
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
+      toast.error('Accept design fail', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     }
   };
 
@@ -129,9 +154,9 @@ const RequestList = () => {
 
       let price;
       if (type === 'deposit') {
-        price = request.quote_amount * 10 / 100;
+        price = request.quote_amount * 30 / 100;
       } else if (type === 'final') {
-        price = request.quote_amount * 90 / 100;
+        price = request.quote_amount * 70 / 100;
       }
 
       const payment = await axiosInstance.post('/payment', {
@@ -149,6 +174,11 @@ const RequestList = () => {
       window.location.href = payment.data.result.order_url;
     } catch (error) {
       console.error('Error, cannot proceed to payment', error);
+      toast.error('Error, cannot proceed to payment', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     }
   };
 
@@ -184,11 +214,19 @@ const RequestList = () => {
       setError('');
       fetchRequests(page);
       handleCloseFeedBackDialog();
-      toast.success('Quote Reject successfully!');
+      toast.success('Quote reject successfully!', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     } catch (error) {
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
-      toast.error('Failed to reject the quote.');
+      toast.error('Failed to reject the quote.', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     }
   };
   const handleRejectDesignRequest = async (values) => {
@@ -198,11 +236,19 @@ const RequestList = () => {
       setError('');
       fetchRequests(page);
       handleCloseDesignFeedBackDialog();
-      toast.success('Design Reject successfully!');
+      toast.success('Design Reject successfully!', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     } catch (error) {
       if (error.response === undefined) setError(error.message);
       else setError(error.response.data.error);
-      toast.error('Failed to reject the design.');
+      toast.error('Failed to reject the design.', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
     }
   };
 
@@ -226,8 +272,6 @@ const RequestList = () => {
           <Card key={index} variant="outlined" sx={{ marginBottom: '20px' }}>
             <CardContent>
               <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
-              <Typography variant="h5" sx={{ textTransform: 'capitalize' }}>Status: {request.request_status}</Typography>
-              <Typography variant="h5">Type: {request.jewelry_id ? request.jewelry_id.type : 'Custom'}</Typography>
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                 Deposit Amount: {request.quote_amount ? (request.quote_amount * 10 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
               </Typography>
@@ -235,18 +279,21 @@ const RequestList = () => {
                 Quote Amount: {request.quote_amount ? request.quote_amount.toLocaleString() + '₫' : 'Awaiting Quote Amount'}
               </Typography>
               <Box my={1}>
-                <Typography variant="h5">Tracking Status:</Typography>
+                <Typography variant="h5">Status Progress:</Typography>
                 <Stepper activeStep={getStatusStep(request.request_status)} alternativeLabel sx={{ marginTop: '20px' }}>
                   {steps.map((label, stepIndex) => {
                     const statusEntry = request.status_history.find(entry => entry.status === label);
                     const timestamp = statusEntry ? new Date(statusEntry.timestamp).toLocaleDateString() : '';
-                    const displayLabel = label === 'design_completed' ? 'Design Completed' : label;
+                    let displayLabel
+                    displayLabel = label === 'design_completed' ? 'user accept design' : label;
+                    displayLabel = displayLabel === 'accepted' ? 'user accept quote' : displayLabel;
+                    displayLabel = displayLabel === 'quote' ? 'manager approve quote' : displayLabel;
                     return (
                       <Step key={label}>
                         <CustomStepLabel
                           StepIconComponent={(props) => <CustomStepIcon {...props} status={request.request_status} icon={stepIndex + 1} />}
                         >
-                          {displayLabel === 'accepted' ? 'quote accept' : displayLabel}
+                          {displayLabel}
                         </CustomStepLabel>
                         <Typography variant='h6' align='center' mt={1} sx={{ fontWeight: '300' }}>{timestamp && `${timestamp}`} </Typography>
                       </Step>
@@ -266,8 +313,8 @@ const RequestList = () => {
               )}
               {request.request_status === 'design_completed' && (
                 <>
-                <CustomButton1 onClick={() => handleAcceptDesignRequest(request._id)} > Accept Design</CustomButton1>
-                <CustomButton1 onClick={() => handleOpenDesignFeedbackDialog(request)}>Reject Design</CustomButton1>
+                  <CustomButton1 onClick={() => handleAcceptDesignRequest(request._id)} > Accept Design</CustomButton1>
+                  <CustomButton1 onClick={() => handleOpenDesignFeedbackDialog(request)}>Reject Design</CustomButton1>
                 </>
               )}
               {request.request_status === 'payment' && (
@@ -303,22 +350,62 @@ const RequestList = () => {
         <Dialog open={isDetailsDialogOpen} onClose={() => setIsDetailsDialogOpen(false)} maxWidth="md" fullWidth>
           <DialogTitle variant='h4' align='center' gutterBottom>Request Details</DialogTitle>
           <DialogContent>
-            <Typography variant="h5" component="p" marginTop="20px">
+            <Typography
+              variant="h5"
+              component="p"
+              marginTop="20px"
+              sx={{
+                wordBreak: 'break-word',
+                whiteSpace: 'pre-wrap',
+                overflow: 'hidden',
+                wordWrap: 'break-word'
+              }}
+            >
               Description: {selectedRequest.request_description}
             </Typography>
             {selectedRequest.quote_content && (
               <>
-                <Typography variant="h6" component="p" marginTop="20px">
+                <Typography
+                  variant="h6"
+                  component="p"
+                  marginTop="20px"
+                  sx={{
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    overflow: 'hidden',
+                    wordWrap: 'break-word'
+                  }}
+                >
                   Quote Content: {selectedRequest.quote_content}
                 </Typography>
-                <Typography variant="h6" component="p">
+                <Typography
+                  variant="h6"
+                  component="p"
+                  sx={{
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    overflow: 'hidden',
+                    wordWrap: 'break-word'
+                  }}
+                >
                   Quote Amount: {selectedRequest.quote_amount.toLocaleString()}₫
                 </Typography>
               </>
             )}
             {selectedRequest.jewelry_id && selectedRequest.jewelry_id.images && (
               <Box marginTop="20px">
-                <Typography variant="h6" component="p">Design Images:</Typography>
+                <Typography
+                  variant="h6"
+                  component="p"
+                  sx={{
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    overflow: 'hidden',
+                    wordWrap: 'break-word'
+                  }}
+                >
+                  Design Images:
+                </Typography>
                 <Box display="flex" flexWrap="wrap">
                   {selectedRequest.jewelry_id.images.map((image, index) => (
                     <Card key={index} sx={{ maxWidth: 200, margin: "10px 20px 0 0" }}>
@@ -334,13 +421,75 @@ const RequestList = () => {
               </Box>
             )}
             {selectedRequest.production_start_date && (
-              <Typography variant="h6" component="p" marginTop="20px">
+              <Typography
+                variant="h6"
+                component="p"
+                mt={2}
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
                 Production Start Date: {new Date(selectedRequest.production_start_date).toLocaleDateString()}
               </Typography>
             )}
             {selectedRequest.production_end_date && (
-              <Typography variant="h6" component="p" marginTop="20px">
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
                 Production End Date: {new Date(selectedRequest.production_end_date).toLocaleDateString()}
+              </Typography>
+            )}
+            {selectedRequest.warranty_content && (
+              <Typography
+                variant="h6"
+                component="p"
+                mt={2}
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Warranty Content: {selectedRequest.warranty_content}
+              </Typography>
+            )}
+            {selectedRequest.warranty_start_date && (
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Production End Date: {new Date(selectedRequest.warranty_start_date).toLocaleDateString()}
+              </Typography>
+            )}
+            {selectedRequest.warranty_end_date && (
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Production End Date: {new Date(selectedRequest.warranty_end_date).toLocaleDateString()}
               </Typography>
             )}
           </DialogContent>
@@ -350,6 +499,7 @@ const RequestList = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
       )}
       <Dialog open={isFeedbackDialogOpen} onClose={handleCloseFeedBackDialog}>
         <DialogContent>
@@ -363,7 +513,7 @@ const RequestList = () => {
       </Dialog>
       <Dialog open={isDesignFeedbackDialogOpen} onClose={handleCloseDesignFeedBackDialog}>
         <DialogContent>
-          <UserFeedbackDesignForm initialValues={selectedRequest} onSubmit={handleRejectDesignRequest}  />
+          <UserFeedbackDesignForm initialValues={selectedRequest} onSubmit={handleRejectDesignRequest} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDesignFeedBackDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>

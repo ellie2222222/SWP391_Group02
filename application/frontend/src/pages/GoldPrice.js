@@ -27,7 +27,7 @@ const GoldPrice = () => {
     return (
         <div>
             <Navbar />
-            <Container maxWidth="md">
+            <Container maxWidth="md" sx={{ minHeight: '90vh'}}>
                 <Box mt={4}>
                     <Typography variant="h2" gutterBottom sx={{ fontWeight: '300', textAlign: 'center' }}>
                         GOLD PRICE
