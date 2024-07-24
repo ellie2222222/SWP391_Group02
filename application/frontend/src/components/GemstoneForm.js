@@ -33,7 +33,34 @@ const CustomTextField = styled(TextField)({
   },
 });
 
+const CustomFormControl = styled(FormControl)({
+  "& .MuiInputLabel-root": {
+      fontSize: "1.3rem",
+      "&.Mui-focused": {
+          color: "#b48c72",
+      },
+  },
+  "& .MuiOutlinedInput-root": {
+      fontSize: "1.3rem",
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+          borderColor: "#b48c72",
+      },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          borderColor: "#b48c72",
+      },
+  },
+  "& .MuiFormHelperText-root": {
+      fontSize: "1.2rem",
+      marginLeft: 0,
+  },
+  "& .MuiTypography-root": {
+      fontSize: "1.2rem",
+      marginLeft: 0,
+  },
+});
+
 const CustomButton = styled(Button)({
+  fontSize: '1.3rem',
   backgroundColor: '#b48c72', // button background color
   '&:hover': {
     backgroundColor: '#a57d65', // button background color on hover
@@ -100,7 +127,7 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
           error={formik.touched.carat && Boolean(formik.errors.carat)}
           helperText={formik.touched.carat && formik.errors.carat}
         />
-        <FormControl variant="outlined" fullWidth>
+        <CustomFormControl variant="outlined" fullWidth>
           <InputLabel id="cut-label">Cut</InputLabel>
           <Select
             labelId="cut-label"
@@ -120,8 +147,8 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
           {formik.touched.cut && formik.errors.cut && (
             <Typography variant="caption" color="red">{formik.errors.cut}</Typography>
           )}
-        </FormControl>
-        <FormControl variant="outlined" fullWidth>
+        </CustomFormControl>
+        <CustomFormControl variant="outlined" fullWidth>
           <InputLabel id="clarity-label">Clarity</InputLabel>
           <Select
             labelId="clarity-label"
@@ -147,8 +174,8 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
           {formik.touched.clarity && formik.errors.clarity && (
             <Typography variant="caption" color="red">{formik.errors.clarity}</Typography>
           )}
-        </FormControl>
-        <FormControl variant="outlined" fullWidth>
+        </CustomFormControl>
+        <CustomFormControl variant="outlined" fullWidth>
           <InputLabel id="color-label">Color</InputLabel>
           <Select
             labelId="color-label"
@@ -168,7 +195,7 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
           {formik.touched.color && formik.errors.color && (
             <Typography variant="caption" color="red">{formik.errors.color}</Typography>
           )}
-        </FormControl>
+        </CustomFormControl>
         <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
           Submit
         </CustomButton>

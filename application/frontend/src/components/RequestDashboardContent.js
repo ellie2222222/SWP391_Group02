@@ -124,6 +124,8 @@ const RequestDashboardContent = () => {
                 },
             });
 
+            console.log(response.data)
+
             setRequests(response.data.requests);
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total)
@@ -424,7 +426,7 @@ const RequestDashboardContent = () => {
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>
+                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
                         Close
                     </Button>
                 </DialogActions>
@@ -436,7 +438,7 @@ const RequestDashboardContent = () => {
                     <LargeTypography>Quote Content: {(selectedRequest && selectedRequest.quote_content) ? selectedRequest.quote_content : 'N/A'}</LargeTypography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>
+                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
                         Close
                     </Button>
                 </DialogActions>
@@ -455,7 +457,7 @@ const RequestDashboardContent = () => {
                     ))}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>
+                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
                         Close
                     </Button>
                 </DialogActions>
@@ -468,7 +470,7 @@ const RequestDashboardContent = () => {
                     <LargeTypography>Production Cost: {(selectedRequest && selectedRequest.production_cost) ? selectedRequest.production_cost : 'N/A'}</LargeTypography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>
+                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
                         Close
                     </Button>
                 </DialogActions>
@@ -479,7 +481,7 @@ const RequestDashboardContent = () => {
                     <LargeTypography>{selectedRequest && selectedRequest.request_description}</LargeTypography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72" }}>
+                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
                         Close
                     </Button>
                 </DialogActions>

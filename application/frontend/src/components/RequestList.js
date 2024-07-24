@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CardMedia, Container, Box, Typography, Button, CircularProgress, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack } from '@mui/material';
+import { CardMedia, Container, Box, Typography, Button, CircularProgress, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack, IconButton } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 import { jwtDecode } from 'jwt-decode';
@@ -7,6 +7,10 @@ import Check from '@mui/icons-material/Check';
 import { ToastContainer, toast } from 'react-toastify';
 import UserFeedbackQuoteForm from './UserFeedbackQuoteForm';
 import UserFeedbackDesignForm from './UserFeedbackDesignForm';
+import { Info } from '@mui/icons-material';
+import ErrorIcon from '@mui/icons-material/Error';
+import zaloLogo from './assets/imgs/Logo_Zalo.svg';
+
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
   backgroundColor: '#b48c72',
@@ -52,20 +56,35 @@ const CustomStepIconRoot = styled('div')(({ theme, ownerState }) => ({
 }));
 
 function CustomStepIcon(props) {
-  const { active, completed, className, icon, status } = props;
+  const { active, completed, className, icon, status, statusHistory, useAlternateSteps } = props;
+
+  // Determine if this step has a timestamp
+  const hasTimestamp = statusHistory.some(entry => entry.status === status && entry.timestamp);
 
   return (
     <CustomStepIconRoot ownerState={{ active }} className={className}>
-      {status === 'completed' ? (
-        <Check className="completed" />
-      ) : completed ? (
-        <Check className="completed" />
+      {useAlternateSteps ? (
+        status === 'cancelled' ? (
+          <ErrorIcon className="completed" />
+        ) : hasTimestamp ? (
+          <Check className="completed" />
+        ) : (
+          <ErrorIcon className="completed" />
+        )
       ) : (
-        <div className="circle">{icon}</div>
+        status === 'completed' ? (
+          <Check className="completed" />
+        ) : completed ? (
+          <Check className="completed" />
+        ) : (
+          <div className="circle">{icon}</div>
+        )
       )}
     </CustomStepIconRoot>
   );
 }
+
+
 
 const RequestList = () => {
   const [loading, setLoading] = useState(true);
@@ -78,7 +97,12 @@ const RequestList = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [saleStaffNumber, setSaleStaffNumber] = useState('');
+  const [designStaffNumber, setDesignStaffNumber] = useState('');
+  const [isContactInfoDialogOpen, setIsContactInfoDialogOpen] = useState(false);
+
   const steps = ['pending', 'quote', 'accepted', 'deposit', 'design', 'design_completed', 'production', 'payment', 'warranty', 'completed'];
+  const alternateSteps = ['pending', 'quote', 'accepted', 'deposit', 'design', 'design_completed', 'production', 'payment', 'warranty', 'cancelled'];
 
   const fetchRequests = async (pageNumber = 1) => {
     setLoading(true);
@@ -101,11 +125,22 @@ const RequestList = () => {
     }
   };
 
+  const getStaffContact = async () => {
+    try {
+      const response = await axiosInstance('/users/get-staff-contact');
+      console.log(response.data)
+      setSaleStaffNumber(response.data.saleStaff);
+      setDesignStaffNumber(response.data.designStaff);
+    } catch (error) {
+      console.error('Error getting contact numbers', error);
+    }
+  }
+
   const handleAcceptRequest = async (requestId) => {
     try {
       await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit' });
       setError('');
-      fetchRequests(page);  
+      fetchRequests(page);
       toast.success('Accept quote successfully', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
@@ -183,7 +218,25 @@ const RequestList = () => {
   };
 
   const getStatusStep = (status) => {
-    return steps.indexOf(status);
+    if (status === 'cancelled') {
+      return alternateSteps.indexOf(status);
+    } else {
+      return steps.indexOf(status);
+    }
+  };
+
+
+  const getDisplayLabel = (label) => {
+    switch (label) {
+      case 'design_completed':
+        return 'user accept design';
+      case 'accepted':
+        return 'user accept quote';
+      case 'quote':
+        return 'manager approve quote';
+      default:
+        return label;
+    }
   };
 
   const handlePageChange = (event, value) => {
@@ -252,8 +305,17 @@ const RequestList = () => {
     }
   };
 
+  const handleOpenContactInfoDialog = () => {
+    setIsContactInfoDialogOpen(true);
+  };
+
+  const handleCloseContactInfoDialog = () => {
+    setIsContactInfoDialogOpen(false);
+  };
+
   useEffect(() => {
     fetchRequests(page);
+    getStaffContact();
   }, [user.token, page]);
 
   if (loading) {
@@ -278,20 +340,28 @@ const RequestList = () => {
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                 Quote Amount: {request.quote_amount ? request.quote_amount.toLocaleString() + '₫' : 'Awaiting Quote Amount'}
               </Typography>
+              <Box display='flex' alignItems='center'>
+                <Typography variant="h5">Staff Contact Information</Typography>
+                <IconButton onClick={handleOpenContactInfoDialog}>
+                  <Info fontSize='large' />
+                </IconButton>
+              </Box>
               <Box my={1}>
                 <Typography variant="h5">Status Progress:</Typography>
-                <Stepper activeStep={getStatusStep(request.request_status)} alternativeLabel sx={{ marginTop: '20px' }}>
-                  {steps.map((label, stepIndex) => {
+                <Stepper
+                  activeStep={getStatusStep(request.request_status)}
+                  alternativeLabel
+                  sx={{ marginTop: '20px' }}
+                >
+                  {(request.request_status === 'cancelled' ? alternateSteps : steps).map((label, stepIndex) => {
                     const statusEntry = request.status_history.find(entry => entry.status === label);
                     const timestamp = statusEntry ? new Date(statusEntry.timestamp).toLocaleDateString() : '';
-                    let displayLabel
-                    displayLabel = label === 'design_completed' ? 'user accept design' : label;
-                    displayLabel = displayLabel === 'accepted' ? 'user accept quote' : displayLabel;
-                    displayLabel = displayLabel === 'quote' ? 'manager approve quote' : displayLabel;
+                    const displayLabel = getDisplayLabel(label);
+
                     return (
                       <Step key={label}>
                         <CustomStepLabel
-                          StepIconComponent={(props) => <CustomStepIcon {...props} status={request.request_status} icon={stepIndex + 1} />}
+                          StepIconComponent={(props) => <CustomStepIcon {...props} status={request.request_status === 'cancelled' ? label : request.request_status} statusHistory={request.status_history} useAlternateSteps={request.request_status === 'cancelled'} icon={stepIndex + 1} />}
                         >
                           {displayLabel}
                         </CustomStepLabel>
@@ -300,7 +370,6 @@ const RequestList = () => {
                     );
                   })}
                 </Stepper>
-
               </Box>
             </CardContent>
             <CardActions>
@@ -518,6 +587,32 @@ const RequestList = () => {
         <DialogActions>
           <Button onClick={handleCloseDesignFeedBackDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>
             Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={isContactInfoDialogOpen} onClose={handleCloseContactInfoDialog}>
+        <DialogTitle variant='h4' align='center'>Contact Information</DialogTitle>
+        <DialogContent>
+          <Typography variant="h5">Sale Staff Contact Number: {saleStaffNumber}</Typography>
+          <Typography variant="h5">Design Staff Contact Number: {designStaffNumber}</Typography>
+          <CustomButton1
+            href="https://chat.zalo.me/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Box
+              component="img"
+              src={zaloLogo}
+              alt="Zalo"
+              sx={{ width: 24, height: 24, marginRight: 1 }}
+            />
+            Zalo
+          </CustomButton1>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseContactInfoDialog} sx={{ fontSize: "1.3rem", color: "#b48c72" }}>
+            Close
           </Button>
         </DialogActions>
       </Dialog>

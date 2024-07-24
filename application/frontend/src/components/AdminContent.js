@@ -190,8 +190,9 @@ const AdminContent = () => {
     };
 
     const handleConfirmDelete = async () => {
+        setIsDeleteDialogOpen(false);
         try {
-            await axiosInstance.delete(`/jewelries/${jewelryToDelete._id}`);
+            await axiosInstance.delete(`/jewelries/${jewelryToDelete}`);
             fetchJewelries();
             toast.success('Jewelry item deleted successfully', {
                 autoClose: 5000, // Auto close after 5 seconds
@@ -206,7 +207,6 @@ const AdminContent = () => {
                 draggable: true,
             });
         } finally {
-            setIsDeleteDialogOpen(false);
             setJewelryToDelete(null);
         }
     };

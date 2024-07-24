@@ -11,9 +11,7 @@ const jewelryRoutes = require('./routes/jewelry')
 const requestRoutes = require('./routes/request')
 const materialRoutes = require('./routes/material')
 const gemstoneRoutes = require('./routes/gemstone')
-const warrantyRoutes = require('./routes/warranty')
 const blogRoutes = require('./routes/blog')
-const designRoutes = require('./routes/design');
 const invoiceRoutes = require('./routes/invoice');
 const transactionRoutes = require('./routes/transaction');
 const analyticRoutes = require('./routes/analytic');
@@ -55,9 +53,7 @@ app.use('/api/jewelries', jewelryRoutes)
 app.use('/api/requests', requestRoutes)
 app.use('/api/materials', materialRoutes)
 app.use('/api/gemstones', gemstoneRoutes)
-app.use('/api/warranties', warrantyRoutes)
 app.use('/api/blogs', blogRoutes)
-app.use('/api/designs', designRoutes)
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/analytics', analyticRoutes);
@@ -91,8 +87,8 @@ app.post('/api/payment', requireAuth, async (req, res) => {
   const { user_info, product, price } = req.body;
 
   const embed_data = {
-    // redirecturl: "https://frontend-chk2.onrender.com/",
-    redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
+    redirecturl: "https://frontend-chk2.onrender.com/products/${product._id}/payment-status",
+    // redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
   };
   
   const items = [{ product }];
@@ -110,7 +106,7 @@ app.post('/api/payment', requireAuth, async (req, res) => {
     email: user_info.email,
     phone: user_info.phone,
     address: user_info.address,
-    // callback_url: "https://ee14-2001-ee0-4f83-e990-e855-8bf6-1042-f79f.ngrok-free.app/callback",
+    callback_url: "https://backend-j9ne.onrender.com",
   };
 
   // appid|app_trans_id|appuser|amount|apptime|embeddata|item

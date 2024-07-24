@@ -208,6 +208,41 @@ const getUser = async (req, res) => {
   }
 }
 
+const getStaffContact = async (req, res) => {
+  try {
+    // Fetch users with the specified emails
+    const users = await User.find({ 
+      email: { $in: ["sale@gmail.com", "design@gmail.com"] }
+    }, 'email phone_number');
+    // console.log(users);
+
+    // Create an object to hold the phone numbers
+    const phoneNumbers = {
+      saleStaff: null,
+      designStaff: null
+    };
+
+    // Assign phone numbers to the appropriate keys
+    users.forEach(user => {
+      if (user.email === "sale@gmail.com") {
+        phoneNumbers.saleStaff = user.phone_number;
+      } else if (user.email === "design@gmail.com") {
+        phoneNumbers.designStaff = user.phone_number;
+      }
+    });
+
+    // Check if both phone numbers were found
+    if (phoneNumbers.saleStaff || phoneNumbers.designStaff) {
+      res.status(200).json(phoneNumbers);
+    } else {
+      res.status(404).json({ message: 'Users not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+}
+
+
 const forgotPassword = async (req, res) => {
   console.log("Forgot password request received");
   const { email } = req.body;
@@ -321,4 +356,4 @@ const logout = (req, res) => {
 
 
 
-module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword };
+module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword, getStaffContact };

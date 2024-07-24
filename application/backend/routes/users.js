@@ -1,11 +1,13 @@
 const express = require('express')
-const { updateUser, deleteUser, assignRole, getUsers, getUser} = require('../controllers/userController')
+const { updateUser, deleteUser, assignRole, getUsers, getUser, getStaffContact} = require('../controllers/userController')
 const requireAuth = require('../middleware/requireAuth')
 const {requireAdmin} = require('../middleware/requireRoles')
 
 const usersRoutes = express.Router()
 
 usersRoutes.use(requireAuth)
+
+usersRoutes.get('/get-staff-contact', getStaffContact)
 
 usersRoutes.patch('/role-assignment/:id', requireAdmin, assignRole)
 
@@ -16,6 +18,7 @@ usersRoutes.delete('/:id', requireAdmin, deleteUser);
 usersRoutes.get('/', requireAdmin, getUsers)
 
 usersRoutes.get('/:id', getUser)
+
 
 // To get all users: GET /users
 // To get users filtered by username (case-insensitive): GET /users?username=john

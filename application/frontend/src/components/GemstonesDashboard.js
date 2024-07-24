@@ -126,7 +126,7 @@ export default function GemstonesDashboard() {
                     <GemstoneForm initialValues={selectedGemstone || {name:'', price: 0, carat: 0, cut:'', clarity:'', color:'' }} onSubmit={handleSubmit}/>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                    <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
                         Cancel
                     </Button>
                 </DialogActions>

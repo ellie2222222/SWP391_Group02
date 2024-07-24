@@ -37,7 +37,7 @@ const jewelrySchema = new Schema( {
     },
     category: {
         type: String,
-        enum: ["Ring", "Necklace", "Bracelet", "Earring", "Other"],
+        enum: ["Ring", "Necklace", "Bracelet", "Earrings", "Other"],
         required: true
     },
     type: {
