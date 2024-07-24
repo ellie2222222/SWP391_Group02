@@ -246,7 +246,7 @@ const JewelryList = () => {
           {products.length > 0 ? (
             products.map((product, index) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                <Card>
+                <Card sx={{ height: 500, display: 'flex', flexDirection: 'column' }}>
                   <CardMedia
                     component="img"
                     height="250"
@@ -263,11 +263,13 @@ const JewelryList = () => {
                     <Typography variant="h4" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                       {product.price.toLocaleString()}₫
                     </Typography>
-                  <CustomButton1 onClick={() => navigate(`/products/${product._id}`)}>
-                    Details
-                  </CustomButton1>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                  <CardContent>
+                    <CustomButton1 onClick={() => navigate(`/products/${product._id}`)}>
+                      Details
+                    </CustomButton1>
+                  </CardContent>
+                </Card>
               </Grid>
         ))
         ) : (

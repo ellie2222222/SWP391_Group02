@@ -224,10 +224,10 @@ const getJewelries = async (req, res) => {
             query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
         }
         if (category) {
-            query.category = new RegExp(category, 'i');
+            query.category = category;
         }
         if (type) {
-            query.type = new RegExp(type, 'i');
+            query.type = type;
         }
         if (available !== undefined && available !== '') {
             query.available = available === 'true';

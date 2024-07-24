@@ -280,7 +280,7 @@ const AdminContent = () => {
                                 <CustomMenuItem value="Ring">Ring</CustomMenuItem>
                                 <CustomMenuItem value="Necklace">Necklace</CustomMenuItem>
                                 <CustomMenuItem value="Bracelet">Bracelet</CustomMenuItem>
-                                <CustomMenuItem value="Earring">Earring</CustomMenuItem>
+                                <CustomMenuItem value="Earrings">Earrings</CustomMenuItem>
                                 <CustomMenuItem value="Other">Other</CustomMenuItem>
                             </Select>
                         </CustomFormControl>

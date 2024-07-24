@@ -91,7 +91,6 @@ userSchema.pre('save', async function(next) {
         // Check if the password is already hashed
         const isHashed = this.password.startsWith('$2b$');
         if (!isHashed) {
-            console.log('Pre-save hook - password modified and not hashed');
             this.password = await bcrypt.hash(this.password, 10);
         }
     }

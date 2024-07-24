@@ -12,11 +12,11 @@ const GoldPrice = () => {
         const fetchGoldPrices = async () => {
             try {
                 const response = await axiosInstance.get('/materials');
-
-                setGoldPrices(response.data);
-                setLoading(false);
+                let list = response.data.filter((material) => material.name.toLowerCase().includes('gold'))
+                setGoldPrices(list);
             } catch (error) {
                 console.error('Error fetching gold prices:', error);
+            } finally {
                 setLoading(false);
             }
         };
@@ -54,11 +54,7 @@ const GoldPrice = () => {
                                             <TableRow key={index}>
                                                 <TableCell align='center'>
                                                     <Typography variant="h5">
-                                                        {item.carat === 24 ? 'SJC Gold 999.9' :
-                                                            item.carat === 18 ? 'Gold 750 (18K)' :
-                                                                item.carat === 14 ? 'Gold 585 (14K)' :
-                                                                    item.carat === 10 ? 'Gold 416 (10K)' :
-                                                                        '-'}
+                                                        {item.name}
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell align='center'><Typography variant="h5">{item.buy_price ? item.buy_price.toLocaleString() + '₫' : '-'}</Typography></TableCell>

@@ -144,7 +144,7 @@ const Signup = () => {
           <CustomButton variant="contained" type="submit" >
             Sign Up
           </CustomButton>
-          {error && <Typography color="error" style={{ marginTop: '16px' }}>{error}</Typography>}
+          {error && <Typography color="error" mt={1} variant='h6'>{error}</Typography>}
         </form>
         <Typography variant="body2" align="center" style={{ marginTop: '1rem', fontSize: '1.3rem' }}>
           Already have an account? <CustomLink to="/login" style={{ color: '#b48c72', fontWeight: 'bold', fontSize: '1.3rem' }}>Sign in</CustomLink>

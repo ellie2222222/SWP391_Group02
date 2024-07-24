@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 const CustomContainer = styled(Container)({
   display: 'flex',
@@ -33,7 +34,28 @@ const CustomButton = styled(Button)({
   '&:hover': {
     backgroundColor: '#8e735c',
   },
-  fontSize: '1rem',
+  fontSize: '1.3rem',
+});
+
+const CustomTextField = styled(TextField)({
+  width: '100%',
+  variant: "outlined",
+  padding: "0",
+  "& .MuiOutlinedInput-root": {
+      fontSize: '1.3rem',
+      "&:hover fieldset": {
+          borderColor: "#b48c72",
+      },
+      "&.Mui-focused fieldset": {
+          borderColor: "#b48c72",
+      },
+  },
+  "& .MuiInputLabel-root": {
+      fontSize: '1.3rem',
+      "&.Mui-focused": {
+          color: "#b48c72",
+      },
+  },
 });
 
 const ForgotPassword = () => {
@@ -43,7 +65,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:4000/api/user/forgot-password', { email }); // Use absolute URL
+      const response = await axiosInstance.post('/user/forgot-password', { email }); // Use absolute URL
       setMessage(response.data.message);
     } catch (error) {
       setMessage(error.response?.data?.message || 'An error occurred.');
@@ -53,13 +75,14 @@ const ForgotPassword = () => {
   return (
     <CustomContainer>
       <FormContainer elevation={3}>
-        <Typography variant="h6" align="center">
-          Forgotten Password
-        </Typography><Typography color="textSecondary" align="center" style={{ marginTop: '1rem' }}>
-        Please enter your registered email address. We will send you a link to reset your password
+        <Typography variant="h2" align="center">
+          Forgot Password?
+        </Typography>
+        <Typography color="textSecondary" align="center" mt={1} variant='h5'>
+          Please enter your registered email address. We will send you a link to reset your password
         </Typography>
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <TextField
+          <CustomTextField
             label="Email"
             fullWidth
             margin="normal"
@@ -71,7 +94,7 @@ const ForgotPassword = () => {
             Submit
           </CustomButton>
           {message && (
-            <Typography color="textSecondary" align="center" style={{ marginTop: '1rem' }}>
+            <Typography color="textSecondary" align="center" mt={1} variant='h5'>
               {message}
             </Typography>
           )}

@@ -4,6 +4,7 @@ import axiosInstance from '../utils/axiosInstance';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import MaterialForm from './MaterialForm';
+import { toast, ToastContainer } from 'react-toastify';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -34,36 +35,71 @@ export default function MaterialDashboard() {
         alignItems: 'center',
         justifyContent: 'flex-end',
         padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     }));
+
     const [materials, setMaterials] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedMaterial, setSelectedMaterial] = useState(null);
+    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+    const [materialToDelete, setMaterialToDelete] = useState(null);
+
     const handleEditClick = (material) => {
         setSelectedMaterial(material);
         setIsDialogOpen(true);
     };
+
     const handleAddClick = () => {
         setSelectedMaterial(null);
         setIsDialogOpen(true);
     };
+
     const fetchMaterials = async () => {
         try {
             const response = await axiosInstance.get('/materials');
             setMaterials(response.data);
         } catch (error) {
             console.error("There was an error fetching the materials!", error);
+            toast.error('Fetch material fail', {
+                autoClose: 5000,
+                closeOnClick: true,
+                draggable: true,
+            });
         }
     };
-    const handleDeleteClick = async (id) => {
+
+    const handleDeleteClick = (material) => {
+        setMaterialToDelete(material);
+        setIsConfirmDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
         try {
-            await axiosInstance.delete(`/materials/${id}`);
+            await axiosInstance.delete(`/materials/${materialToDelete._id}`);
             fetchMaterials();
+            toast.success('Delete material successfully', {
+                autoClose: 5000,
+                closeOnClick: true,
+                draggable: true,
+            });
         } catch (error) {
-            console.error('Error deleting jewelry:', error);
+            console.error('Error deleting material:', error);
+            toast.error('Delete material fail', {
+                autoClose: 5000,
+                closeOnClick: true,
+                draggable: true,
+            });
+        } finally {
+            setIsConfirmDialogOpen(false);
+            setMaterialToDelete(null);
         }
     };
+
+    const handleCancelDelete = () => {
+        setIsConfirmDialogOpen(false);
+        setMaterialToDelete(null);
+    };
+
     const handleSubmit = async (values) => {
         try {
             if (selectedMaterial) {
@@ -73,10 +109,21 @@ export default function MaterialDashboard() {
             }
             fetchMaterials();
             setIsDialogOpen(false);
+            toast.success('Successful', {
+                autoClose: 5000,
+                closeOnClick: true,
+                draggable: true,
+            });
         } catch (error) {
-            console.error("There was an error saving the jewelry!", error);
+            console.error("There was an error saving the material!", error);
+            toast.error('Fail', {
+                autoClose: 5000,
+                closeOnClick: true,
+                draggable: true,
+            });
         }
-    }
+    };
+
     useEffect(() => {
         fetchMaterials();
     }, []);
@@ -84,7 +131,7 @@ export default function MaterialDashboard() {
     return (
         <Container>
             <DrawerHeader />
-            <CustomButton1 startIcon={<Add fontSize='large' />} variant="contained" color="primary" onClick={() => handleAddClick()}>
+            <CustomButton1 startIcon={<Add fontSize='large' />} variant="contained" color="primary" onClick={handleAddClick}>
                 <Typography sx={{ fontSize: "1.3rem", fontWeight: "bold" }}>Add Material</Typography>
             </CustomButton1>
             <TableContainer component={Paper}>
@@ -107,7 +154,7 @@ export default function MaterialDashboard() {
                                     <StyledIconButton onClick={() => handleEditClick(material)}>
                                         <Edit fontSize='large' />
                                     </StyledIconButton>
-                                    <StyledIconButton onClick={() => handleDeleteClick(material._id)}>
+                                    <StyledIconButton onClick={() => handleDeleteClick(material)}>
                                         <Delete fontSize='large' />
                                     </StyledIconButton>
                                 </CustomTableCell>
@@ -116,6 +163,7 @@ export default function MaterialDashboard() {
                     </TableBody>
                 </Table>
             </TableContainer>
+
             <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                 <DialogContent>
                     <MaterialForm initialValues={selectedMaterial || { name: '', buy_price: 0, sell_price: 0, carat: 0, cut: '', clarity: '', color: '' }} onSubmit={handleSubmit} />
@@ -126,7 +174,23 @@ export default function MaterialDashboard() {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Container>
 
-    )
+            <Dialog open={isConfirmDialogOpen} onClose={handleCancelDelete}>
+                <DialogTitle align='center' variant='h4'>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ fontSize: '1.3rem' }}>Are you sure you want to delete this material?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} sx={{ color: "#b48c72", fontSize: "1.3rem" }}>
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmDelete} sx={{ color: "#b48c72", fontSize: "1.3rem" }}>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <ToastContainer />
+        </Container>
+    );
 }

@@ -124,8 +124,6 @@ const RequestDashboardContent = () => {
                 },
             });
 
-            console.log(response.data)
-
             setRequests(response.data.requests);
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total)

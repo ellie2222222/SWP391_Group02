@@ -214,7 +214,6 @@ const getStaffContact = async (req, res) => {
     const users = await User.find({ 
       email: { $in: ["sale@gmail.com", "design@gmail.com"] }
     }, 'email phone_number');
-    // console.log(users);
 
     // Create an object to hold the phone numbers
     const phoneNumbers = {
@@ -244,7 +243,6 @@ const getStaffContact = async (req, res) => {
 
 
 const forgotPassword = async (req, res) => {
-  console.log("Forgot password request received");
   const { email } = req.body;
 
   try {
@@ -279,7 +277,6 @@ const forgotPassword = async (req, res) => {
         console.error('Error sending email:', error);
         return res.status(500).json({ message: 'Error sending email' });
       }
-      console.log('Password reset email sent:', response);
       res.status(200).json({ message: 'Email sent successfully' });
     });
   } catch (err) {
@@ -292,6 +289,10 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   const { id, token } = req.params;
   const { password } = req.body;
+
+  if (!validator.isStrongPassword(password)) {
+    return res.status(400).json('Password is not strong enough');
+  }
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) {
@@ -311,6 +312,10 @@ const resetPassword = async (req, res) => {
 const resetProfilePassword = async (req, res) => {
   const { id } = req.body;
   const { oldPassword, password } = req.body;
+
+  if (!validator.isStrongPassword(password)) {
+    return res.status(400).send({ Status: 'Password is not strong enough' });
+  }
 
   try {
     const user = await User.findById(id);

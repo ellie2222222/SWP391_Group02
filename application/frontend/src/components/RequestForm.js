@@ -105,6 +105,33 @@ export default function RequestForm({ initialValues, onSubmit, fetchData, closeA
         }),
     });
 
+    const handleJewelrySubmit = async (values) => {
+        try {
+            if (initialValues.jewelry_id) {
+                await axiosInstance.patch(`/jewelries/${initialValues.jewelry_id._id}`, values);
+                toast.success('Jewelry item updated successfully', {
+                    autoClose: 5000, // Auto close after 5 seconds
+                    closeOnClick: true,
+                    draggable: true,
+                });
+            } else {
+                await axiosInstance.post('/jewelries', values);
+                toast.success('Jewelry item added successfully', {
+                    autoClose: 5000, // Auto close after 5 seconds
+                    closeOnClick: true,
+                    draggable: true,
+                });
+            }
+        } catch (error) {
+            console.error("There was an error saving the jewelry!", error);
+            toast.error(error.response?.data?.error || error.message, {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
+        }
+    };
+
     const handleSubFormSubmission = async (values) => {
         try {
             const response = await axiosInstance.patch(`/requests/${initialValues._id}`, values);
@@ -149,6 +176,7 @@ export default function RequestForm({ initialValues, onSubmit, fetchData, closeA
         setIsQuoteFormOpen(false);
         formik.setFieldValue('quote', values);
         await handleSubFormSubmission(values);
+        // await handleJewelrySubmit(values);
         fetchData();
     };
     

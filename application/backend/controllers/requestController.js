@@ -119,11 +119,6 @@ const getUserRequests = async (req, res) => {
     // Get total count of requests
     const totalRequests = await Request.countDocuments({ user_id: _id });
 
-    // Check if requests exist
-    if (requests.length === 0) {
-      return res.status(404).json({ error: "No requests found" });
-    }
-
     res.status(200).json({
       requests,
       total: totalRequests,
@@ -400,7 +395,6 @@ const createOrderRequest = async (req, res) => {
 
     // Add to the database
     const request = await Request.create(newRequest);
-    console.log(request)
     res.status(201).json(request);
   } catch (error) {
     console.error('Error creating order request:', error);

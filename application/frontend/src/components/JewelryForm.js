@@ -356,7 +356,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
               <CustomMenuItem value="Ring">Ring</CustomMenuItem>
               <CustomMenuItem value="Necklace">Necklace</CustomMenuItem>
               <CustomMenuItem value="Bracelet">Bracelet</CustomMenuItem>
-              <CustomMenuItem value="Earring">Earring</CustomMenuItem>
+              <CustomMenuItem value="Earrings">Earrings</CustomMenuItem>
               <CustomMenuItem value="Other">Other</CustomMenuItem>
             </Select>
             {formik.touched.category && formik.errors.category && (
@@ -588,7 +588,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             fullWidth
           >
             {loading ? (
-              <CircularProgress size={24} />
+              <CircularProgress size={24} sx={{color: 'white'}}/>
             ) : initialValues._id ? (
               "Update Jewelry"
             ) : (

@@ -26,7 +26,7 @@ const Footer = () => {
               0938 256 545
             </Typography>
             <Typography variant="h5" sx={{ mt: 2 }}>
-              Connect with Tierra
+              Connect with Us
             </Typography>
             <Box>
               <CustomIconButton href="#" color="inherit" variant="h5">
@@ -53,8 +53,6 @@ const Footer = () => {
             <Typography variant="h3" gutterBottom>
               About Us
             </Typography>
-            <Link href="#" color="inherit" underline="none" variant="h5">Tierra Story</Link><br/>
-            <Link href="#" color="inherit" underline="none" variant="h5">Tierra and You</Link><br/>
             <Link href="#" color="inherit" underline="none" variant="h5">Shop System</Link><br/>
             <Link href="#" color="inherit" underline="none" variant="h5">Recruitment</Link>
           </Grid>

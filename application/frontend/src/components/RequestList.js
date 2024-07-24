@@ -128,7 +128,6 @@ const RequestList = () => {
   const getStaffContact = async () => {
     try {
       const response = await axiosInstance('/users/get-staff-contact');
-      console.log(response.data)
       setSaleStaffNumber(response.data.saleStaff);
       setDesignStaffNumber(response.data.designStaff);
     } catch (error) {
@@ -330,6 +329,9 @@ const RequestList = () => {
     <Container>
       <Box minHeight="60vh">
         <Typography variant="h2" component="p" textAlign="center" my={2}>Requests</Typography>
+        {requests.length === 0 && (
+          <Typography variant="h4" my={2}>No requests</Typography>
+        )} 
         {requests.map((request, index) => (
           <Card key={index} variant="outlined" sx={{ marginBottom: '20px' }}>
             <CardContent>

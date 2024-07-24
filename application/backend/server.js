@@ -106,7 +106,7 @@ app.post('/api/payment', requireAuth, async (req, res) => {
     email: user_info.email,
     phone: user_info.phone,
     address: user_info.address,
-    callback_url: "https://backend-j9ne.onrender.com",
+    callback_url: "https://backend-j9ne.onrender.com/callback",
   };
 
   // appid|app_trans_id|appuser|amount|apptime|embeddata|item
