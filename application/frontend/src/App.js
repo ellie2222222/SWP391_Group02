@@ -30,6 +30,7 @@ import GoldPrice from "./pages/GoldPrice";
 import Dashboard from "./pages/Dashboard";
 import InvoiceDashboard from "./pages/InvoiceDashboard";
 import WarrantyDashboard from "./pages/WarrantyDashboard";
+import Collection from './pages/Collection';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
@@ -55,6 +56,8 @@ function App() {
         <Route path="/warranty-policy" element={<WarrantyPolicy />} />
         <Route path="/exchange-policy" element={<ExchangePolicy />} />
         <Route path="/gold-price" element={<GoldPrice />} />
+        <Route path="/collections" element={<Collection />} />
+        
 
         <Route element={<AdminRoute />}>
           <Route path="/management" element={<JewelryDashboard />} />
