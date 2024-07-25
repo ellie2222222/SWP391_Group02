@@ -192,7 +192,6 @@ const RequestList = () => {
       }
 
       const payment = await axiosInstance.post('/payment', {
-        user_info: userResponse.data,
         product: request.jewelry_id,
         price: price,
       });
