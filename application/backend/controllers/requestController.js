@@ -184,6 +184,7 @@ const createRequest = async (req, res) => {
     endedAt: null,
     design_images: [],
     warranty_content: null,
+    warranty_duration: null,
     warranty_start_date: null,
     warranty_end_date: null,
     deposit_paid: false,
@@ -216,6 +217,7 @@ const updateRequest = async (req, res) => {
       production_cost,
       endedAt,
       warranty_content,
+      warranty_duration,
       warranty_start_date,
       warranty_end_date,
     } = req.body;
@@ -252,6 +254,10 @@ const updateRequest = async (req, res) => {
 
     if (production_cost != null && (typeof Number(production_cost) !== 'number' || production_cost <= 0)) {
       return res.status(400).json('Production cost must be a positive number');
+    }
+
+    if (warranty_duration != null && (typeof Number(warranty_duration) !== 'number' || warranty_duration <= 0)) {
+      return res.status(400).json('Warranty duration must be a positive number');
     }
 
     // Validate and parse dates
@@ -330,6 +336,7 @@ const updateRequest = async (req, res) => {
       ...(endedAt !== undefined && { endedAt: parsedEndAt }),
       ...(images.length > 0 && (req.role === 'design_staff' || req.role === 'manager') && { design_images: images }),
       ...(warranty_content !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_content }),
+      ...(warranty_duration !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_duration }),
       ...(warranty_start_date !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_start_date: parsedWarrantyStartDate }),
       ...(warranty_end_date !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_end_date: parsedWarrantyEndDate }),
       ...existingRequest.status_history.length && { status_history: existingRequest.status_history },
@@ -386,6 +393,7 @@ const createOrderRequest = async (req, res) => {
       endedAt: null,
       warranty_content: null,
       warranty_start_date: null,
+      warranty_duration: null,
       warranty_end_date: null,
       design_images: [],
       deposit_paid: null,
