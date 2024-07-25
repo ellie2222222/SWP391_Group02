@@ -84,11 +84,11 @@ let config = {
 
 const requireAuth = require('./middleware/requireAuth');
 app.post('/api/payment', requireAuth, async (req, res) => {
-  const { user_info, product, price } = req.body;
+  const { product, price } = req.body;
 
   const embed_data = {
-    redirecturl: `https://frontend-chk2.onrender.com/products/${product._id}/payment-status`,
-    // redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
+    // redirecturl: `https://frontend-chk2.onrender.com/products/${product._id}/payment-status`,
+    redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
   };
   
   const items = [{ product }];
@@ -103,9 +103,6 @@ app.post('/api/payment', requireAuth, async (req, res) => {
     amount: price,
     description: `Payment for the order #${transID}`,
     bank_code: "",
-    email: user_info.email,
-    phone: user_info.phone,
-    address: user_info.address,
     callback_url: "https://backend-j9ne.onrender.com/callback",
   };
 

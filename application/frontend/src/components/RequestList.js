@@ -183,8 +183,6 @@ const RequestList = () => {
 
   const handlePayment = async (request, type) => {
     try {
-      const decoded = jwtDecode(user.token);
-      const userResponse = await axiosInstance.get(`/users/` + decoded._id);
 
       let price;
       if (type === 'deposit') {
@@ -194,20 +192,20 @@ const RequestList = () => {
       }
 
       const payment = await axiosInstance.post('/payment', {
-        user_info: userResponse.data,
         product: request.jewelry_id,
         price: price,
       });
 
-      await axiosInstance.post('transactions', {
+      await axiosInstance.post('/transactions', {
         trans_id: payment.data.trans_id,
         request_id: request._id,
         type,
       });
 
-      window.location.href = payment.data.result.order_url;
+      // window.location.href = payment.data.result.order_url;
+      window.open(payment.data.result.order_url, '_blank');
     } catch (error) {
-      console.error('Error, cannot proceed to payment', error);
+      console.error('Error, cannot proceed to payment', error); 
       toast.error('Error, cannot proceed to payment', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
@@ -337,7 +335,7 @@ const RequestList = () => {
             <CardContent>
               <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
-                Deposit Amount: {request.quote_amount ? (request.quote_amount * 10 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
+                Deposit Amount: {request.quote_amount ? (request.quote_amount * 30 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
               </Typography>
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                 Quote Amount: {request.quote_amount ? request.quote_amount.toLocaleString() + '₫' : 'Awaiting Quote Amount'}
