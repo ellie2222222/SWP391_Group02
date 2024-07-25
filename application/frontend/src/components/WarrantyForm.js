@@ -110,7 +110,10 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
             warranty_end_date: Yup.date().required('Required.'),
             warranty_content: Yup.string().required('Required.'),
             request_status: Yup.string().required('Required.'),
-            warranty_duration: Yup.number().min(1).required('Required.'),
+            warranty_duration: Yup.number() .integer('Must be an integer')
+            .min(1, 'Must be at least 1')
+            .max(3, 'Must be at most 3')
+            .required('Required.'),
         })
     }
 
