@@ -183,8 +183,6 @@ const RequestList = () => {
 
   const handlePayment = async (request, type) => {
     try {
-      const decoded = jwtDecode(user.token);
-      const userResponse = await axiosInstance.get(`/users/` + decoded._id);
 
       let price;
       if (type === 'deposit') {
