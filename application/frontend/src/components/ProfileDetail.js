@@ -124,7 +124,7 @@ const ProfileDetail = () => {
                 });
             } catch (error) {
                 console.error(error.response?.data?.error || error.message);
-                toast.error('Failed to update profile', {
+                toast.error('Failed to update profile', {   
                     autoClose: 5000, // Auto close after 5 seconds
                     closeOnClick: true,
                     draggable: true,
