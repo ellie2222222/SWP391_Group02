@@ -196,15 +196,16 @@ const RequestList = () => {
         price: price,
       });
 
-      await axiosInstance.post('transactions', {
+      await axiosInstance.post('/transactions', {
         trans_id: payment.data.trans_id,
         request_id: request._id,
         type,
       });
 
-      window.location.href = payment.data.result.order_url;
+      // window.location.href = payment.data.result.order_url;
+      window.open(payment.data.result.order_url, '_blank');
     } catch (error) {
-      console.error('Error, cannot proceed to payment', error);
+      console.error('Error, cannot proceed to payment', error); 
       toast.error('Error, cannot proceed to payment', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,

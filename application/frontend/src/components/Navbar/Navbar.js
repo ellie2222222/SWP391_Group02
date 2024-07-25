@@ -277,6 +277,12 @@ const Navbar = () => {
                 </Link>
               </Grid>
               <Grid item xs>
+                <Link to="/collections">
+                  <CustomButton>Collection</CustomButton>
+                </Link>
+              </Grid>
+              
+              <Grid item xs>
                 <Link to="/blogs">
                   <CustomButton>Blogs</CustomButton>
                 </Link>
