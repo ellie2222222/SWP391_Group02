@@ -87,8 +87,8 @@ app.post('/api/payment', requireAuth, async (req, res) => {
   const { product, price } = req.body;
 
   const embed_data = {
-    // redirecturl: `https://frontend-chk2.onrender.com/products/${product._id}/payment-status`,
-    redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
+    redirecturl: `https://frontend-chk2.onrender.com/products/${product._id}/payment-status`,
+    // redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
   };
   
   const items = [{ product }];
