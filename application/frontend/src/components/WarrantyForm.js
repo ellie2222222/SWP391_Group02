@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, addYears } from 'date-fns';
 import axiosInstance from '../utils/axiosInstance';
 import useAuth from '../hooks/useAuthContext';
 
@@ -102,6 +102,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
             warranty_end_date: Yup.date(),
             warranty_content: Yup.string(),
             request_status: Yup.string(),
+            warranty_duration: Yup.number().min(1).required('Required.'),
         })
     } else {
         validationSchema = Yup.object({
@@ -109,6 +110,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
             warranty_end_date: Yup.date().required('Required.'),
             warranty_content: Yup.string().required('Required.'),
             request_status: Yup.string().required('Required.'),
+            warranty_duration: Yup.number().min(1).required('Required.'),
         })
     }
 
@@ -118,6 +120,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
             warranty_end_date: initialValues.warranty_end_date ? convertToInputDateFormat(new Date(initialValues.warranty_end_date).toLocaleDateString()) : '',
             request_status: initialValues.request_status || '',
             warranty_content: initialValues.warranty_content || '',
+            warranty_duration: initialValues.warranty_duration || 1,
         },
         enableReinitialize: true,
         validationSchema: validationSchema,
@@ -132,6 +135,13 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
             setLoading(false);
         },
     });
+
+    useEffect(() => {
+        if (formik.values.warranty_start_date && formik.values.warranty_duration) {
+            const endDate = addYears(new Date(formik.values.warranty_start_date), formik.values.warranty_duration);
+            formik.setFieldValue('warranty_end_date', format(endDate, 'yyyy-MM-dd'));
+        }
+    }, [formik.values.warranty_start_date, formik.values.warranty_duration]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -165,6 +175,18 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
 
                 <CustomTextField
                     fullWidth
+                    id="warranty_duration"
+                    name="warranty_duration"
+                    label="Warranty Duration (Years)"
+                    type="number"
+                    value={formik.values.warranty_duration}
+                    onChange={formik.handleChange}
+                    error={formik.touched.warranty_duration && Boolean(formik.errors.warranty_duration)}
+                    helperText={formik.touched.warranty_duration && formik.errors.warranty_duration}
+                />
+
+                <CustomTextField
+                    fullWidth
                     id="warranty_end_date"
                     name="warranty_end_date"
                     label="Warranty End Date"
@@ -176,6 +198,7 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
                         inputProps: {
                             min: formik.values.warranty_start_date,
                         },
+                        readOnly: true,
                     }}
                     value={formik.values.warranty_end_date}
                     onChange={formik.handleChange}

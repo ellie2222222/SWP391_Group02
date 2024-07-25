@@ -334,7 +334,7 @@ const RequestList = () => {
             <CardContent>
               <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
-                Deposit Amount: {request.quote_amount ? (request.quote_amount * 10 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
+                Deposit Amount: {request.quote_amount ? (request.quote_amount * 30 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
               </Typography>
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                 Quote Amount: {request.quote_amount ? request.quote_amount.toLocaleString() + '₫' : 'Awaiting Quote Amount'}
