@@ -248,7 +248,7 @@ const StaffsDashboardContent = () => {
                             {users.map((user) => (
                                 <TableRow key={user._id}>
                                     <CustomTableCell>{user._id}</CustomTableCell>
-                                    <CustomTableCell>{user.name}</CustomTableCell>
+                                    <CustomTableCell>{user.username}</CustomTableCell>
                                     <CustomTableCell>{user.email}</CustomTableCell>
                                     <CustomTableCell>{user.phone}</CustomTableCell>
                                     <CustomTableCell>{user.address}</CustomTableCell>
