@@ -1,3 +1,4 @@
+//homepage blog detail
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Button, CircularProgress, Grid, Card, CardContent, CardMedia } from '@mui/material';

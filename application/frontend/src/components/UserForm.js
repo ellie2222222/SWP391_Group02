@@ -1,3 +1,4 @@
+//Admin User Management editing form
 import React from 'react';
 import { useFormik } from 'formik';
 import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography } from '@mui/material';
@@ -42,19 +43,19 @@ const CustomTextField = styled(TextField)({
 const CustomFormControl = styled(FormControl)({
   minWidth: 120,
   "& .MuiInputLabel-root": {
-      fontSize: '1.3rem',
-      "&.Mui-focused": {
-          color: "#b48c72",
-      },
+    fontSize: '1.3rem',
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
   },
   "& .MuiOutlinedInput-root": {
-      fontSize: '1.3rem',
-      "&:hover .MuiOutlinedInput-notchedOutline": {
-          borderColor: "#b48c72",
-      },
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "#b48c72",
-      },
+    fontSize: '1.3rem',
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#b48c72",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#b48c72",
+    },
   },
 });
 
@@ -133,7 +134,21 @@ const UserForm = ({ initialValues, onSubmit }) => {
           error={formik.touched.email && Boolean(formik.errors.email)}
           helperText={formik.touched.email && formik.errors.email}
         />
-        <CustomFormControl variant="outlined" fullWidth>
+
+        <CustomTextField
+          name="role"
+          label="Role"
+          variant="outlined"
+          value={formik.values.role}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.email && Boolean(formik.errors.email)}
+          helperText={formik.touched.email && formik.errors.email}
+          InputProps={{
+    readOnly: true,
+  }}
+        />
+        {/* <CustomFormControl variant="outlined" fullWidth>
           <InputLabel id="role-label">Role</InputLabel>
           <Select
             labelId="role-label"
@@ -154,7 +169,7 @@ const UserForm = ({ initialValues, onSubmit }) => {
           {formik.touched.role && formik.errors.role && (
             <Typography variant="caption" color="red">{formik.errors.role}</Typography>
           )}
-        </CustomFormControl>
+        </CustomFormControl> */}
 
         <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
           Submit
