@@ -1,8 +1,8 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
-const gemstoneSchema = new Schema( {
+const gemstoneSchema = new Schema({
     name: {
         type: String,
         required: true
@@ -22,7 +22,7 @@ const gemstoneSchema = new Schema( {
     },
     clarity: {
         type: String,
-        enum:  ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', 'I2', 'I3', 'Other'],
+        enum: ['FL', 'IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', 'I2', 'I3', 'Other'],
         required: true
     },
     color: {
@@ -32,7 +32,41 @@ const gemstoneSchema = new Schema( {
             'Red', 'Orange', 'Green', 'Blue', 'Yellow', 'Purple', 'Pink', 'Brown', 'Black', 'White'
         ],
         required: true
-    }
-}, {timestamps: true})
+    },
+    measurements: {
+        type: String, // e.g., 6.50 x 6.45 x 4.03 mm
+        required: true
+    },
+    polish: {
+        type: String,
+        enum: ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'],
+        required: true
+    },
+    symmetry: {
+        type: String,
+        enum: ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor'],
+        required: true
+    },
+    fluorescence: {
+        type: String,
+        enum: ['None', 'Faint', 'Medium', 'Strong', 'Very Strong'],
+        required: true
+    },
+    comments: {
+        type: String
+    },
+    available: {
+        type: Boolean,
+        required: true
+    },
+    certificate_image: [{
+        type: String, 
+        required: true
+    }],
+    certificate_image_public_ids: [{
+        type: String, 
+        required: true
+    }],
+}, { timestamps: true });
 
-module.exports = mongoose.model('Gemstone', gemstoneSchema)
+module.exports = mongoose.model('Gemstone', gemstoneSchema);
