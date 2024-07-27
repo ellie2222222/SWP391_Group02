@@ -1,34 +1,34 @@
 import React from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography } from '@mui/material';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, Switch, FormControlLabel } from '@mui/material';
 import * as Yup from 'yup';
 import { styled } from '@mui/system';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
-    color: '#b48c72', // focused label color
+    color: '#b48c72',
   },
   '& .MuiInput-underline:after': {
-    borderBottomColor: '#b48c72', // underline color after focus
+    borderBottomColor: '#b48c72',
   },
   '& .MuiOutlinedInput-root': {
     fontSize: "1.3rem",
     '& fieldset': {
-      borderColor: '#b48c72', // outline color
+      borderColor: '#b48c72',
     },
     '&:hover fieldset': {
-      borderColor: '#b48c72', // outline color on hover
+      borderColor: '#b48c72',
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#b48c72', // outline color when focused
+      borderColor: '#b48c72',
     },
   },
   "& .MuiInputLabel-root": {
-        fontSize: '1.3rem',
-        "&.Mui-focused": {
-            color: "#b48c72",
-        },
+    fontSize: '1.3rem',
+    "&.Mui-focused": {
+      color: "#b48c72",
     },
+  },
   "& .MuiFormHelperText-root": {
     fontSize: "1.2rem",
     marginLeft: 0,
@@ -41,35 +41,35 @@ const CustomTextField = styled(TextField)({
 
 const CustomFormControl = styled(FormControl)({
   "& .MuiInputLabel-root": {
-      fontSize: "1.3rem",
-      "&.Mui-focused": {
-          color: "#b48c72",
-      },
+    fontSize: "1.3rem",
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
   },
   "& .MuiOutlinedInput-root": {
-      fontSize: "1.3rem",
-      "&:hover .MuiOutlinedInput-notchedOutline": {
-          borderColor: "#b48c72",
-      },
-      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-          borderColor: "#b48c72",
-      },
+    fontSize: "1.3rem",
+    "&:hover .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#b48c72",
+    },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#b48c72",
+    },
   },
   "& .MuiFormHelperText-root": {
-      fontSize: "1.2rem",
-      marginLeft: 0,
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
   "& .MuiTypography-root": {
-      fontSize: "1.2rem",
-      marginLeft: 0,
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
 });
 
 const CustomButton = styled(Button)({
   fontSize: '1.3rem',
-  backgroundColor: '#b48c72', // button background color
+  backgroundColor: '#b48c72',
   '&:hover': {
-    backgroundColor: '#a57d65', // button background color on hover
+    backgroundColor: '#a57d65',
   },
 });
 
@@ -81,9 +81,10 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
   const formik = useFormik({
     initialValues: {
       ...initialValues,
+      available: initialValues.available || false,
     },
     onSubmit: async (values) => {
-        onSubmit(values);
+      onSubmit(values);
     },
     validationSchema: Yup.object({
       name: Yup.string().required('Diamond Name is required'),
@@ -92,6 +93,11 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
       cut: Yup.string().required('Cut is required'),
       clarity: Yup.string().required('Clarity is required'),
       color: Yup.string().required('Color is required'),
+      fluorescence: Yup.string().required('Fluorescence is required'),
+      measurements: Yup.string().required('Measurements are required'),
+      polish: Yup.string().required('Polish is required'),
+      symmetry: Yup.string().required('Symmetry is required'),
+      comments: Yup.string().optional(),
     }),
   });
 
@@ -99,7 +105,7 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
     <Container maxWidth="sm">
       <Typography variant="h4" gutterBottom align='center'>
         {initialValues._id ? 'Edit Gemstone' : 'Add Gemstone'}
-      </Typography> 
+      </Typography>
       <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
         <CustomTextField
           name="name"
@@ -219,6 +225,103 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
             <Typography variant="caption" color="red">{formik.errors.color}</Typography>
           )}
         </CustomFormControl>
+        <CustomFormControl variant="outlined" fullWidth>
+          <InputLabel id="fluorescence-label">Fluorescence</InputLabel>
+          <Select
+            labelId="fluorescence-label"
+            name="fluorescence"
+            value={formik.values.fluorescence}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            label="Fluorescence"
+            error={formik.touched.fluorescence && Boolean(formik.errors.fluorescence)}
+          >
+            <CustomMenuItem value="None">None</CustomMenuItem>
+            <CustomMenuItem value="Faint">Faint</CustomMenuItem>
+            <CustomMenuItem value="Medium">Medium</CustomMenuItem>
+            <CustomMenuItem value="Strong">Strong</CustomMenuItem>
+            <CustomMenuItem value="Very Strong">Very Strong</CustomMenuItem>
+          </Select>
+          {formik.touched.fluorescence && formik.errors.fluorescence && (
+            <Typography variant="caption" color="red">{formik.errors.fluorescence}</Typography>
+          )}
+        </CustomFormControl>
+        <CustomTextField
+          name="measurements"
+          label="Measurements"
+          variant="outlined"
+          value={formik.values.measurements}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.measurements && Boolean(formik.errors.measurements)}
+          helperText={formik.touched.measurements && formik.errors.measurements}
+        />
+        <CustomFormControl variant="outlined" fullWidth>
+          <InputLabel id="polish-label">Polish</InputLabel>
+          <Select
+            labelId="polish-label"
+            name="polish"
+            value={formik.values.polish}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            label="Polish"
+            error={formik.touched.polish && Boolean(formik.errors.polish)}
+          >
+            <CustomMenuItem value="Excellent">Excellent</CustomMenuItem>
+            <CustomMenuItem value="Very Good">Very Good</CustomMenuItem>
+            <CustomMenuItem value="Good">Good</CustomMenuItem>
+            <CustomMenuItem value="Fair">Fair</CustomMenuItem>
+            <CustomMenuItem value="Poor">Poor</CustomMenuItem>
+          </Select>
+          {formik.touched.polish && formik.errors.polish && (
+            <Typography variant="caption" color="red">{formik.errors.polish}</Typography>
+          )}
+        </CustomFormControl>
+        <CustomFormControl variant="outlined" fullWidth>
+          <InputLabel id="symmetry-label">Symmetry</InputLabel>
+          <Select
+            labelId="symmetry-label"
+            name="symmetry"
+            value={formik.values.symmetry}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            label="Symmetry"
+            error={formik.touched.symmetry && Boolean(formik.errors.symmetry)}
+          >
+            <CustomMenuItem value="Excellent">Excellent</CustomMenuItem>
+            <CustomMenuItem value="Very Good">Very Good</CustomMenuItem>
+            <CustomMenuItem value="Good">Good</CustomMenuItem>
+            <CustomMenuItem value="Fair">Fair</CustomMenuItem>
+            <CustomMenuItem value="Poor">Poor</CustomMenuItem>
+          </Select>
+          {formik.touched.symmetry && formik.errors.symmetry && (
+            <Typography variant="caption" color="red">{formik.errors.symmetry}</Typography>
+          )}
+        </CustomFormControl>
+        <CustomTextField
+          name="comments"
+          label="Comments"
+          variant="outlined"
+          multiline
+          rows={4}
+          value={formik.values.comments}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.comments && Boolean(formik.errors.comments)}
+          helperText={formik.touched.comments && formik.errors.comments}
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              name="available"
+              checked={formik.values.available}
+              onChange={formik.handleChange}
+              color="primary"
+            />
+          }
+          label="Available"
+          labelPlacement="end"
+        />
         <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
           Submit
         </CustomButton>
