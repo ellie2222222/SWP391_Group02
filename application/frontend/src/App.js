@@ -8,6 +8,7 @@ import Details from "./pages/Details";
 import Signup from "./pages/Signup";
 import JewelryDashboard from "./pages/JewelryDashboard";
 import UsersDashboard from "./pages/UsersDashboard";
+import StaffsDashboard from './pages/StaffsDashboard';
 import BlogContents from "./pages/BlogContents";
 import BlogCreate from "./pages/BlogCreate";
 import Warranty from './pages/Warranty'; // Import the new page
@@ -63,6 +64,7 @@ function App() {
         <Route element={<AdminRoute />}>
           <Route path="/management" element={<JewelryDashboard />} />
           <Route path="/management/users" element={<UsersDashboard />} />
+          <Route path="/management/staffs" element={<StaffsDashboard />} />
           <Route path="/management/requests" element={<RequestDashboard />} />
           <Route path="/management/pending-requests" element={<PendingRequestDashboard />} />
           <Route path="/management/quote-request" element={<QuotedRequest />} />

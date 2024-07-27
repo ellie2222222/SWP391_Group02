@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, styled, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem, Pagination, Stack, Typography } from '@mui/material';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { Edit, Delete, Search } from '@mui/icons-material';
+import { Box, styled, TextField, InputAdornment, IconButton, FormControl, InputLabel, Select, MenuItem, Pagination, Typography, Dialog, DialogContent, DialogActions, Button } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Edit, Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
 import UserForm from './UserForm';
+import CreateStaffForm from './CreateStaffForm'; // Import the CreateStaffForm component
 import { useSearchParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,10 +17,14 @@ const StyledIconButton = styled(IconButton)({
 });
 
 const CustomButton = styled(Button)({
+    outlineColor: '#000',
     backgroundColor: '#b48c72',
+    color: '#fff',
+    width: '100%',
     fontSize: '1.3rem',
     '&:hover': {
-      backgroundColor: '#a57d65',
+        color: '#b48c72',
+        backgroundColor: 'transparent',
     },
 });
 
@@ -79,7 +84,7 @@ const capitalizeWords = (str) => {
     return words.join(' ');
 };
 
-const UserDashboardContent = () => {
+const StaffsDashboardContent = () => {
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
@@ -92,13 +97,14 @@ const UserDashboardContent = () => {
     const [total, setTotal] = useState(0);
     const [selectedUser, setSelectedUser] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [deleteUserId, setDeleteUserId] = useState(null);
+    const [isCreateStaffOpen, setIsCreateStaffOpen] = useState(false); // State for Create Staff Form
     const [search, setSearch] = useState('');
     const [role, setRole] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const staffRoles = ['manager', 'sale_staff', 'design_staff', 'production_staff'];
 
     const fetchUsers = async () => {
         try {
@@ -108,7 +114,7 @@ const UserDashboardContent = () => {
                 },
             });
             
-            const filteredUserList = response.data.users.filter((user) => user.role !== 'admin');
+            const filteredUserList = response.data.users.filter((user) => staffRoles.includes(user.role));
 
             setUsers(filteredUserList);
             setTotal(response.data.total);
@@ -200,8 +206,8 @@ const UserDashboardContent = () => {
                             }}
                         />
                     </Box>
-                    <Box display="flex">
-                        <CustomFormControl>
+                    <Box display="flex" alignItems="center">
+                        <CustomFormControl sx={{ marginRight: '1rem' }}>
                             <InputLabel id="role-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Role</InputLabel>
                             <Select
                                 labelId='role-label'
@@ -210,13 +216,14 @@ const UserDashboardContent = () => {
                                 onChange={(event) => handleFilterChange('role', event.target.value)}
                             >
                                 <CustomMenuItem value=""><em>None</em></CustomMenuItem>
-                                <CustomMenuItem value="user">User</CustomMenuItem>
-                                <CustomMenuItem value="manager">Manager</CustomMenuItem>
-                                <CustomMenuItem value="sale_staff">Sale Staff</CustomMenuItem>
-                                <CustomMenuItem value="design_staff">Design Staff</CustomMenuItem>
-                                <CustomMenuItem value="production_staff">Production Staff</CustomMenuItem>
+                                {staffRoles.map((role) => (
+                                    <CustomMenuItem key={role} value={role}>{capitalizeWords(role)}</CustomMenuItem>
+                                ))}
                             </Select>
                         </CustomFormControl>
+                        <CustomButton variant="contained" onClick={() => setIsCreateStaffOpen(true)}>
+                            + Add Staff Account
+                        </CustomButton>
                     </Box>
                 </Box>
 
@@ -234,49 +241,42 @@ const UserDashboardContent = () => {
                                 <CustomTableCell sx={{ fontWeight: 'bold' }}>Phone Number</CustomTableCell>
                                 <CustomTableCell sx={{ fontWeight: 'bold' }}>Address</CustomTableCell>
                                 <CustomTableCell sx={{ fontWeight: 'bold' }}>Role</CustomTableCell>
-                                <CustomTableCell sx={{ fontWeight: 'bold' }} align='center'>Actions</CustomTableCell>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>Actions</CustomTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {users.length > 0 ? (
-                                users.map((user) => (
-                                    <TableRow key={user._id}>
-                                        <CustomTableCell sx={{ fontWeight: 'bold' }}>{user._id}</CustomTableCell>
-                                        <CustomTableCell>{user.username}</CustomTableCell>
-                                        <CustomTableCell>{user.email}</CustomTableCell>
-                                        <CustomTableCell>{user.phone_number}</CustomTableCell>
-                                        <CustomTableCell>{user.address}</CustomTableCell>
-                                        <CustomTableCell sx={{ textTransform: 'capitalize' }}>{user.role && capitalizeWords(user.role)}</CustomTableCell>
-                                        <CustomTableCell align='center'>
-                                            <StyledIconButton color="primary" onClick={() => handleEditClick(user)}>
-                                                <Edit fontSize='large' />
-                                            </StyledIconButton>
-                                        </CustomTableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <CustomTableCell align='center' colSpan={7}>
-                                        <Typography variant="h6">No users found</Typography>
+                            {users.map((user) => (
+                                <TableRow key={user._id}>
+                                    <CustomTableCell>{user._id}</CustomTableCell>
+                                    <CustomTableCell>{user.username}</CustomTableCell>
+                                    <CustomTableCell>{user.email}</CustomTableCell>
+                                    <CustomTableCell>{user.phone}</CustomTableCell>
+                                    <CustomTableCell>{user.address}</CustomTableCell>
+                                    <CustomTableCell>{capitalizeWords(user.role)}</CustomTableCell>
+                                    <CustomTableCell>
+                                        <StyledIconButton color="inherit" onClick={() => handleEditClick(user)}>
+                                            <Edit />
+                                        </StyledIconButton>
                                     </CustomTableCell>
                                 </TableRow>
-                            )}
+                            ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
 
-                <Box display="flex" justifyContent="center" marginTop="20px">
-                    <Stack spacing={2}>
-                        <Pagination
-                            size='large'
-                            count={totalPages}
-                            page={page}
-                            onChange={handlePageChange}
-                            showFirstButton
-                            showLastButton
-                        />
-                    </Stack>
+                <Box mt={2}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                    />
                 </Box>
+
+                <Dialog open={isCreateStaffOpen} onClose={() => setIsCreateStaffOpen(false)}>
+                    <DialogContent>
+                        <CreateStaffForm onClose={() => setIsCreateStaffOpen(false)} />
+                    </DialogContent>
+                </Dialog>
 
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <DialogContent>
@@ -293,4 +293,4 @@ const UserDashboardContent = () => {
     );
 };
 
-export default UserDashboardContent;
+export default StaffsDashboardContent;

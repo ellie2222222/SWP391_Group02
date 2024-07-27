@@ -1,3 +1,4 @@
+//home page collection
 import React, { useEffect, useState } from 'react';
 import {
     Grid, Card, CardContent, CardMedia, Typography, CircularProgress, Container, Box, Button,

@@ -271,6 +271,18 @@ export default function Sidebar() {
                             </Link>
                         </ListItem>
                     )}
+                    {user.role === 'admin' && (
+                        <ListItem key="Staffs" disablePadding sx={{ display: 'block' }}>
+                            <Link to='/management/staffs'>
+                                <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                    <PeopleIcon fontSize='large' />
+                                    </CustomListItemIcon>
+                                    <CustomListItemText primary="Staffs" sx={{ opacity: open ? 1 : 0 }} />
+                                </CustomListItemButton>
+                            </Link>
+                        </ListItem>
+                    )}
                     {(user.role === 'sale_staff' || user.role === 'manager') && (
                         <div>
                             <ListItem key="invoices" disablePadding sx={{ display: 'block' }}>

@@ -60,6 +60,9 @@ const requestSchema = new Schema({
     warranty_content: {
         type: String
     },
+    warranty_duration: {
+        type: Number
+    },
     warranty_start_date: {
         type: Date
     },

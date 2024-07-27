@@ -20,7 +20,8 @@ const userSchema = new Schema( {
     },
     role: {
         type: String,
-        required: true
+        required: true,
+        enum: ['admin', 'user', 'manager', 'sale_staff', 'production_staff', 'design_staff']
     },
     phone_number: {
         type: String,
@@ -32,7 +33,7 @@ const userSchema = new Schema( {
     }
 }, {timestamps: true})
 
-userSchema.statics.signup = async function(username, email, password, phone_number, address) {
+userSchema.statics.signup = async function(username, email, password, role, phone_number, address) {
     if (!username || !email || !password || !phone_number || !address) {
         throw Error('All fields must be filled');
     }
@@ -56,7 +57,7 @@ userSchema.statics.signup = async function(username, email, password, phone_numb
         username,
         email,
         password: hash,
-        role: 'user',
+        role: role || 'user',
         phone_number,
         address
     });
