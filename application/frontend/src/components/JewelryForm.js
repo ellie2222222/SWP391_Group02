@@ -257,19 +257,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     });
   };
 
-  const handleRemoveImage = (index) => {
-    const imageToRemove = selectedImages[index];
-    const newSelectedImages = selectedImages.filter((_, i) => i !== index);
-    const newFiles = selectedFiles.filter((_, i) => i !== index);
-
-    setSelectedImages(newSelectedImages);
-    setSelectedFiles(newFiles);
-
-    if (typeof imageToRemove === 'string') {
-      setRemovedImages([...removedImages, imageToRemove]);
-    }
-  };
-
   const handleClickOpen = () => {
     setOpen(true);
   };
