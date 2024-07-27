@@ -77,20 +77,37 @@ const CustomLink = styled(Link)({
 const CustomTextField = styled(TextField)({
   width: '100%',
   marginBottom: '1rem',
-  "& .MuiOutlinedInput-root": {
-    fontSize: '1.3rem',
-    "&:hover fieldset": {
-      borderColor: "#b48c72",
+  '& label.Mui-focused': {
+    color: '#b48c72', // focused label color
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#b48c72', // underline color after focus
+  },
+  '& .MuiOutlinedInput-root': {
+    fontSize: "1.3rem",
+    '& fieldset': {
+      borderColor: '#b48c72', // outline color
     },
-    "&.Mui-focused fieldset": {
-      borderColor: "#b48c72",
+    '&:hover fieldset': {
+      borderColor: '#b48c72', // outline color on hover
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#b48c72', // outline color when focused
     },
   },
   "& .MuiInputLabel-root": {
-    fontSize: '1.3rem',
-    "&.Mui-focused": {
-      color: "#b48c72",
+        fontSize: '1.3rem',
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
     },
+  "& .MuiFormHelperText-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
+  },
+  "& .MuiTypography-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
 });
 

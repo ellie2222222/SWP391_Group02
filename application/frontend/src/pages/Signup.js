@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Grid, Box } from '@mui/material';
+import { TextField, Button, Typography, Grid, Box, InputAdornment, IconButton } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuthContext';
 import { styled } from '@mui/system';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const CustomContainer = styled(Grid)({
   minHeight: '100vh',
@@ -22,22 +23,37 @@ const FormContainer = styled(Grid)({
 });
 
 const CustomTextField = styled(TextField)({
-  width: '100%',
-  marginBottom: '1rem',
-  "& .MuiOutlinedInput-root": {
-    fontSize: '1.3rem',
-    "&:hover fieldset": {
-      borderColor: "#b48c72",
+  '& label.Mui-focused': {
+    color: '#b48c72', // focused label color
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#b48c72', // underline color after focus
+  },
+  '& .MuiOutlinedInput-root': {
+    fontSize: "1.3rem",
+    '& fieldset': {
+      borderColor: '#b48c72', // outline color
     },
-    "&.Mui-focused fieldset": {
-      borderColor: "#b48c72",
+    '&:hover fieldset': {
+      borderColor: '#b48c72', // outline color on hover
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#b48c72', // outline color when focused
     },
   },
   "& .MuiInputLabel-root": {
-    fontSize: '1.3rem',
-    "&.Mui-focused": {
-      color: "#b48c72",
+        fontSize: '1.3rem',
+        "&.Mui-focused": {
+            color: "#b48c72",
+        },
     },
+  "& .MuiFormHelperText-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
+  },
+  "& .MuiTypography-root": {
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
 });
 
@@ -71,9 +87,14 @@ const Signup = () => {
   const [error, setError] = useState('');
   const { signup } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -119,11 +140,20 @@ const Signup = () => {
           <CustomTextField
             label="Password"
             name="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             fullWidth
             margin="normal"
             value={userData.password}
             onChange={handleChange}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={togglePasswordVisibility}>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <CustomTextField
             label="Phone Number"

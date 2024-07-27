@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, styled, CircularProgress, MenuItem, Select, InputLabel, FormControl, Stack, Pagination, InputAdornment, TextField } from '@mui/material';
+import { Box, Typography, styled, CircularProgress, MenuItem, Select, InputLabel, FormControl, Stack, Pagination, InputAdornment, TextField, Grid } from '@mui/material';
 import { Container, CardMedia, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import { Edit, Search } from '@mui/icons-material';
 import axiosInstance from '../utils/axiosInstance';
@@ -11,6 +11,7 @@ import DesignStaffDashboard from './DesignStaffDashboard';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSearchParams } from 'react-router-dom';
+import StaffAssignmentForm from './StaffAssignmentForm';
 
 const CustomButton1 = styled(Button)({
     outlineColor: '#000',
@@ -101,11 +102,8 @@ const RequestDashboardContent = () => {
     const [requests, setRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [isJewelryDetailDialogOpen, setIsJewelryDetailDialogOpen] = useState(false);
-    const [isQuoteDetailDialogOpen, setIsQuoteDetailDialogOpen] = useState(false);
-    const [isDesignDetailDialogOpen, setIsDesignDetailDialogOpen] = useState(false);
-    const [isProductionDetailDialogOpen, setIsProductionDetailDialogOpen] = useState(false);
-    const [isDescriptionDetailDialogOpen, setIsDescriptionDetailDialogOpen] = useState(false); // State for description dialog
+    const [isDescriptionDetailDialogOpen, setIsDescriptionDetailDialogOpen] = useState(false);
+    const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
     const [total, setTotal] = useState(0);
@@ -144,29 +142,9 @@ const RequestDashboardContent = () => {
         setIsEditDialogOpen(true);
     };
 
-    const handleJewelryDetailOpen = (request) => {
-        setSelectedRequest(request);
-        setIsJewelryDetailDialogOpen(true);
-    };
-
-    const handleQuoteDetailOpen = (request) => {
-        setSelectedRequest(request);
-        setIsQuoteDetailDialogOpen(true);
-    };
-
-    const handleDesignDetailOpen = (request) => {
-        setSelectedRequest(request);
-        setIsDesignDetailDialogOpen(true);
-    };
-
-    const handleProductionDetailOpen = (request) => {
-        setSelectedRequest(request);
-        setIsProductionDetailDialogOpen(true);
-    };
-
     const handleDescriptionDetailOpen = (request) => {
         setSelectedRequest(request);
-        setIsDescriptionDetailDialogOpen(true); // Open description dialog
+        setIsDescriptionDetailDialogOpen(true);
     };
 
     const handleSubmit = async (values) => {
@@ -196,11 +174,8 @@ const RequestDashboardContent = () => {
 
     const handleCloseAllDialogs = () => {
         setIsEditDialogOpen(false);
-        setIsJewelryDetailDialogOpen(false);
-        setIsQuoteDetailDialogOpen(false);
-        setIsDesignDetailDialogOpen(false);
-        setIsProductionDetailDialogOpen(false);
         setIsDescriptionDetailDialogOpen(false);
+        setIsAssignmentDialogOpen(false);
     };
 
     const updateQueryParams = (key, value, resetPage = false) => {
@@ -285,6 +260,7 @@ const RequestDashboardContent = () => {
                                     >
                                         <CustomMenuItem value="">All</CustomMenuItem>
                                         <CustomMenuItem value="pending">Pending</CustomMenuItem>
+                                        <CustomMenuItem value="assigned">Assigned</CustomMenuItem>
                                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
                                         <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
                                         <CustomMenuItem value="deposit">Deposit</CustomMenuItem>
@@ -311,11 +287,8 @@ const RequestDashboardContent = () => {
                                             <CustomTableCell sx={{ fontWeight: "bold" }}>Sender</CustomTableCell>
                                             <CustomTableCell sx={{ fontWeight: "bold" }}>Request Status</CustomTableCell>
                                             <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Description</CustomTableCell>
-                                            <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Jewelry</CustomTableCell>
-                                            <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Quote</CustomTableCell>
-                                            <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Design</CustomTableCell>
-                                            <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Production</CustomTableCell>
-                                            <CustomTableCell sx={{ fontWeight: "bold" }}>Actions</CustomTableCell>
+                                            <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Staffs</CustomTableCell>
+                                            <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Actions</CustomTableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -327,19 +300,10 @@ const RequestDashboardContent = () => {
                                                 <CustomTableCell>
                                                     <CustomButton1 color="primary" onClick={() => handleDescriptionDetailOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
-                                                <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleJewelryDetailOpen(request)}>Details</CustomButton1>
-                                                </CustomTableCell>
-                                                <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleQuoteDetailOpen(request)}>Details</CustomButton1>
-                                                </CustomTableCell>
-                                                <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleDesignDetailOpen(request)}>Details</CustomButton1>
-                                                </CustomTableCell>
-                                                <CustomTableCell align="center">
-                                                    <CustomButton1 color="primary" onClick={() => handleProductionDetailOpen(request)}>Details</CustomButton1>
-                                                </CustomTableCell>
                                                 <CustomTableCell>
+                                                    <CustomButton1 color="primary" onClick={() => setIsAssignmentDialogOpen(true)}>Details</CustomButton1>
+                                                </CustomTableCell>
+                                                <CustomTableCell align='center'>
                                                     <IconButton color="primary" onClick={() => handleEditClick(request)}>
                                                         <Edit sx={{ color: "#b48c72" }} fontSize='large' />
                                                     </IconButton>
@@ -385,10 +349,12 @@ const RequestDashboardContent = () => {
                     {user.role === 'production_staff' && <ProductionStaffDashboard />}
                 </>
             )}
-
-            <Dialog open={isJewelryDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Jewelry Detail</DialogTitle>
+            <Dialog open={isDescriptionDetailDialogOpen} onClose={handleCloseAllDialogs}>
+                <DialogTitle align='center' variant='h2'>Request Details</DialogTitle>
                 <DialogContent>
+                    <Typography variant='h3' fontWeight={300} my={2}>Description</Typography>
+                    <LargeTypography>{selectedRequest && selectedRequest.request_description}</LargeTypography>
+                    <Typography variant='h3' fontWeight={300} my={2}>Jewelry Information</Typography>
                     {selectedRequest && selectedRequest?.jewelry_id && (
                         <>
                             <LargeTypography marginBottom="10px">Name: {selectedRequest?.jewelry_id?.name}</LargeTypography>
@@ -411,58 +377,26 @@ const RequestDashboardContent = () => {
                             )}
                             <LargeTypography marginBottom="10px">Material Weight: {selectedRequest?.jewelry_id?.material_weight} kg</LargeTypography>
                             <LargeTypography marginBottom="10px">Category: {selectedRequest?.jewelry_id?.category}</LargeTypography>
-                            {selectedRequest?.jewelry_id?.images.map((image, index) => (
-                                <CardMedia
-                                    key={index}
-                                    component="img"
-                                    alt="Jewelry"
-                                    image={image}
-                                    sx={{ width: '100%', margin: '0px' }}
-                                />
-                            ))}
+                            <Typography variant='h3' fontWeight={300} my={2}>Images</Typography>
+                            <Grid container spacing={2}>
+                                {selectedRequest?.jewelry_id?.images.map((image, index) => (
+                                    <Grid item xs={4}>
+                                        <CardMedia
+                                            key={index}
+                                            component="img"
+                                            alt="Jewelry"
+                                            image={image}
+                                            sx={{ width: '100%', margin: '0px' }}
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
                         </>
                     )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog open={isQuoteDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Quote Detail</DialogTitle>
-                <DialogContent>
+                    <Typography variant='h3' fontWeight={300} my={2}>Quote Information</Typography>
                     <LargeTypography>Quote Amount: {(selectedRequest && selectedRequest.quote_amount) ? selectedRequest.quote_amount : 'N/A'}</LargeTypography>
                     <LargeTypography>Quote Content: {(selectedRequest && selectedRequest.quote_content) ? selectedRequest.quote_content : 'N/A'}</LargeTypography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog open={isDesignDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Design Detail</DialogTitle>
-                <DialogContent>
-                    {selectedRequest?.jewelry_id?.images.map((image, index) => (
-                        <CardMedia
-                            key={index}
-                            component="img"
-                            alt="Jewelry"
-                            image={image}
-                            sx={{ width: '100%', margin: '0px' }}
-                        />
-                    ))}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog open={isProductionDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Production Detail</DialogTitle>
-                <DialogContent>
+                    <Typography variant='h3' fontWeight={300} my={2}>Production Information</Typography>
                     <LargeTypography>Production Start Date: {(selectedRequest && selectedRequest.production_start_date) ? new Date(selectedRequest.production_start_date).toLocaleDateString() : 'N/A'}</LargeTypography>
                     <LargeTypography>Production End Date: {(selectedRequest && selectedRequest.production_end_date) ? new Date(selectedRequest.production_end_date).toLocaleDateString() : 'N/A'}</LargeTypography>
                     <LargeTypography>Production Cost: {(selectedRequest && selectedRequest.production_cost) ? selectedRequest.production_cost : 'N/A'}</LargeTypography>
@@ -473,10 +407,11 @@ const RequestDashboardContent = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Dialog open={isDescriptionDetailDialogOpen} onClose={handleCloseAllDialogs}>
-                <DialogTitle align='center' sx={{ fontSize: "1.5rem" }}>Description Detail</DialogTitle>
+
+            <Dialog open={isAssignmentDialogOpen} onClose={handleCloseAllDialogs}>
+                <DialogTitle align='center' variant='h4' fontWeight={300}>Staffs Assignment</DialogTitle>
                 <DialogContent>
-                    <LargeTypography>{selectedRequest && selectedRequest.request_description}</LargeTypography>
+                    <StaffAssignmentForm selectedRequest={selectedRequest} fetchData={fetchRequests} handleCloseAllDialogs={handleCloseAllDialogs}/>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>

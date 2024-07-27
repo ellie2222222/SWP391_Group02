@@ -1,11 +1,13 @@
 const express = require('express')
-const { updateUser, deleteUser, assignRole, getUsers, getUser, getStaffContact} = require('../controllers/userController')
+const { updateUser, deleteUser, assignRole, getUsers, getUser, getStaffContact, getStaffs} = require('../controllers/userController')
 const requireAuth = require('../middleware/requireAuth')
 const {requireAdmin} = require('../middleware/requireRoles')
 
 const usersRoutes = express.Router()
 
 usersRoutes.use(requireAuth)
+
+usersRoutes.get('/get-staffs', getStaffs)
 
 usersRoutes.get('/get-staff-contact', getStaffContact)
 

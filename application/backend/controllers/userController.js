@@ -187,6 +187,56 @@ const getUsers = async (req, res) => {
   }
 }
 
+const getStaffs = async (req, res) => {
+  const { search, sort, role, page = 1, limit = 10 } = req.query;
+
+  try {
+    let query = {
+      role: { $nin: ['user', 'admin'] }  // Exclude 'user' and 'admin' roles
+    };
+    
+    if (search) {
+      query.$or = [
+        { username: new RegExp(search, 'i') },
+        { email: new RegExp(search, 'i') }
+      ];
+    }
+    
+    if (role && !['user', 'admin'].includes(role.toLowerCase())) {
+      query.role = {
+        ...query.role,
+        $regex: new RegExp(role, 'i')
+      };
+    }
+
+    // Determine the sort field and order
+    let sortField = {};
+    if (sort) {
+      const [field, order] = sort.split('_');
+      sortField[field] = order === 'asc' ? 1 : -1;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const users = await User.find(query)
+      .select('-password')
+      .sort(sortField)
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    return res.status(200).json({
+      users,
+      total: totalUsers,
+      totalPages
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Error while getting staffs" });
+  }
+}
+
 const getUser = async (req, res) => {
   try {
     const { id } = req.params
@@ -361,4 +411,4 @@ const logout = (req, res) => {
 
 
 
-module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword, getStaffContact };
+module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword, getStaffContact, getStaffs };

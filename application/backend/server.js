@@ -15,6 +15,7 @@ const blogRoutes = require('./routes/blog')
 const invoiceRoutes = require('./routes/invoice');
 const transactionRoutes = require('./routes/transaction');
 const analyticRoutes = require('./routes/analytic');
+const worksOnRoutes = require('./routes/worksOn');
 
 //application
 const app = express()
@@ -57,6 +58,7 @@ app.use('/api/blogs', blogRoutes)
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/analytics', analyticRoutes);
+app.use('/api/works-on', worksOnRoutes);
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)
@@ -87,8 +89,8 @@ app.post('/api/payment', requireAuth, async (req, res) => {
   const { product, price } = req.body;
 
   const embed_data = {
-    redirecturl: `https://frontend-chk2.onrender.com/products/${product._id}/payment-status`,
-    // redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
+    // redirecturl: `https://frontend-chk2.onrender.com/products/${product._id}/payment-status`,
+    redirecturl: `http://localhost:3000/products/${product._id}/payment-status`,
   };
   
   const items = [{ product }];

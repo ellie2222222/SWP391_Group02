@@ -1,5 +1,6 @@
 const Request = require("../models/requestModel");
 const Jewelry = require("../models/jewelryModel")
+const WorksOn = require("../models/worksOnModel")
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const streamifier = require('streamifier');
@@ -9,35 +10,46 @@ const ObjectId = mongoose.Types.ObjectId;
 // get all requests
 const getRequests = async (req, res) => {
   const { search, request_status, page = 1, limit = 10 } = req.query;
+  const uid  = req.id;
+  const role = req.role;
 
   try {
     // Construct base query object
     let query = {};
     if (request_status) {
       query.request_status = request_status;
-  }  
+    }
 
     const skip = (page - 1) * limit;
 
     let userFilter = {};
     if (search) {
-      if (ObjectId.isValid(search)) {
-        query._id = new ObjectId(search);
+      if (mongoose.Types.ObjectId.isValid(search)) {
+        query._id = new mongoose.Types.ObjectId(search);
       } else {
         userFilter = { email: new RegExp(search, 'i') };
       }
     }
 
     // Role-based query adjustments
-    if (req.role === "sale_staff") {
+    if (role === "sale_staff") {
       query.$or = [
-        { request_status: "pending" },
+        { request_status: "assigned" },
         { request_status: "warranty" }
       ];
-    } else if (req.role === "design_staff") {
+    } else if (role === "design_staff") {
       query.request_status = "design";
-    } else if (req.role === "production_staff") {
+    } else if (role === "production_staff") {
       query.request_status = "production";
+    }
+    
+    if (role !== 'manager') {
+      // Fetch associated WorksOn entries for the user
+      const worksOnEntries = await WorksOn.find({ staff_ids: { $elemMatch: { staff_id: uid } } });
+      const allowedRequestIds = worksOnEntries.map(entry => entry.request_id);
+
+      // Modify query to include only requests associated with the user
+      query._id = { $in: allowedRequestIds };
     }
 
     // Fetch requests with pagination and population
@@ -68,7 +80,6 @@ const getRequests = async (req, res) => {
       currentPage: parseInt(page),
     });
   } catch (error) {
-    console.error('Error fetching requests:', error);
     res.status(500).json({ error: "An error occurred while fetching requests" });
   }
 };
@@ -194,6 +205,13 @@ const createRequest = async (req, res) => {
   // Add to the database
   try {
     const request = await Request.create(newRequest);
+    
+    const worksOn = new WorksOn({
+      request_id: request._id,
+      staff_ids: [],
+    });
+    await worksOn.save();
+
     res.status(201).json(request);
   } catch (error) {
     console.error('Error creating request:', error);
@@ -240,7 +258,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled', 'user_accepted'];
+    const allowedRequestStatuses = ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }

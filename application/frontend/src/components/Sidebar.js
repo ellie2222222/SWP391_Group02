@@ -25,6 +25,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import Button from '@mui/material/Button';
+import PendingIcon from '@mui/icons-material/Pending';
 import useAuth from '../hooks/useAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Dashboard, Diamond } from '@mui/icons-material';
@@ -194,6 +195,16 @@ export default function Sidebar() {
                     )}
                     {user.role === 'manager' && (
                         <div>
+                            <ListItem key="My Requests" disablePadding sx={{ display: 'block' }}>
+                                <Link to='/management/pending-requests'>
+                                    <CustomListItemButton>
+                                        <CustomListItemIcon>
+                                            <PendingIcon fontSize='large' />
+                                        </CustomListItemIcon>
+                                        <CustomListItemText primary="Pending Requests" sx={{ opacity: open ? 1 : 0 }} />
+                                    </CustomListItemButton>
+                                </Link>
+                            </ListItem>
                             <ListItem key="Users" disablePadding sx={{ display: 'block' }}>
                                 <Link to='/management/dashboard'>
                                     <CustomListItemButton>

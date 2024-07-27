@@ -204,40 +204,38 @@ export default function SaleStaffDashboard() {
                     </TableHead>
                     <TableBody>
                         {requests.map((request, index) => (
-                            (request.request_status === 'pending' || request.request_status === 'rejected_quote') && (
-                                <TableRow key={index}>
-                                    <CustomTableCell sx={{ fontWeight: 'bold' }}>{request._id}</CustomTableCell>
-                                    <CustomTableCell>{request.user_id ? request.user_id.email : 'User not found'}</CustomTableCell>
-                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
-                                    <CustomTableCell>
-                                        {getTimestamp(request)}
-                                    </CustomTableCell>
-                                    <CustomTableCell onClick={() => handleDetailClick(request)}>
-                                        <CustomButton1>
-                                            Detail
-                                        </CustomButton1>
-                                    </CustomTableCell>
-                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>
-                                        {request.manager_feedback_quote && request.manager_feedback_quote.length > 0
-                                            ? request.manager_feedback_quote.map((feedback, index) => (
-                                                <Typography variant='h6' key={index}>Feedback {index + 1}: {feedback}</Typography>
-                                            ))
-                                            : 'N/A'}
-                                    </CustomTableCell>
-                                    <CustomTableCell style={{ textTransform: 'capitalize' }}>
-                                        {request.user_feedback_quote && request.user_feedback_quote.length > 0
-                                            ? request.user_feedback_quote.map((feedback, index) => (
-                                                <Typography variant='h6' key={index}>Feedback {index + 1}: {feedback}</Typography>
-                                            ))
-                                            : 'N/A'}
-                                    </CustomTableCell>
-                                    <CustomTableCell align="center">
-                                        <IconButton color="primary" onClick={() => handleEditClick(request)}>
-                                            <Add fontSize="large" sx={{ color: '#b48c72' }} />
-                                        </IconButton>
-                                    </CustomTableCell>
-                                </TableRow>
-                            )
+                            <TableRow key={index}>
+                                <CustomTableCell sx={{ fontWeight: 'bold' }}>{request._id}</CustomTableCell>
+                                <CustomTableCell>{request.user_id ? request.user_id.email : 'User not found'}</CustomTableCell>
+                                <CustomTableCell style={{ textTransform: 'capitalize' }}>{request.request_status}</CustomTableCell>
+                                <CustomTableCell>
+                                    {getTimestamp(request)}
+                                </CustomTableCell>
+                                <CustomTableCell onClick={() => handleDetailClick(request)}>
+                                    <CustomButton1>
+                                        Detail
+                                    </CustomButton1>
+                                </CustomTableCell>
+                                <CustomTableCell style={{ textTransform: 'capitalize' }}>
+                                    {request.manager_feedback_quote && request.manager_feedback_quote.length > 0
+                                        ? request.manager_feedback_quote.map((feedback, index) => (
+                                            <Typography variant='h6' key={index}>Feedback {index + 1}: {feedback}</Typography>
+                                        ))
+                                        : 'N/A'}
+                                </CustomTableCell>
+                                <CustomTableCell style={{ textTransform: 'capitalize' }}>
+                                    {request.user_feedback_quote && request.user_feedback_quote.length > 0
+                                        ? request.user_feedback_quote.map((feedback, index) => (
+                                            <Typography variant='h6' key={index}>Feedback {index + 1}: {feedback}</Typography>
+                                        ))
+                                        : 'N/A'}
+                                </CustomTableCell>
+                                <CustomTableCell align="center">
+                                    <IconButton color="primary" onClick={() => handleEditClick(request)}>
+                                        <Add fontSize="large" sx={{ color: '#b48c72' }} />
+                                    </IconButton>
+                                </CustomTableCell>
+                            </TableRow>
                         ))}
                         {requests.length === 0 && (
                             <TableRow>

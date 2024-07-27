@@ -7,7 +7,7 @@ const statusHistorySchema = new Schema({
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled', 'rejected_quote']
+        enum: ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled']
     },
     timestamp: {
         type: Date,
@@ -32,7 +32,7 @@ const requestSchema = new Schema({
     request_status: {
         type: String,
         required: true,
-        enum: ['pending', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled', 'rejected_quote'],
+        enum: ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit', 'design', 'design_completed', 'production', 'warranty', 'payment', 'cancelled'],
         default: 'pending'
     },
     status_history: [statusHistorySchema],

@@ -32,6 +32,7 @@ import InvoiceDashboard from "./pages/InvoiceDashboard";
 import WarrantyDashboard from "./pages/WarrantyDashboard";
 import Collection from './pages/Collection';
 import 'react-toastify/dist/ReactToastify.css';
+import PendingRequestDashboard from "./pages/PendingRequestDashboard";
 
 function App() {
   return (
@@ -63,6 +64,7 @@ function App() {
           <Route path="/management" element={<JewelryDashboard />} />
           <Route path="/management/users" element={<UsersDashboard />} />
           <Route path="/management/requests" element={<RequestDashboard />} />
+          <Route path="/management/pending-requests" element={<PendingRequestDashboard />} />
           <Route path="/management/quote-request" element={<QuotedRequest />} />
           <Route path="/management/warranty-request" element={<WarrantyDashboard />} />
           <Route path="/management/gemstones" element={<Gemstones />}></Route>
