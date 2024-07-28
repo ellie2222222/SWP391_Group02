@@ -7,7 +7,7 @@ const statusHistorySchema = new Schema({
     status: {
         type: String,
         required: true,
-        enum: ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled']
+        enum: ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'warranty', 'payment', 'cancelled'],
     },
     timestamp: {
         type: Date,
@@ -32,7 +32,7 @@ const requestSchema = new Schema({
     request_status: {
         type: String,
         required: true,
-        enum: ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit', 'design', 'design_completed', 'production', 'warranty', 'payment', 'cancelled'],
+        enum: ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'warranty', 'payment', 'cancelled'],
         default: 'pending'
     },
     status_history: [statusHistorySchema],
@@ -50,9 +50,6 @@ const requestSchema = new Schema({
     },
     production_cost: {
         type: Number
-    },
-    endedAt: {
-        type: Date
     },
     design_images: [{
         type: String
@@ -72,14 +69,6 @@ const requestSchema = new Schema({
     images_public_ids: [{
         type: String
     }],
-    deposit_paid: {
-        type: Boolean,
-        default: false
-    },
-    final_paid: {
-        type: Boolean,
-        default: false
-    },
     user_feedback_quote: {
         type: Array
     },

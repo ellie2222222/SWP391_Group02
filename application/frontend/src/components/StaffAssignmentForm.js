@@ -81,7 +81,7 @@ const capitalizeWords = (str) => {
     return words.join(' ');
 };
 
-const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs }) => {
+const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs, finishAssignment }) => {
     const [loading, setLoading] = useState(true);
     const [total, setTotal] = useState(0);
     const [search, setSearch] = useState('');
@@ -223,8 +223,8 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
     }, [page, role]);
 
     return (
-        <Box component="main" sx={{ flexGrow: 1, p: 3, width: '500px' }}>
-            <Container>
+        <Box sx={{ width: '500px' }}>
+            <Container sx={{ maxWidth: '100%'}}>
                 <Box mb={2}>
                     <CustomTextField
                         label="Search by name or email"
@@ -278,7 +278,11 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                                 <Typography variant="h6">Role: {staff.role && capitalizeWords(staff.role)}</Typography>
                             </CardContent>
                             <CardActions>
-                                <Button size="large" sx={{ color: '#b48c72' }} onClick={() => assignStaff(staff)} startIcon={<Add />}>Add</Button>
+                                <Button  onClick={() => assignStaff(staff)}>
+                                    <IconButton sx={{ color: '#b48c72' }}>
+                                        <Add fontSize='large'/>
+                                    </IconButton>
+                                </Button>
                             </CardActions>
                         </Card>
                     ))}
@@ -320,7 +324,11 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                             </CardContent>
                             {staff.role !== 'manager' && (
                                 <CardActions>
-                                    <Button size="large" sx={{ color: '#b48c72' }} onClick={() => removeStaff(staff.staff_id)} startIcon={<Delete />}>Remove</Button>
+                                    <Button onClick={() => removeStaff(staff.staff_id)}>
+                                        <IconButton sx={{ color: '#b48c72' }}>
+                                            <Delete fontSize='large'/>
+                                        </IconButton>
+                                    </Button>
                                 </CardActions>
                             )}
                         </Card>
@@ -332,9 +340,11 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                             </CardContent>
                         </Card>
                     )}
-                    <CustomButton1 sx={{ mt: 2 }} onClick={handleFinishAssignment}>
-                        Finish Assignment
-                    </CustomButton1>
+                    {finishAssignment === true && (
+                        <CustomButton1 sx={{ mt: 2 }} onClick={handleFinishAssignment}>
+                            Finish Assignment
+                        </CustomButton1>
+                    )}
                 </Box>
             </Container>
         </Box>

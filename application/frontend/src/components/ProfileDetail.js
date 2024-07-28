@@ -196,7 +196,7 @@ const ProfileDetail = () => {
     };
 
     return (
-        <Box display="flex" justifyContent="center" minHeight="100vh" maxWidth="1300px" margin="auto" padding="50px" gap='2rem'>
+        <Box display="flex" justifyContent="center" minHeight="100vh" maxWidth="1500px" margin="auto" padding="50px" gap='2rem'>
             <Paper elevation={3} sx={{ width: 'fit-content', padding: 2, borderRadius: '10px', maxHeight: '800px' }}>
                 <List>
                     {['Information', 'Password', 'My Requests'].map((text) => (

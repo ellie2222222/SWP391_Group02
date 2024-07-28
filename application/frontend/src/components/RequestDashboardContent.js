@@ -116,9 +116,10 @@ const RequestDashboardContent = () => {
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/requests/', {
+            const response = await axiosInstance.get('/requests', {
                 params: {
                     ...Object.fromEntries(searchParams),
+                    request_status: { $ne: 'pending' },
                 },
             });
 
@@ -147,6 +148,11 @@ const RequestDashboardContent = () => {
         setIsDescriptionDetailDialogOpen(true);
     };
 
+    const handleAssignmentDialogOpen = (request) => {
+        setSelectedRequest(request);
+        setIsAssignmentDialogOpen(true);
+    };
+    
     const handleSubmit = async (values) => {
         try {
             setLoading(true);
@@ -259,7 +265,6 @@ const RequestDashboardContent = () => {
                                         label="Request Status"
                                     >
                                         <CustomMenuItem value="">All</CustomMenuItem>
-                                        <CustomMenuItem value="pending">Pending</CustomMenuItem>
                                         <CustomMenuItem value="assigned">Assigned</CustomMenuItem>
                                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
                                         <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
@@ -301,7 +306,7 @@ const RequestDashboardContent = () => {
                                                     <CustomButton1 color="primary" onClick={() => handleDescriptionDetailOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
                                                 <CustomTableCell>
-                                                    <CustomButton1 color="primary" onClick={() => setIsAssignmentDialogOpen(true)}>Details</CustomButton1>
+                                                    <CustomButton1 color="primary" onClick={() => handleAssignmentDialogOpen(request)}>Details</CustomButton1>
                                                 </CustomTableCell>
                                                 <CustomTableCell align='center'>
                                                     <IconButton color="primary" onClick={() => handleEditClick(request)}>
@@ -321,11 +326,22 @@ const RequestDashboardContent = () => {
                                 </Table>
                                 <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
                                     <DialogContent>
-                                        <RequestForm initialValues={selectedRequest} onSubmit={handleSubmit} fetchData={fetchRequests} closeAllDialogs={handleCloseAllDialogs} />
+                                        <RequestForm initialValues={selectedRequest} onSubmit={handleSubmit} fetchData={fetchRequests} closeAllDialogs={handleCloseAllDialogs}/>
                                     </DialogContent>
                                     <DialogActions>
                                         <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72", fontSize: '1.3rem' }}>
                                             Cancel
+                                        </Button>
+                                    </DialogActions>
+                                </Dialog>
+                                <Dialog open={isAssignmentDialogOpen} onClose={handleCloseAllDialogs}>
+                                    <DialogTitle align='center' variant='h2' fontWeight={300}>Staffs Assignment</DialogTitle>
+                                    <DialogContent>
+                                        <StaffAssignmentForm selectedRequest={selectedRequest} fetchData={fetchRequests} handleCloseAllDialogs={handleCloseAllDialogs} finishAssignment={false}/>
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
+                                            Close
                                         </Button>
                                     </DialogActions>
                                 </Dialog>
@@ -408,17 +424,6 @@ const RequestDashboardContent = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isAssignmentDialogOpen} onClose={handleCloseAllDialogs}>
-                <DialogTitle align='center' variant='h4' fontWeight={300}>Staffs Assignment</DialogTitle>
-                <DialogContent>
-                    <StaffAssignmentForm selectedRequest={selectedRequest} fetchData={fetchRequests} handleCloseAllDialogs={handleCloseAllDialogs}/>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
             <ToastContainer />
         </Box>
     );

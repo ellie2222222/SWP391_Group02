@@ -101,8 +101,8 @@ const RequestList = () => {
   const [designStaffNumber, setDesignStaffNumber] = useState('');
   const [isContactInfoDialogOpen, setIsContactInfoDialogOpen] = useState(false);
 
-  const steps = ['pending', 'quote', 'accepted', 'deposit', 'design', 'design_completed', 'production', 'payment', 'warranty', 'completed'];
-  const alternateSteps = ['pending', 'quote', 'accepted', 'deposit', 'design', 'design_completed', 'production', 'payment', 'warranty', 'cancelled'];
+  const steps = ['pending', 'assigned', 'quote', 'accepted', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'payment', 'warranty', 'completed'];
+  const alternateSteps = ['pending', 'assigned', 'quote', 'accepted', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'payment', 'warranty', 'cancelled'];
 
   const fetchRequests = async (pageNumber = 1) => {
     setLoading(true);
@@ -137,7 +137,7 @@ const RequestList = () => {
 
   const handleAcceptRequest = async (requestId) => {
     try {
-      await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit' });
+      await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit_design' });
       setError('');
       fetchRequests(page);
       toast.success('Accept quote successfully', {
@@ -157,7 +157,7 @@ const RequestList = () => {
   };
   const handleAcceptDesignRequest = async (requestId) => {
     try {
-      await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'production' });
+      await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit_production' });
       setError('');
       fetchRequests(page);
       toast.success('Accept design successfully', {
@@ -185,10 +185,12 @@ const RequestList = () => {
     try {
 
       let price;
-      if (type === 'deposit') {
+      if (type === 'deposit_design') {
+        price = request.quote_amount * 20 / 100;
+      } else if (type === 'deposit_production') {
         price = request.quote_amount * 30 / 100;
       } else if (type === 'final') {
-        price = request.quote_amount * 70 / 100;
+        price = request.quote_amount * 50 / 100;
       }
 
       const payment = await axiosInstance.post('/payment', {
@@ -202,8 +204,8 @@ const RequestList = () => {
         type,
       });
 
-      // window.location.href = payment.data.result.order_url;
-      window.open(payment.data.result.order_url, '_blank');
+      window.location.href = payment.data.result.order_url;
+      // window.open(payment.data.result.order_url, '_blank');
     } catch (error) {
       console.error('Error, cannot proceed to payment', error); 
       toast.error('Error, cannot proceed to payment', {
@@ -225,12 +227,16 @@ const RequestList = () => {
 
   const getDisplayLabel = (label) => {
     switch (label) {
+      case 'deposit_design':
+        return 'deposit design';
       case 'design_completed':
         return 'user accept design';
       case 'accepted':
         return 'user accept quote';
       case 'quote':
         return 'manager approve quote';
+      case 'deposit_production':
+        return 'deposit production';
       default:
         return label;
     }
@@ -331,11 +337,14 @@ const RequestList = () => {
           <Typography variant="h4" my={2}>No requests</Typography>
         )} 
         {requests.map((request, index) => (
-          <Card key={index} variant="outlined" sx={{ marginBottom: '20px' }}>
+          <Card key={index} variant="outlined" sx={{ marginBottom: '20px', overflow: 'auto' }}>
             <CardContent>
               <Typography variant="h5" component="p">Request ID: {request._id}</Typography>
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
-                Deposit Amount: {request.quote_amount ? (request.quote_amount * 30 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
+                Design Deposit Amount: {request.quote_amount ? (request.quote_amount * 20 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
+              </Typography>
+              <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
+                Production Deposit Amount: {request.quote_amount ? (request.quote_amount * 30 / 100).toLocaleString() + '₫' : 'Awaiting Quote Amount'}
               </Typography>
               <Typography variant="h5" component="p" sx={{ color: 'red', fontWeight: '300' }}>
                 Quote Amount: {request.quote_amount ? request.quote_amount.toLocaleString() + '₫' : 'Awaiting Quote Amount'}
@@ -389,8 +398,11 @@ const RequestList = () => {
               {request.request_status === 'payment' && (
                 <CustomButton1 onClick={() => handlePayment(request, 'final')}>Payment</CustomButton1>
               )}
-              {request.request_status === 'deposit' && (
-                <CustomButton1 onClick={() => handlePayment(request, 'deposit')}>Deposit</CustomButton1>
+              {request.request_status === 'deposit_design' && (
+                <CustomButton1 onClick={() => handlePayment(request, 'deposit_design')}>Deposit Design</CustomButton1>
+              )}
+              {request.request_status === 'deposit_production' && (
+                <CustomButton1 onClick={() => handlePayment(request, 'deposit_production')}>Deposit Production</CustomButton1>
               )}
             </CardActions>
           </Card>

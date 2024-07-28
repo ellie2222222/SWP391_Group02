@@ -1,6 +1,7 @@
 const Request = require("../models/requestModel");
-const Jewelry = require("../models/jewelryModel")
-const WorksOn = require("../models/worksOnModel")
+const Jewelry = require("../models/jewelryModel");
+const WorksOn = require("../models/worksOnModel");
+const User = require("../models/userModel");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const streamifier = require('streamifier');
@@ -41,7 +42,10 @@ const getRequests = async (req, res) => {
       query.request_status = "design";
     } else if (role === "production_staff") {
       query.request_status = "production";
-    }
+    } 
+    // else if (role === "manager") {
+    //   query.request_status = { $ne: 'pending' };
+    // }
     
     if (role !== 'manager') {
       // Fetch associated WorksOn entries for the user
@@ -192,14 +196,11 @@ const createRequest = async (req, res) => {
     production_start_date: null,
     production_end_date: null,
     production_cost: null,
-    endedAt: null,
     design_images: [],
     warranty_content: null,
     warranty_duration: null,
     warranty_start_date: null,
     warranty_end_date: null,
-    deposit_paid: false,
-    final_paid: false,
     status_history: [{ status: 'pending', timestamp: new Date() }]
   };
 
@@ -207,9 +208,15 @@ const createRequest = async (req, res) => {
   try {
     const request = await Request.create(newRequest);
     
+    const manager = await User.findOne({ role: "manager" });
+
     const worksOn = new WorksOn({
       request_id: request._id,
-      staff_ids: [],
+      staff_ids: [{
+        staff_id: manager._id,
+        role: 'manager',
+        addedAt: new Date(),
+      }],
     });
     await worksOn.save();
 
@@ -233,7 +240,6 @@ const updateRequest = async (req, res) => {
       production_start_date,
       production_end_date,
       production_cost,
-      endedAt,
       warranty_content,
       warranty_duration,
       warranty_start_date,
@@ -260,7 +266,7 @@ const updateRequest = async (req, res) => {
     }
 
     // Validate request status
-    const allowedRequestStatuses = ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit', 'design','design_completed', 'production', 'warranty', 'payment', 'cancelled'];
+    const allowedRequestStatuses = ['pending', 'assigned', 'accepted', 'completed', 'quote', 'deposit_design', 'design', 'design_completed', 'deposit_production','production', 'warranty', 'payment', 'cancelled'];
     if (request_status && !allowedRequestStatuses.includes(request_status)) {
       return res.status(400).json({ error: "Invalid request status" });
     }
@@ -283,7 +289,6 @@ const updateRequest = async (req, res) => {
 
     let parsedStartDate = production_start_date ? parseDate(production_start_date) : existingRequest.production_start_date;
     let parsedEndDate = production_end_date ? parseDate(production_end_date) : existingRequest.production_end_date;
-    let parsedEndAt = endedAt ? parseDate(endedAt) : existingRequest.endedAt;
     let parsedWarrantyStartDate = warranty_start_date ? parseDate(warranty_start_date) : existingRequest.warranty_start_date;
     let parsedWarrantyEndDate = warranty_end_date ? parseDate(warranty_end_date) : existingRequest.warranty_end_date;
 
@@ -293,10 +298,6 @@ const updateRequest = async (req, res) => {
 
     if (production_end_date && isNaN(parsedEndDate)) {
       return res.status(400).json({ error: "Invalid production end date" });
-    }
-
-    if (endedAt && (isNaN(parsedEndAt) || parsedEndAt <= existingRequest.createdAt)) {
-      return res.status(400).json({ error: "End date must be valid and after creation date" });
     }
 
     if (warranty_start_date && isNaN(parsedWarrantyStartDate)) {
@@ -351,7 +352,6 @@ const updateRequest = async (req, res) => {
       ...(production_start_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_start_date: parsedStartDate }),
       ...(production_end_date !== undefined && (req.role === 'production_staff' || req.role === 'manager') && { production_end_date: parsedEndDate }),
       ...(production_cost !== undefined && (req.role === 'sale_staff' || req.role === 'production_staff' || req.role === 'manager') && { production_cost }),
-      ...(endedAt !== undefined && { endedAt: parsedEndAt }),
       ...(images.length > 0 && (req.role === 'design_staff' || req.role === 'manager') && { design_images: images }),
       ...(warranty_content !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_content }),
       ...(warranty_duration !== undefined && (req.role === 'sale_staff' || req.role === 'manager') && { warranty_duration }),
@@ -408,14 +408,11 @@ const createOrderRequest = async (req, res) => {
       production_start_date: null,
       production_end_date: null,
       production_cost: null,
-      endedAt: null,
       warranty_content: null,
       warranty_start_date: null,
       warranty_duration: null,
       warranty_end_date: null,
       design_images: [],
-      deposit_paid: null,
-      final_paid: null,
       status_history: [{ status: 'pending', timestamp: new Date() }],
     };
 
@@ -557,5 +554,5 @@ module.exports = {
   createOrderRequest,
   userFeedbackQuote,
   userFeedbackDesign,
-  managerFeedbackQuote
+  managerFeedbackQuote,
 };

@@ -20,22 +20,28 @@ const createInvoice = async (req, res) => {
         const requestId = transaction.request_id._id;
 
         // Check if an invoice transaction of the same type already exists for this request
-        const existingDepositInvoice = await Invoice.exists({
+        const existingDepositDesignInvoice = await Invoice.exists({
             transaction_id,
-            type: 'deposit',
-            'transaction_id.request_id.deposit_paid': true,
+            type: 'deposit_design',
         });
-        if (existingDepositInvoice) {
-            return res.status(200).json({ message: 'The request already has an invoice of type deposit' });
+        if (existingDepositDesignInvoice) {
+            return res.status(200).json({ error: 'The request already has an invoice of type deposit design' });
+        }
+
+        const existingDepositProductionInvoice = await Invoice.exists({
+            transaction_id,
+            type: 'deposit_production',
+        });
+        if (existingDepositProductionInvoice) {
+            return res.status(200).json({ error: 'The request already has an invoice of type deposit production' });
         }
 
         const existingFinalInvoice = await Invoice.exists({
             transaction_id,
             type: 'final',
-            'transaction_id.request_id.final_paid': true,
         });
         if (existingFinalInvoice) {
-            return res.status(200).json({ message: 'The request already has an invoice of type final' });
+            return res.status(200).json({ error: 'The request already has an invoice of type final' });
         }
 
         // Check if total_amount is valid
@@ -45,16 +51,22 @@ const createInvoice = async (req, res) => {
 
         // Update the request status based on the invoice type
         let updatedRequest;
-        if (transaction.type === 'deposit') {
+        if (transaction.type === 'deposit_design') {
             updatedRequest = await Request.findByIdAndUpdate(
                 requestId,
-                { $set: { deposit_paid: true, request_status: 'design' } },
+                { $set: { request_status: 'design' } },
+                { new: true, runValidators: true }
+            );
+        } else if (transaction.type === 'deposit_production') {
+            updatedRequest = await Request.findByIdAndUpdate(
+                requestId,
+                { $set: { request_status: 'production' } },
                 { new: true, runValidators: true }
             );
         } else if (transaction.type === 'final') {
             updatedRequest = await Request.findByIdAndUpdate(
                 requestId,
-                { $set: { final_paid: true, request_status: 'warranty' } },
+                { $set: { request_status: 'warranty' } },
                 { new: true, runValidators: true }
             );
         }

@@ -85,7 +85,7 @@ const PaymentStatus = () => {
               <LargeTypography variant="body1">Transaction ID: {transactionId}</LargeTypography>
               <LargeTypography variant="body1">Status: {orderStatus.return_message}</LargeTypography>
               <LargeTypography variant="body1">Amount: {orderStatus.amount}</LargeTypography>
-              <Link component={RouterLink} to={`/requests`} underline="none" sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
+              <Link component={RouterLink} to={`/profile/${user._id}`} underline="none" sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'right' }}>
                 <KeyboardBackspaceIcon sx={{ mr: 1, color: '#b48c72' }} />
                 <LargeTypography variant="body1" sx={{ fontWeight: 'bold', color: '#b48c72' }}>
                   Back to request list

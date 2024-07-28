@@ -219,11 +219,13 @@ export default function RequestForm({ initialValues, onSubmit, fetchData, closeA
                         error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                     >
                         <CustomMenuItem value="pending">Pending</CustomMenuItem>
+                        <CustomMenuItem value="assigned">Assigned</CustomMenuItem>
                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
                         <CustomMenuItem value="accepted">Accepted</CustomMenuItem>
-                        <CustomMenuItem value="deposit">Deposit</CustomMenuItem>
+                        <CustomMenuItem value="deposit_design">Deposit Design</CustomMenuItem>
                         <CustomMenuItem value="design">Design</CustomMenuItem>
                         <CustomMenuItem value="design_completed">Design Completed</CustomMenuItem>
+                        <CustomMenuItem value="deposit_production">Deposit Production</CustomMenuItem>
                         <CustomMenuItem value="production">Production</CustomMenuItem>
                         <CustomMenuItem value="payment">Payment</CustomMenuItem>
                         <CustomMenuItem value="warranty">Warranty</CustomMenuItem>

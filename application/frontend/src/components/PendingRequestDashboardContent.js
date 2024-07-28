@@ -115,9 +115,10 @@ const PendingRequestDashboardContent = () => {
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/requests?request_status=pending', {
+            const response = await axiosInstance.get('/requests', {
                 params: {
                     ...Object.fromEntries(searchParams),
+                    request_status: 'pending',
                 },
             });
 
@@ -311,8 +312,9 @@ const PendingRequestDashboardContent = () => {
                             </TableBody>
                         </Table>
                         <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
+                            <DialogTitle align='center' variant='h2' fontWeight={300}>Staff Assignment</DialogTitle>
                             <DialogContent>
-                                <StaffAssignmentForm selectedRequest={selectedRequest} fetchData={fetchRequests} handleCloseAllDialogs={handleCloseAllDialogs}/>
+                                <StaffAssignmentForm selectedRequest={selectedRequest} fetchData={fetchRequests} handleCloseAllDialogs={handleCloseAllDialogs} finishAssignment={true}/>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72", fontSize: '1.3rem' }}>

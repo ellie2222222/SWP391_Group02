@@ -19,7 +19,7 @@ const transactionSchema = new Schema({
     type: {
         type: String,
         required: true,
-        enum: ['deposit', 'final']
+        enum: ['deposit_design', 'deposit_production', 'final']
     },
 }, { timestamps: true });
 
