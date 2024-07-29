@@ -99,7 +99,7 @@ const CustomIconButton = styled(IconButton)({
 });
 
 const GemstoneForm = ({ initialValues, onSubmit }) => {
-  const [certificateImage, setCertificateImage] = useState(initialValues.certificate_image ? initialValues.certificate_image[0] : '');
+  const [certificateImage, setCertificateImage] = useState(initialValues.certificate_image || '');
   const [removedImages, setRemovedImages] = useState([]);
   console.log(removedImages)
   console.log(certificateImage)
