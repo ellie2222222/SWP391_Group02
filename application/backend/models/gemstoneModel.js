@@ -59,14 +59,12 @@ const gemstoneSchema = new Schema({
         type: Boolean,
         required: true
     },
-    certificate_image: [{
+    certificate_image: {
         type: String, 
-        required: true
-    }],
-    certificate_image_public_ids: [{
+    },
+    certificate_image_public_ids: {
         type: String, 
-        required: true
-    }],
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Gemstone', gemstoneSchema);

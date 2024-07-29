@@ -13,10 +13,10 @@ gemstoneRoutes.get('/', getGemstones)
 
 gemstoneRoutes.get('/:id', getGemstone)
 
-gemstoneRoutes.post('/', requireAuth, requireAdminOrManagerOrSale, upload.array('certificate_images', 5), createGemstone)
+gemstoneRoutes.post('/', requireAuth, requireAdminOrManagerOrSale, upload.single('file'), createGemstone)
 
 gemstoneRoutes.delete('/:id', requireAuth, requireAdminOrManagerOrSale, deleteGemstone)
 
-gemstoneRoutes.patch('/:id', requireAuth, requireAdminOrManagerOrSale, upload.array('certificate_images', 5), updateGemstone)
+gemstoneRoutes.patch('/:id', requireAuth, requireAdminOrManagerOrSale, upload.single('file'), updateGemstone)
 
 module.exports = gemstoneRoutes
