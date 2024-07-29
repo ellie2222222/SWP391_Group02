@@ -102,7 +102,7 @@ const RequestList = () => {
   const [designStaffNumber, setDesignStaffNumber] = useState('');
   const [isContactInfoDialogOpen, setIsContactInfoDialogOpen] = useState(false);
   const [isWarrantyDialogOpen, setIsWarrantyDialogOpen] = useState(false);
-  const [warrantyDetails, setWarrantyDetails] = useState(null);
+ 
 
 
   const steps = ['pending', 'assigned', 'quote', 'accepted', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'payment', 'warranty', 'completed'];
@@ -139,14 +139,7 @@ const RequestList = () => {
     }
   }
 
-  const fetchWarrantyDetails = async (requestId) => {
-    try {
-      const response = await axiosInstance.get('/warranties');
-      setWarrantyDetails(response.data);
-    } catch (error) {
-      console.error('Error fetching warranty details:', error);
-    }
-  };
+
 
   const handleAcceptRequest = async (requestId) => {
     try {
@@ -523,7 +516,7 @@ const RequestList = () => {
                 </Box>
               </Box>
             )}
-            {selectedRequest.production_start_date && (
+            {/* {selectedRequest.production_start_date && (
               <Typography
                 variant="h6"
                 component="p"
@@ -578,7 +571,7 @@ const RequestList = () => {
                   wordWrap: 'break-word'
                 }}
               >
-                Production End Date: {new Date(selectedRequest.warranty_start_date).toLocaleDateString()}
+                Warranty Start Date: {new Date(selectedRequest.warranty_start_date).toLocaleDateString()}
               </Typography>
             )}
             {selectedRequest.warranty_end_date && (
@@ -592,9 +585,9 @@ const RequestList = () => {
                   wordWrap: 'break-word'
                 }}
               >
-                Production End Date: {new Date(selectedRequest.warranty_end_date).toLocaleDateString()}
+                Warranty End Date: {new Date(selectedRequest.warranty_end_date).toLocaleDateString()}
               </Typography>
-            )}
+            )} */}
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setIsDetailsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
@@ -650,36 +643,84 @@ const RequestList = () => {
           </Button>
         </DialogActions>
         </Dialog>
+        {selectedRequest && (
         <Dialog open={isWarrantyDialogOpen} onClose={() => setIsWarrantyDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Warranty Details</DialogTitle>
         <DialogContent>
-          {warrantyDetails ? (
-            <>
-              <Typography variant="h5" component="p" marginBottom="20px">
-                Warranty #{requests.findIndex(request => request._id === selectedRequest._id) + 1}
+          
+        {selectedRequest.production_start_date && (
+              <Typography
+                variant="h6"
+                component="p"
+                mt={2}
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Production Start Date: {new Date(selectedRequest.production_start_date).toLocaleDateString()}
               </Typography>
-              <Typography variant="body1" component="p">
-                Warranty ID: {warrantyDetails._id}
+            )}
+            {selectedRequest.production_end_date && (
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Production End Date: {new Date(selectedRequest.production_end_date).toLocaleDateString()}
               </Typography>
-              <Typography variant="body1" component="p">
-                Jewelry ID: {warrantyDetails.jewelry_id}
+            )}
+            {selectedRequest.warranty_content && (
+              <Typography
+                variant="h6"
+                component="p"
+                mt={2}
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Warranty Content: {selectedRequest.warranty_content}
               </Typography>
-              <Typography variant="body1" component="p">
-                User ID: {warrantyDetails.user_id}
+            )}
+            {selectedRequest.warranty_start_date && (
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Warranty Start Date: {new Date(selectedRequest.warranty_start_date).toLocaleDateString()}
               </Typography>
-              <Typography variant="body1" component="p">
-                Content: {warrantyDetails.warranty_content}
+            )}
+            {selectedRequest.warranty_end_date && (
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  overflow: 'hidden',
+                  wordWrap: 'break-word'
+                }}
+              >
+                Warranty End Date: {new Date(selectedRequest.warranty_end_date).toLocaleDateString()}
               </Typography>
-              <Typography variant="body1" component="p">
-                Start Date: {new Date(warrantyDetails.warranty_start_date).toLocaleDateString()}
-              </Typography>
-              <Typography variant="body1" component="p">
-                End Date: {new Date(warrantyDetails.warranty_end_date).toLocaleDateString()}
-              </Typography>
-            </>
-          ) : (
-            <Typography>Error fetching warranty</Typography>
-          )}
+            )}
+            
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsWarrantyDialogOpen(false)} color="primary">
@@ -687,6 +728,7 @@ const RequestList = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      )}
       
     </Container>
   );
