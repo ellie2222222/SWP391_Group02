@@ -678,7 +678,7 @@ const RequestList = () => {
               </Typography>
             </>
           ) : (
-            <Typography>Loading warranty details...</Typography>
+            <Typography>Error fetching warranty</Typography>
           )}
         </DialogContent>
         <DialogActions>
