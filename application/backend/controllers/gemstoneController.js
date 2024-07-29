@@ -145,20 +145,29 @@ const createGemstone = async (req, res) => {
             return res.status(400).json({ error: validationErrors.join(', ') });
         }
 
-        let certificate_image = '';
-        let certificate_image_public_id = '';
+        let certificate_image = "";
+        let certificate_image_public_ids = "";
 
         if (req.file) {
-            const file = req.file;
-            const result = await new Promise((resolve, reject) => {
-                cloudinary.uploader.upload_stream({ folder: 'certificate' }, (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }).end(file.buffer);
-            });
+            try {
+                // Upload the image to Cloudinary and store the result
+                const result = await new Promise((resolve, reject) => {
+                    cloudinary.uploader.upload_stream({ folder: 'certificate' }, (error, result) => {
+                        if (error) {
+                            console.error('Upload Error:', error);
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }).end(req.file.buffer);
+                });
 
-            certificate_image = result.secure_url;
-            certificate_image_public_id = result.public_id;
+                certificate_image = result.secure_url;
+                certificate_image_public_ids = result.public_id;
+            } catch (uploadError) {
+                console.error('Error uploading to Cloudinary:', uploadError);
+                return res.status(500).json({ error: 'Error uploading certificate image' });
+            }
         }
 
         const newGemstone = new Gemstone({
@@ -175,15 +184,18 @@ const createGemstone = async (req, res) => {
             comments,
             available,
             certificate_image,
-            certificate_image_public_id
+            certificate_image_public_ids
         });
 
         const savedGemstone = await newGemstone.save();
         res.status(201).json(savedGemstone);
     } catch (error) {
+        console.error('Error while creating Gemstone', error);
         res.status(500).json({ error: error.message });
     }
 };
+
+
 
 const updateGemstone = async (req, res) => {
     try {
@@ -215,12 +227,12 @@ const updateGemstone = async (req, res) => {
 
         // Handle image upload and replacement
         let certificate_image = existingGemstone.certificate_image;
-        let certificate_image_public_id = existingGemstone.certificate_image_public_id;
+        let certificate_image_public_ids = existingGemstone.certificate_image_public_ids;
 
         if (req.file) {
-            // Delete the old image from Cloudinary
-            if (certificate_image_public_id) {
-                await cloudinary.uploader.destroy(certificate_image_public_id);
+            // Delete the old image from Cloudinary if it exists
+            if (certificate_image_public_ids) {
+                await cloudinary.uploader.destroy(certificate_image_public_ids);
             }
 
             // Upload the new image
@@ -232,12 +244,12 @@ const updateGemstone = async (req, res) => {
             });
 
             certificate_image = result.secure_url;
-            certificate_image_public_id = result.public_id;
+            certificate_image_public_ids = result.public_id;
         }
 
         // Update the gemstone with the new image data
         updateData.certificate_image = certificate_image;
-        updateData.certificate_image_public_id = certificate_image_public_id;
+        updateData.certificate_image_public_ids = certificate_image_public_ids;
 
         const updatedGemstone = await Gemstone.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.status(200).json(updatedGemstone);
@@ -246,31 +258,34 @@ const updateGemstone = async (req, res) => {
     }
 };
 
-
-// delete a gemstone
 const deleteGemstone = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'Invalid ID' })
+        return res.status(400).json({ error: 'Invalid ID' });
     }
 
     try {
-        const gemstone = await Gemstone.findOneAndDelete({ _id: id })
+        // Find and delete the gemstone
+        const gemstone = await Gemstone.findByIdAndDelete(id);
 
         if (!gemstone) {
-            return res.status(400).json({ error: 'No such gemstone' })
+            return res.status(404).json({ error: 'No such gemstone' });
         }
 
-        // Delete associated images from Cloudinary
-        const deletePromises = gemstone.certificate_image_public_ids.map(publicId => cloudinary.uploader.destroy(publicId));
-        await Promise.all(deletePromises);
+        // Handle certificate_image_public_ids as a single string
+        const publicId = gemstone.certificate_image_public_ids || '';
 
-        res.status(200).json(gemstone)
+        // If there's a public ID, delete the associated image from Cloudinary
+        if (publicId.length > 0) {
+            await cloudinary.uploader.destroy(publicId);
+        }
+
+        res.status(200).json({ message: 'Gemstone deleted successfully', gemstone });
     } catch (error) {
-        console.error('Error deleting gemstones:', error);
-        res.status(500).json({ error: 'An error occurred while deleting gemstones' });
+        console.error('Error details:', error); // Enhanced logging
+        res.status(500).json({ error: 'An error occurred while deleting the gemstone', details: error.message });
     }
-}
+};
 
 module.exports = { getGemstones, getGemstone, createGemstone, deleteGemstone, updateGemstone }
