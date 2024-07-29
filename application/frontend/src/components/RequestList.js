@@ -10,6 +10,7 @@ import UserFeedbackDesignForm from './UserFeedbackDesignForm';
 import { Info } from '@mui/icons-material';
 import ErrorIcon from '@mui/icons-material/Error';
 import zaloLogo from './assets/imgs/Logo_Zalo.svg';
+import WarrantyLists from './WarrantyLists';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -100,6 +101,9 @@ const RequestList = () => {
   const [saleStaffNumber, setSaleStaffNumber] = useState('');
   const [designStaffNumber, setDesignStaffNumber] = useState('');
   const [isContactInfoDialogOpen, setIsContactInfoDialogOpen] = useState(false);
+  const [isWarrantyDialogOpen, setIsWarrantyDialogOpen] = useState(false);
+  const [warrantyDetails, setWarrantyDetails] = useState(null);
+
 
   const steps = ['pending', 'assigned', 'quote', 'accepted', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'payment', 'warranty', 'completed'];
   const alternateSteps = ['pending', 'assigned', 'quote', 'accepted', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'payment', 'warranty', 'cancelled'];
@@ -134,6 +138,15 @@ const RequestList = () => {
       console.error('Error getting contact numbers', error);
     }
   }
+
+  const fetchWarrantyDetails = async (requestId) => {
+    try {
+      const response = await axiosInstance.get('/warranties');
+      setWarrantyDetails(response.data);
+    } catch (error) {
+      console.error('Error fetching warranty details:', error);
+    }
+  };
 
   const handleAcceptRequest = async (requestId) => {
     try {
@@ -215,7 +228,11 @@ const RequestList = () => {
       });
     }
   };
-
+  const handleWarrantyDialog = (request) => {
+    setSelectedRequest(request);
+    setIsWarrantyDialogOpen(true);
+  };
+  
   const getStatusStep = (status) => {
     if (status === 'cancelled') {
       return alternateSteps.indexOf(status);
@@ -383,6 +400,11 @@ const RequestList = () => {
             </CardContent>
             <CardActions>
               <CustomButton1 onClick={() => handleDetailsDialog(request)}>View Detail</CustomButton1>
+              {request.request_status === 'completed' && (
+                  <CustomButton1 onClick={() => handleWarrantyDialog(request)}>
+                                                  Warranty Detail
+                  </CustomButton1>
+              )}
               {request.request_status === 'accepted' && (
                 <>
                   <CustomButton1 onClick={() => handleAcceptRequest(request._id)}>Accept Quote</CustomButton1>
@@ -627,7 +649,45 @@ const RequestList = () => {
             Close
           </Button>
         </DialogActions>
+        </Dialog>
+        <Dialog open={isWarrantyDialogOpen} onClose={() => setIsWarrantyDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Warranty Details</DialogTitle>
+        <DialogContent>
+          {warrantyDetails ? (
+            <>
+              <Typography variant="h5" component="p" marginBottom="20px">
+                Warranty #{requests.findIndex(request => request._id === selectedRequest._id) + 1}
+              </Typography>
+              <Typography variant="body1" component="p">
+                Warranty ID: {warrantyDetails._id}
+              </Typography>
+              <Typography variant="body1" component="p">
+                Jewelry ID: {warrantyDetails.jewelry_id}
+              </Typography>
+              <Typography variant="body1" component="p">
+                User ID: {warrantyDetails.user_id}
+              </Typography>
+              <Typography variant="body1" component="p">
+                Content: {warrantyDetails.warranty_content}
+              </Typography>
+              <Typography variant="body1" component="p">
+                Start Date: {new Date(warrantyDetails.warranty_start_date).toLocaleDateString()}
+              </Typography>
+              <Typography variant="body1" component="p">
+                End Date: {new Date(warrantyDetails.warranty_end_date).toLocaleDateString()}
+              </Typography>
+            </>
+          ) : (
+            <Typography>Loading warranty details...</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsWarrantyDialogOpen(false)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
+      
     </Container>
   );
 };
