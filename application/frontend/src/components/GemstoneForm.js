@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, Switch, FormControlLabel } from '@mui/material';
-import * as Yup from 'yup';
+import { Container, TextField, Button, Box, MenuItem, FormControl, InputLabel, Select, Typography, Switch, FormControlLabel, IconButton, CardMedia } from '@mui/material';
 import { styled } from '@mui/system';
+import * as Yup from 'yup';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
@@ -66,25 +67,60 @@ const CustomFormControl = styled(FormControl)({
 });
 
 const CustomButton = styled(Button)({
-  fontSize: '1.3rem',
+  outlineColor: '#000',
   backgroundColor: '#b48c72',
+  color: '#fff',
+  width: '100%',
+  fontSize: '1.3rem',
   '&:hover': {
-    backgroundColor: '#a57d65',
+    color: '#b48c72',
+    backgroundColor: 'transparent',
+  },
+});
+const CustomSwitch = styled(Switch)({
+  '& .MuiSwitch-switchBase.Mui-checked': {
+    color: '#b48c72',
+    '&:hover': {
+      backgroundColor: 'rgba(180, 140, 114, 0.08)',
+    },
+  },
+  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+    backgroundColor: '#b48c72',
+  },
+});
+const CustomMenuItem = styled(MenuItem)({
+  fontSize: '1.3rem',
+});
+const CustomIconButton = styled(IconButton)({
+  color: '#b48c72',
+  '&:hover': {
+    color: '#a57d65',
   },
 });
 
-const CustomMenuItem = styled(MenuItem)({
-  fontSize: '1.3rem',
-})
-
 const GemstoneForm = ({ initialValues, onSubmit }) => {
+  const [certificateImage, setCertificateImage] = useState(initialValues.certificate_image ? initialValues.certificate_image[0] : '');
+  const [removedImages, setRemovedImages] = useState([]);
+  console.log(removedImages)
+  console.log(certificateImage)
   const formik = useFormik({
     initialValues: {
       ...initialValues,
       available: initialValues.available || false,
     },
     onSubmit: async (values) => {
-      onSubmit(values);
+      const formData = new FormData();
+      Object.keys(values).forEach((key) => {
+        if(key !== 'certificate_image'){
+        formData.append(key, values[key])};
+      });
+      if (certificateImage) {
+        formData.append('certificate_image', certificateImage);
+      }
+      if (removedImages.length > 0) {
+        formData.append('removedImages', removedImages);
+      }
+      onSubmit(formData);
     },
     validationSchema: Yup.object({
       name: Yup.string().required('Diamond Name is required'),
@@ -100,7 +136,15 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
       comments: Yup.string().optional(),
     }),
   });
+  const handleImageChange = (event) => {
+    const file = event.currentTarget.files[0];
+    setCertificateImage(file);
+  };
 
+  const handleRemoveImage = () => {
+    setRemovedImages((prev) => [...prev, certificateImage]);
+    setCertificateImage('');
+  };
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" gutterBottom align='center'>
@@ -312,7 +356,7 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
         />
         <FormControlLabel
           control={
-            <Switch
+            <CustomSwitch
               name="available"
               checked={formik.values.available}
               onChange={formik.handleChange}
@@ -322,7 +366,42 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
           label="Available"
           labelPlacement="end"
         />
-        <CustomButton type="submit" variant="contained" sx={{ mt: 2 }}>
+        <FormControl fullWidth>
+
+          {certificateImage && (
+            <Box mt={2} position="relative" display="inline-block">
+              <CardMedia
+                component='img'
+                src={typeof certificateImage === 'string' ? certificateImage : URL.createObjectURL(certificateImage)}
+                alt="Certificate"
+                sx={{ maxWidth: '100%', maxHeight: '400px' }}
+              />
+              <CustomIconButton
+                size="small"
+                color="secondary"
+                onClick={handleRemoveImage}
+                style={{ position: 'absolute', top: 0, right: 0 }}
+              >
+                <DeleteIcon />
+              </CustomIconButton>
+
+            </Box>
+          )}
+          <CustomButton
+            component="label"
+            sx={{ mt: 1 }}
+          >
+            Upload Certificate
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleImageChange}
+
+            />
+          </CustomButton>
+        </FormControl>
+        <CustomButton type="submit" variant="contained" sx={{ mt: 1 }}>
           Submit
         </CustomButton>
       </Box>
