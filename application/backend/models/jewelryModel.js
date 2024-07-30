@@ -14,27 +14,23 @@ const jewelrySchema = new Schema( {
     price: {
         type: Number
     },
-    gemstone_id: {
+    gemstone_ids: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gemstone',
-    },
+    }],
     material_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Material', 
+        ref: 'Material',
         required: true
     },
     material_weight: {
         type: Number,
         required: true
     },
-    subgemstone_id: {
+    subgemstone_ids: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gemstone',
-    },
-    subgemstone_quantity: {
-        type: Number,
-        default: null
-    },
+    }],
     category: {
         type: String,
         enum: ["Ring", "Necklace", "Bracelet", "Earrings", "Other"],

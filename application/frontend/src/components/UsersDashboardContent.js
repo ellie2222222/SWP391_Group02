@@ -105,13 +105,11 @@ const UserDashboardContent = () => {
             const response = await axiosInstance.get('/users', {
                 params: {
                     ...Object.fromEntries(searchParams),
+                    role: 'user',
                 },
             });
-            
-            const filteredUserList = response.data.users.filter((user) => user.role !== 'admin');
-
-            setUsers(filteredUserList);
-            setTotal(response.data.total);
+    
+            setUsers(response.data.users);
             setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error("There was an error fetching the users!", error);
@@ -200,7 +198,7 @@ const UserDashboardContent = () => {
                             }}
                         />
                     </Box>
-                    <Box display="flex">
+                    {/* <Box display="flex">
                         <CustomFormControl>
                             <InputLabel id="role-label" sx={{ fontSize: '1.3rem', fontWeight: '900' }}>Role</InputLabel>
                             <Select
@@ -217,7 +215,7 @@ const UserDashboardContent = () => {
                                 <CustomMenuItem value="production_staff">Production Staff</CustomMenuItem>
                             </Select>
                         </CustomFormControl>
-                    </Box>
+                    </Box> */}
                 </Box>
 
                 <Box mb={2}>
