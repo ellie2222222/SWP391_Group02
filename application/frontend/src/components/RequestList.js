@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CardMedia, Container, Box, Typography, Button, CircularProgress, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack, IconButton } from '@mui/material';
+import { CardMedia, Container, Box, Typography, Button, CircularProgress, Grid, Divider, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack, IconButton } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 import { jwtDecode } from 'jwt-decode';
@@ -644,92 +644,192 @@ const RequestList = () => {
         </DialogActions>
         </Dialog>
         {selectedRequest && (
-        <Dialog open={isWarrantyDialogOpen} onClose={() => setIsWarrantyDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Warranty Details</DialogTitle>
-        <DialogContent>
-          
-        {selectedRequest.production_start_date && (
+  <Dialog
+    open={isWarrantyDialogOpen}
+    onClose={() => setIsWarrantyDialogOpen(false)}
+    maxWidth="sm"
+    fullWidth
+  >
+    <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '2.5rem' }}>
+      Warranty Details
+    </DialogTitle>
+    <DialogContent>
+      <Box sx={{ padding: 2 }}>
+        <Grid container spacing={2}>
+          {/* User ID Section */}
+          {selectedRequest.user_id && (
+            <Grid item xs={12}>
               <Typography
                 variant="h6"
-                component="p"
-                mt={2}
+                component="div"
+                sx={{ fontWeight: 'bold', mb: 1 }}
+              >
+                User ID
+              </Typography>
+              <Typography
+                variant="body1"
+                component="div"
                 sx={{
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
+                }}
+              >
+                {selectedRequest.user_id}
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+            </Grid>
+          )}
+
+          {/* Jewelry Details Section */}
+          {selectedRequest.jewelry_id && (
+            <Grid item xs={12}>
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ fontWeight: 'bold', mb: 1 }}
+              >
+                Jewelry Details
+              </Typography>
+              {selectedRequest.jewelry_id.name && (
+                <Typography
+                  variant="body1"
+                  component="div"
+                  sx={{
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    mb: 1
+                  }}
+                >
+                  Jewelry Name: {selectedRequest.jewelry_id.name}
+                </Typography>
+              )}
+              {selectedRequest.jewelry_id.gemstone_id && (
+                <Typography
+                  variant="body1"
+                  component="div"
+                  sx={{
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    mb: 1
+                  }}
+                >
+                  Gemstone ID: {selectedRequest.jewelry_id.gemstone_id}
+                </Typography>
+              )}
+              <Divider sx={{ my: 2 }} />
+            </Grid>
+          )}
+
+          {/* Production Dates Section */}
+          {selectedRequest.production_start_date && (
+            <Grid item xs={12}>
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ fontWeight: 'bold', mb: 1 }}
+              >
+                Production Dates
+              </Typography>
+              <Typography
+                variant="body1"
+                component="div"
+                sx={{
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  mb: 1
                 }}
               >
                 Production Start Date: {new Date(selectedRequest.production_start_date).toLocaleDateString()}
               </Typography>
-            )}
-            {selectedRequest.production_end_date && (
               <Typography
-                variant="h6"
-                component="p"
+                variant="body1"
+                component="div"
                 sx={{
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
+                  mb: 1
                 }}
               >
                 Production End Date: {new Date(selectedRequest.production_end_date).toLocaleDateString()}
               </Typography>
-            )}
-            {selectedRequest.warranty_content && (
+              <Divider sx={{ my: 2 }} />
+            </Grid>
+          )}
+
+          {/* Warranty Content Section */}
+          {selectedRequest.warranty_content && (
+            <Grid item xs={12}>
               <Typography
                 variant="h6"
-                component="p"
-                mt={2}
+                component="div"
+                sx={{ fontWeight: 'bold', mb: 1 }}
+              >
+                Warranty Content
+              </Typography>
+              <Typography
+                variant="body1"
+                component="div"
                 sx={{
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
+                  mb: 1
                 }}
               >
-                Warranty Content: {selectedRequest.warranty_content}
+                {selectedRequest.warranty_content}
               </Typography>
-            )}
-            {selectedRequest.warranty_start_date && (
+              <Divider sx={{ my: 2 }} />
+            </Grid>
+          )}
+
+          {/* Warranty Dates Section */}
+          {selectedRequest.warranty_start_date && (
+            <Grid item xs={12}>
               <Typography
                 variant="h6"
-                component="p"
+                component="div"
+                sx={{ fontWeight: 'bold', mb: 1 }}
+              >
+                Warranty Dates
+              </Typography>
+              <Typography
+                variant="body1"
+                component="div"
                 sx={{
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
+                  mb: 1
                 }}
               >
                 Warranty Start Date: {new Date(selectedRequest.warranty_start_date).toLocaleDateString()}
               </Typography>
-            )}
-            {selectedRequest.warranty_end_date && (
               <Typography
-                variant="h6"
-                component="p"
+                variant="body1"
+                component="div"
                 sx={{
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
+                  mb: 1
                 }}
               >
                 Warranty End Date: {new Date(selectedRequest.warranty_end_date).toLocaleDateString()}
               </Typography>
-            )}
-            
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsWarrantyDialogOpen(false)} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-      )}
-      
+              <Divider sx={{ my: 2 }} />
+            </Grid>
+          )}
+        </Grid>
+      </Box>
+    </DialogContent>
+    <DialogActions>
+      <Button
+        onClick={() => setIsWarrantyDialogOpen(false)}
+        color="primary"
+      >
+        Close
+      </Button>
+    </DialogActions>
+  </Dialog>
+)}
+        
     </Container>
   );
 };
