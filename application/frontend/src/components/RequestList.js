@@ -651,7 +651,7 @@ const RequestList = () => {
     fullWidth
   >
     <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '2.5rem' }}>
-      Warranty Details
+      Warranty
     </DialogTitle>
     <DialogContent>
       <Box sx={{ padding: 2 }}>
