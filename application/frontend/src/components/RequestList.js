@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CardMedia, Container, Box, Typography, Button, CircularProgress, Grid, Divider, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack, IconButton } from '@mui/material';
+import { CardMedia, Container, Box, Typography, Button, CircularProgress, Grid, Divider, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack, IconButton } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 import { jwtDecode } from 'jwt-decode';
@@ -655,168 +655,77 @@ const RequestList = () => {
     </DialogTitle>
     <DialogContent>
       <Box sx={{ padding: 2 }}>
-        <Grid container spacing={2}>
-          {/* User ID Section */}
-          {selectedRequest.user_id && (
-            <Grid item xs={12}>
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ fontWeight: 'bold', mb: 1 }}
-              >
-                User ID
-              </Typography>
-              <Typography
-                variant="body1"
-                component="div"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {selectedRequest.user_id}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-            </Grid>
-          )}
-
-          {/* Jewelry Details Section */}
-          {selectedRequest.jewelry_id && (
-            <Grid item xs={12}>
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ fontWeight: 'bold', mb: 1 }}
-              >
-                Jewelry Details
-              </Typography>
-              {selectedRequest.jewelry_id.name && (
-                <Typography
-                  variant="body1"
-                  component="div"
-                  sx={{
-                    wordBreak: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                    mb: 1
-                  }}
-                >
-                  Jewelry Name: {selectedRequest.jewelry_id.name}
-                </Typography>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell colSpan={2} sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                  Warranty Details
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {/* User ID Row */}
+              {selectedRequest.user_id && (
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>User ID</TableCell>
+                  <TableCell>{selectedRequest.user_id}</TableCell>
+                </TableRow>
               )}
-              {selectedRequest.jewelry_id.gemstone_id && (
-                <Typography
-                  variant="body1"
-                  component="div"
-                  sx={{
-                    wordBreak: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                    mb: 1
-                  }}
-                >
-                  Gemstone ID: {selectedRequest.jewelry_id.gemstone_id}
-                </Typography>
+
+              {/* Jewelry Details Rows */}
+
+              {selectedRequest.jewelry_id && (
+                <>         
+                  <TableRow>                   
+                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Jewelry Name</TableCell>
+                    <TableCell>{selectedRequest.jewelry_id.name || 'N/A'}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Gemstone ID</TableCell>
+                    <TableCell>{selectedRequest.jewelry_id.gemstone_id || 'N/A'}</TableCell>
+                  </TableRow>
+                </>
               )}
-              <Divider sx={{ my: 2 }} />
-            </Grid>
-          )}
 
-          {/* Production Dates Section */}
-          {selectedRequest.production_start_date && (
-            <Grid item xs={12}>
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ fontWeight: 'bold', mb: 1 }}
-              >
-                Production Dates
-              </Typography>
-              <Typography
-                variant="body1"
-                component="div"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  mb: 1
-                }}
-              >
-                Production Start Date: {new Date(selectedRequest.production_start_date).toLocaleDateString()}
-              </Typography>
-              <Typography
-                variant="body1"
-                component="div"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  mb: 1
-                }}
-              >
-                Production End Date: {new Date(selectedRequest.production_end_date).toLocaleDateString()}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-            </Grid>
-          )}
+              {/* Production Dates Rows */}
+              {selectedRequest.production_start_date && (
+                <>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Production Start Date</TableCell>
+                    <TableCell>{new Date(selectedRequest.production_start_date).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Production End Date</TableCell>
+                    <TableCell>{new Date(selectedRequest.production_end_date).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                </>
+              )}
 
-          {/* Warranty Content Section */}
-          {selectedRequest.warranty_content && (
-            <Grid item xs={12}>
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ fontWeight: 'bold', mb: 1 }}
-              >
-                Warranty Content
-              </Typography>
-              <Typography
-                variant="body1"
-                component="div"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  mb: 1
-                }}
-              >
-                {selectedRequest.warranty_content}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-            </Grid>
-          )}
+              {/* Warranty Content Row */}
+              {selectedRequest.warranty_content && (
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty Content</TableCell>
+                  <TableCell>{selectedRequest.warranty_content}</TableCell>
+                </TableRow>
+              )}
 
-          {/* Warranty Dates Section */}
-          {selectedRequest.warranty_start_date && (
-            <Grid item xs={12}>
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ fontWeight: 'bold', mb: 1 }}
-              >
-                Warranty Dates
-              </Typography>
-              <Typography
-                variant="body1"
-                component="div"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  mb: 1
-                }}
-              >
-                Warranty Start Date: {new Date(selectedRequest.warranty_start_date).toLocaleDateString()}
-              </Typography>
-              <Typography
-                variant="body1"
-                component="div"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  mb: 1
-                }}
-              >
-                Warranty End Date: {new Date(selectedRequest.warranty_end_date).toLocaleDateString()}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-            </Grid>
-          )}
-        </Grid>
+              {/* Warranty Dates Rows */}
+              {selectedRequest.warranty_start_date && (
+                <>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty Start Date</TableCell>
+                    <TableCell>{new Date(selectedRequest.warranty_start_date).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty End Date</TableCell>
+                    <TableCell>{new Date(selectedRequest.warranty_end_date).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                </>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
     </DialogContent>
     <DialogActions>
@@ -829,6 +738,7 @@ const RequestList = () => {
     </DialogActions>
   </Dialog>
 )}
+
         
     </Container>
   );
