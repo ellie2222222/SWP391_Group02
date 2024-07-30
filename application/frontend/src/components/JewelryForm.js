@@ -288,7 +288,8 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     toast.success('Image removed successfully!');
     handleDeleteClose();
   };
-
+  const filteredGemstones = gemstones.filter(g => g._id !== formik.values.subgemstone_id);
+  const filteredSubgemstones = gemstones.filter(g => g._id !== formik.values.gemstone_id);
 
   return (
     <Container maxWidth="sm">
@@ -427,7 +428,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 Boolean(formik.errors.gemstone_id)
               }
             >
-              {gemstones.map((gemstone) => (
+              {filteredGemstones.map((gemstone) => (
                 <CustomMenuItem key={gemstone._id} value={gemstone._id}>
                   {gemstone.name} - Carat: {gemstone.carat} - Cut:{" "}
                   {gemstone.cut} - Clarity: {gemstone.clarity} - Color:{" "}
@@ -455,7 +456,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
                 Boolean(formik.errors.subgemstone_id)
               }
             >
-              {gemstones.map((subgemstone) => (
+              {filteredSubgemstones.map((subgemstone) => (
                 <CustomMenuItem key={subgemstone._id} value={subgemstone._id}>
                   {subgemstone.name} - Carat: {subgemstone.carat} - Cut:{" "}
                   {subgemstone.cut} - Clarity: {subgemstone.clarity} - Color:{" "}
