@@ -212,9 +212,16 @@ const AdminContent = () => {
         }
     };
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values,gemstoneValues) => {
+        console.log(gemstoneValues.subgemstone_ids)
         try {
             setLoading(true);
+            const gemstoneIdsToUpdate = [...new Set([...gemstoneValues.gemstone_ids, ...gemstoneValues.subgemstone_ids])];
+            console.log(gemstoneIdsToUpdate)
+            const updateGemstoneRequests = gemstoneIdsToUpdate.map(id => 
+                axiosInstance.patch(`/gemstones/${id}`, { available: false })
+            );
+            await Promise.all([...updateGemstoneRequests]);
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
                 toast.success('Jewelry item updated successfully', {

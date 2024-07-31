@@ -133,8 +133,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
           axiosInstance.get('/gemstones'),
           axiosInstance.get('/materials')
         ]);
-
-        setGemstones(gemstonesRes.data);
+        setGemstones( gemstonesRes.data);
         setMaterials(materialsRes.data);
       } catch (error) {
         console.error('Failed to fetch options', error);
@@ -188,9 +187,8 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
       removedImages.forEach((image) => {
         formData.append('removedImages', image);
       });
-
       try {
-        await onSubmit(formData);
+        await onSubmit(formData,values);
         toast.success('Form submitted', {
           autoClose: 5000, // Auto close after 5 seconds
           closeOnClick: true,
@@ -291,15 +289,14 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);
     const selectedSubGemstoneIds = formik.values.subgemstone_ids.map(gem => gem);
     const allSelectedIds = new Set([...selectedGemstoneIds, ...selectedSubGemstoneIds]);
-    return gemstones.filter(gem => !allSelectedIds.has(gem._id) || gem._id === formik.values.gemstone_ids[index]);
+    return gemstones.filter(gem => (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === formik.values.gemstone_ids[index]);
   };
   const getFilteredSubGemstones = (index) => {
     const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);
     const selectedSubGemstoneIds = formik.values.subgemstone_ids.map(gem => gem);
     const allSelectedIds = new Set([...selectedGemstoneIds, ...selectedSubGemstoneIds]);
-    return gemstones.filter(gem => !allSelectedIds.has(gem._id) || gem._id === formik.values.subgemstone_ids[index]);
+    return gemstones.filter(gem => (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === formik.values.subgemstone_ids[index]);
   };
-  const filteredSubgemstones = gemstones.filter(g => g._id !== formik.values.gemstone_id);
   const handleAddGemstone = () => {
     formik.setFieldValue('gemstone_ids', [...formik.values.gemstone_ids, '']); // Add a new empty field
   };
