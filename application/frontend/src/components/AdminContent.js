@@ -409,7 +409,7 @@ const AdminContent = () => {
 
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <DialogContent>
-                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', images: [], available: false, subgemstone_id: '', subgemstone_quantity: 0 }} onSubmit={handleSubmit} />
+                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_ids: [], gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', images: [], available: false, subgemstone_ids: [], subgemstone_quantity: 0 }} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: "1.3rem", color: "#b48c72" }} disabled={loading}>

@@ -126,7 +126,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
 
-
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -144,22 +143,22 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
 
     fetchOptions();
   }, []);
-
   const formik = useFormik({
     initialValues: {
       ...initialValues,
       images: initialValues.images || [],
       available: initialValues.available ?? false,
-      gemstone_id: initialValues.gemstone_id ?? '',
-      subgemstone_id: initialValues.subgemstone_id ?? '',
+      gemstone_ids: initialValues.gemstone_ids.length > 0 ? initialValues.gemstone_ids.map(gem => gem._id) : [], // Changed from gemstone_id to gemstone_ids
+      subgemstone_ids: initialValues.subgemstone_ids.length > 0 ? initialValues.subgemstone_ids.map(subgem => subgem._id) : [],
       subgemstone_quantity: initialValues.subgemstone_quantity ?? 0,
+      material_id: initialValues.material_id?._id || '',
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Required."),
       description: Yup.string().required("Required."),
       price: Yup.number().required("Required.").typeError("Must be a number"),
-      gemstone_id: Yup.string().nullable(),
-      subgemstone_id: Yup.string().nullable(),
+      gemstone_ids: Yup.array().of(Yup.string()).nullable(),
+      subgemstone_ids: Yup.array().of(Yup.string()).nullable(),
       subgemstone_quantity: Yup.number()
         .typeError("Must be a number")
         .integer("Must be an integer")
@@ -196,14 +195,14 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
           autoClose: 5000, // Auto close after 5 seconds
           closeOnClick: true,
           draggable: true,
-      })
+        })
       } catch (error) {
         console.error(error)
         toast.error(error, {
           autoClose: 5000, // Auto close after 5 seconds
           closeOnClick: true,
           draggable: true,
-      })
+        })
       }
       setLoading(false);
     },
@@ -288,9 +287,47 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     toast.success('Image removed successfully!');
     handleDeleteClose();
   };
-  const filteredGemstones = gemstones.filter(g => g._id !== formik.values.subgemstone_id);
+  const getFilteredGemstones = (index) => {
+    const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);
+    const selectedSubGemstoneIds = formik.values.subgemstone_ids.map(gem => gem);
+    const allSelectedIds = new Set([...selectedGemstoneIds, ...selectedSubGemstoneIds]);
+    return gemstones.filter(gem => !allSelectedIds.has(gem._id) || gem._id === formik.values.gemstone_ids[index]);
+  };
+  const getFilteredSubGemstones = (index) => {
+    const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);
+    const selectedSubGemstoneIds = formik.values.subgemstone_ids.map(gem => gem);
+    const allSelectedIds = new Set([...selectedGemstoneIds, ...selectedSubGemstoneIds]);
+    return gemstones.filter(gem => !allSelectedIds.has(gem._id) || gem._id === formik.values.subgemstone_ids[index]);
+  };
   const filteredSubgemstones = gemstones.filter(g => g._id !== formik.values.gemstone_id);
+  const handleAddGemstone = () => {
+    formik.setFieldValue('gemstone_ids', [...formik.values.gemstone_ids, '']); // Add a new empty field
+  };
 
+  const handleGemstoneChange = (index, value) => {
+    const updatedGemstoneIds = [...formik.values.gemstone_ids];
+    updatedGemstoneIds[index] = value;
+    formik.setFieldValue('gemstone_ids', updatedGemstoneIds);
+  };
+
+  const handleRemoveGemstone = (index) => {
+    const updatedGemstoneIds = formik.values.gemstone_ids.filter((_, i) => i !== index);
+    formik.setFieldValue('gemstone_ids', updatedGemstoneIds);
+  };
+  const handleAddSubGemstone = () => {
+    formik.setFieldValue('subgemstone_ids', [...formik.values.subgemstone_ids, '']); // Add a new empty field
+  };
+
+  const handleSubGemstoneChange = (index, value) => {
+    const updatedSubGemstoneIds = [...formik.values.subgemstone_ids];
+    updatedSubGemstoneIds[index] = value;
+    formik.setFieldValue('subgemstone_ids', updatedSubGemstoneIds);
+  };
+
+  const handleRemoveSubGemstone = (index) => {
+    const updatedSubGemstoneIds = formik.values.subgemstone_ids.filter((_, i) => i !== index);
+    formik.setFieldValue('subgemstone_ids', updatedSubGemstoneIds);
+  };
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" gutterBottom align="center">
@@ -414,79 +451,78 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
               </Typography>
             )}
           </CustomFormControl>
-          <CustomFormControl fullWidth>
-            <InputLabel id="gemstone-label">Gemstone</InputLabel>
-            <Select
-              labelId="gemstone-label"
-              label="Gemstone"
-              name="gemstone_id"
-              value={formik.values.gemstone_id}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.gemstone_id &&
-                Boolean(formik.errors.gemstone_id)
-              }
-            >
-              {filteredGemstones.map((gemstone) => (
-                <CustomMenuItem key={gemstone._id} value={gemstone._id}>
-                  {gemstone.name} - Carat: {gemstone.carat} - Cut:{" "}
-                  {gemstone.cut} - Clarity: {gemstone.clarity} - Color:{" "}
-                  {gemstone.color}
-                </CustomMenuItem>
-              ))}
-            </Select>
-            {formik.touched.gemstone_id && formik.errors.gemstone_id && (
-              <Typography variant="caption" color="red">
-                {formik.errors.gemstone_id}
-              </Typography>
-            )}
-          </CustomFormControl>
-          <CustomFormControl fullWidth>
-            <InputLabel id="subgemstone-label">Subgemstone</InputLabel>
-            <Select
-              labelId="subgemstone-label"
-              label="Subgemstone"
-              name="subgemstone_id"
-              value={formik.values.subgemstone_id}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.subgemstone_id &&
-                Boolean(formik.errors.subgemstone_id)
-              }
-            >
-              {filteredSubgemstones.map((subgemstone) => (
-                <CustomMenuItem key={subgemstone._id} value={subgemstone._id}>
-                  {subgemstone.name} - Carat: {subgemstone.carat} - Cut:{" "}
-                  {subgemstone.cut} - Clarity: {subgemstone.clarity} - Color:{" "}
-                  {subgemstone.color}
-                </CustomMenuItem>
-              ))}
-            </Select>
-            {formik.touched.subgemstone_id &&
-              formik.errors.subgemstone_id && (
-                <Typography variant="caption" color="red">
-                  {formik.errors.subgemstone_id}
-                </Typography>
-              )}
-          </CustomFormControl>
-          <CustomTextField
-            name="subgemstone_quantity"
-            label="Subgemstone Quantity"
-            variant="outlined"
-            value={formik.values.subgemstone_quantity}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.subgemstone_quantity &&
-              Boolean(formik.errors.subgemstone_quantity)
-            }
-            helperText={
-              formik.touched.subgemstone_quantity &&
-              formik.errors.subgemstone_quantity
-            }
-          />
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Gemstones
+            </Typography>
+            {formik.values.gemstone_ids.map((gemstoneId, index) => (
+              <Box key={index} display="flex" alignItems="center" mb={2}>
+                <CustomFormControl fullWidth>
+                  <InputLabel id={`gemstone-${index}-label`}>Gemstone</InputLabel>
+                  <Select
+                    labelId={`gemstone-${index}-label`}
+                    label="Gemstone"
+                    value={gemstoneId}
+                    onChange={(e) => handleGemstoneChange(index, e.target.value)}
+                    error={
+                      formik.touched.gemstone_ids &&
+                      Boolean(formik.errors.gemstone_ids)
+                    }
+                  >
+                    {getFilteredGemstones(index).map((gemstone) => (
+                      <CustomMenuItem key={gemstone._id} value={gemstone._id}>
+                        {gemstone.name} - Carat: {gemstone.carat} - Cut:{" "}
+                        {gemstone.cut} - Clarity: {gemstone.clarity} - Color:{" "}
+                        {gemstone.color}
+                      </CustomMenuItem>
+                    ))}
+                  </Select>
+                </CustomFormControl>
+                <CustomIconButton onClick={() => handleRemoveGemstone(index)} color="error" sx={{ ml: 1 }}>
+                  <DeleteIcon />
+                </CustomIconButton>
+              </Box>
+            ))}
+            <CustomButton onClick={handleAddGemstone} variant="contained" color="primary">
+              Add Gemstone
+            </CustomButton>
+          </Box>
+          <Box>
+            <Typography variant="h6" gutterBottom>
+             Sub Gemstones
+            </Typography>
+            {formik.values.subgemstone_ids.map((subGemstoneId, index) => (
+              <Box key={index} display="flex" alignItems="center" mb={2}>
+                <CustomFormControl fullWidth>
+                  <InputLabel id={`gemstone-${index}-label`}>Sub Gemstone</InputLabel>
+                  <Select
+                    labelId={`gemstone-${index}-label`}
+                    label="Gemstone"
+                    value={subGemstoneId}
+                    onChange={(e) => handleSubGemstoneChange(index, e.target.value)}
+                    error={
+                      formik.touched.gemstone_ids &&
+                      Boolean(formik.errors.gemstone_ids)
+                    }
+                  >
+                    {getFilteredSubGemstones(index).map((gemstone) => (
+                      <CustomMenuItem key={gemstone._id} value={gemstone._id}>
+                        {gemstone.name} - Carat: {gemstone.carat} - Cut:{" "}
+                        {gemstone.cut} - Clarity: {gemstone.clarity} - Color:{" "}
+                        {gemstone.color}
+                      </CustomMenuItem>
+                    ))}
+                  </Select>
+                </CustomFormControl>
+                <CustomIconButton onClick={() => handleRemoveSubGemstone(index)} color="error" sx={{ ml: 1 }}>
+                  <DeleteIcon />
+                </CustomIconButton>
+              </Box>
+            ))}
+            <CustomButton onClick={handleAddSubGemstone} variant="contained" color="primary">
+              Add Sub Gemstone
+            </CustomButton>
+          </Box>
           <CustomTextField
             name="price"
             label="Price"
@@ -576,7 +612,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
             fullWidth
           >
             {loading ? (
-              <CircularProgress size={24} sx={{color: 'white'}}/>
+              <CircularProgress size={24} sx={{ color: 'white' }} />
             ) : initialValues._id ? (
               "Update Jewelry"
             ) : (
