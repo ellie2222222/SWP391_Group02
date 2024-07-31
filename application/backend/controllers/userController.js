@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const nodemailer = require('nodemailer');
+const WorksOn = require('../models/worksOnModel');
 const bcrypt = require('bcrypt');
 
 const createToken = (_id, role) => {
@@ -261,37 +262,32 @@ const getUser = async (req, res) => {
 
 const getStaffContact = async (req, res) => {
   try {
-    // Fetch users with the specified emails
-    const users = await User.find({ 
-      email: { $in: ["sale@gmail.com", "design@gmail.com"] }
-    }, 'email phone_number');
+    const { request_id } = req.params;
 
-    // Create an object to hold the phone numbers
-    const phoneNumbers = {
-      saleStaff: null,
-      designStaff: null
-    };
+    // Find the WorksOn document for the specific request_id
+    const worksOnDocument = await WorksOn.findOne({ request_id });
 
-    // Assign phone numbers to the appropriate keys
-    users.forEach(user => {
-      if (user.email === "sale@gmail.com") {
-        phoneNumbers.saleStaff = user.phone_number;
-      } else if (user.email === "design@gmail.com") {
-        phoneNumbers.designStaff = user.phone_number;
-      }
-    });
-
-    // Check if both phone numbers were found
-    if (phoneNumbers.saleStaff || phoneNumbers.designStaff) {
-      res.status(200).json(phoneNumbers);
-    } else {
-      res.status(404).json({ message: 'Users not found' });
+    if (!worksOnDocument) {
+      return res.status(404).json({ message: 'WorksOn document not found for the specified request' });
     }
+
+    const saleStaffEntry = worksOnDocument.staff_ids.find(staff => staff.role === 'sale_staff');
+
+    if (!saleStaffEntry) {
+      return res.status(404).json({ message: 'Sale staff not assigned to this request' });
+    }
+
+    const saleStaffUser = await User.findById(saleStaffEntry.staff_id, 'phone_number');
+
+    if (!saleStaffUser) {
+      return res.status(404).json({ message: 'Sale staff user not found' });
+    }
+
+    res.status(200).json({ saleStaffContact: saleStaffUser.phone_number });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
-}
-
+};
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;

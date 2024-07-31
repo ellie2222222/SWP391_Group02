@@ -9,7 +9,7 @@ usersRoutes.use(requireAuth)
 
 usersRoutes.get('/get-staffs', getStaffs)
 
-usersRoutes.get('/get-staff-contact', getStaffContact)
+usersRoutes.get('/get-staff-contact/:request_id', getStaffContact)
 
 usersRoutes.patch('/role-assignment/:id', requireAdmin, assignRole)
 
