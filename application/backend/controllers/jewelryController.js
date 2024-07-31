@@ -77,12 +77,20 @@ const createJewelry = async (req, res) => {
     try {
         let { name, description, price, gemstone_ids, material_id, material_weight, subgemstone_ids, category, type, available } = req.body;
 
-        const emptyFieldsError = validateEmptyFields(req.body);
+        // Parse comma-separated strings
+        if (typeof gemstone_ids === 'string') {
+            gemstone_ids = gemstone_ids.split(',').map(id => id.trim());
+        }
+        if (typeof subgemstone_ids === 'string') {
+            subgemstone_ids = subgemstone_ids.split(',').map(id => id.trim());
+        }
+
+        const emptyFieldsError = validateEmptyFields({ ...req.body, gemstone_ids, subgemstone_ids });
         if (emptyFieldsError) {
             return res.status(400).json({ error: emptyFieldsError });
         }
 
-        const validationErrors = validateInputData(req.body);
+        const validationErrors = validateInputData({ ...req.body, gemstone_ids, subgemstone_ids });
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
         }
@@ -120,15 +128,10 @@ const createJewelry = async (req, res) => {
             type,
             available,
             images,
-            image_public_ids
+            image_public_ids,
+            gemstone_ids,
+            subgemstone_ids
         });
-
-        if (gemstone_ids && gemstone_ids.length > 0) {
-            newJewelry.gemstone_ids = gemstone_ids;
-        }
-        if (subgemstone_ids && subgemstone_ids.length > 0) {
-            newJewelry.subgemstone_ids = subgemstone_ids;
-        }
 
         const savedJewelry = await newJewelry.save();
         const populatedJewelry = await Jewelry.findById(savedJewelry._id)
