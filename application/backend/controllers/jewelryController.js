@@ -150,7 +150,16 @@ const updateJewelry = async (req, res) => {
     try {
         let { name, description, price, gemstone_ids, material_id, material_weight, subgemstone_ids, category, type, available } = req.body;
 
-        const validationErrors = validateInputData(req.body);
+        // Parse comma-separated strings
+        if (typeof gemstone_ids === 'string') {
+            gemstone_ids = gemstone_ids.split(',').map(id => id.trim());
+        }
+        if (typeof subgemstone_ids === 'string') {
+            subgemstone_ids = subgemstone_ids.split(',').map(id => id.trim());
+        }
+
+        // Validate input data
+        const validationErrors = validateInputData({ ...req.body, gemstone_ids, subgemstone_ids });
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
         }
@@ -164,10 +173,10 @@ const updateJewelry = async (req, res) => {
         if (name) updateData.name = name;
         if (description) updateData.description = description;
         if (price) updateData.price = price;
-        if (gemstone_ids && gemstone_ids.length > 0) updateData.gemstone_ids = gemstone_ids.map(id => id.trim());
+        if (gemstone_ids && gemstone_ids.length > 0) updateData.gemstone_ids = gemstone_ids;
         if (material_id) updateData.material_id = material_id.trim();
         if (material_weight) updateData.material_weight = material_weight;
-        if (subgemstone_ids && subgemstone_ids.length > 0) updateData.subgemstone_ids = subgemstone_ids.map(id => id.trim());
+        if (subgemstone_ids && subgemstone_ids.length > 0) updateData.subgemstone_ids = subgemstone_ids;
         if (category) updateData.category = category;
         if (type) updateData.type = type;
         if (available !== undefined) updateData.available = available;
@@ -214,6 +223,7 @@ const updateJewelry = async (req, res) => {
             .populate('subgemstone_ids');
         res.status(200).json(updatedJewelry);
     } catch (error) {
+        console.error('Error while updating jewelry', error);
         res.status(500).json({ error: error.message });
     }
 };
