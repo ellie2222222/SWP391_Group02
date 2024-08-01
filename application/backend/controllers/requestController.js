@@ -70,7 +70,8 @@ const getRequests = async (req, res) => {
         path: 'jewelry_id',
         populate: [
           { path: 'material_id' },
-          { path: 'gemstone_id' }
+          { path: 'gemstone_ids' },
+          { path: 'subgemstone_ids' }
         ]
       });
 

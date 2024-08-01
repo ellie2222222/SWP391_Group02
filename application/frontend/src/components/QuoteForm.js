@@ -107,25 +107,23 @@ export default function QuoteForm({ initialValues, onSubmit }) {
 
     useEffect(() => {
         if (selectedJewelry || formik.values.production_cost) {
-            const gemstoneName = selectedJewelry?.gemstone_id?.name || 'Gemstone';
-            const subGemstoneName = selectedJewelry?.subgemstone_id?.name || 'Subgemstone';
-            const gemstonePrice = selectedJewelry?.gemstone_id?.price || 0;
-            const subGemstonePrice = selectedJewelry?.subgemstone_id?.price || 0;
+            const gemstoneNames = selectedJewelry?.gemstone_ids?.map(gem => gem.name).join(', ') || 'Gemstone';
+            const subGemstoneNames = selectedJewelry?.subgemstone_ids?.map(gem => gem.name).join(', ') || 'Subgemstone';
+            const gemstonePrices = selectedJewelry?.gemstone_ids?.reduce((total, gem) => total + gem.price, 0) || 0;
+            const subGemstonePrices = selectedJewelry?.subgemstone_ids?.reduce((total, gem) => total + gem.price, 0) || 0;
             const materialName = selectedJewelry?.material_id?.name || 'Material';
             const materialWeight = selectedJewelry?.material_weight || 0;
             const materialSellPrice = selectedJewelry?.material_id?.sell_price || 0;
             const productionCost = Number(formik.values.production_cost) || 0;
-            const subGemstoneQuantity = selectedJewelry?.subgemstone_quantity
-            const totalCost = gemstonePrice + (subGemstonePrice * subGemstoneQuantity) + (materialSellPrice * materialWeight) + productionCost;
-        
+            const totalCost = gemstonePrices + subGemstonePrices  + (materialSellPrice * materialWeight) + productionCost;
+    
             const quoteContent = `
-                Main Gemstone (${gemstoneName}) + Sub Gemstone (${subGemstoneName} * ${subGemstoneQuantity} ) + ${materialName} * ${materialWeight} mace + Production Cost = ${gemstonePrice} + ${subGemstonePrice} + ${materialSellPrice} * ${materialWeight} + ${productionCost} = ${totalCost}
+                Main Gemstones (${gemstoneNames}) + Sub Gemstones (${subGemstoneNames}) + ${materialName} * ${materialWeight} mace + Production Cost = ${gemstonePrices} + ${subGemstonePrices} + (${materialSellPrice} * ${materialWeight}) + ${productionCost} = ${totalCost}
             `.trim();
-        
+    
             formik.setFieldValue('quote_content', quoteContent);
         }
     }, [selectedJewelry, formik.values.production_cost]);
-
     useEffect(() => {
         if (selectedJewelry || formik.values.production_cost) {
             const quoteAmount = Number(formik.values.production_cost) + selectedJewelry?.price;

@@ -18,7 +18,7 @@ jewelryRoutes.post('/', requireAuth, requireAdminOrManagerOrSaleOrDesignOrUser, 
 
 jewelryRoutes.delete('/:id', requireAuth, requireAdminOrManagerOrSaleOrDesign, deleteJewelry);
 
-jewelryRoutes.patch('/:id', requireAuth, requireAdminOrManagerOrSaleOrDesign, upload.array('images', 5), updateJewelry);
+jewelryRoutes.patch('/:id', requireAuth, requireAdminOrManagerOrSaleOrDesignOrUser, upload.array('images', 5), updateJewelry);
 
 
 module.exports = jewelryRoutes;

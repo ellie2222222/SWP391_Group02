@@ -54,7 +54,7 @@ const UserFeedbackQuoteForm = ({ initialValues,onSubmit }) => {
       ...initialValues,
       manager_feedback_quote: '',
       user_feedback_quote:'',
-      request_status:'pending',
+      request_status:'assigned',
     },
     onSubmit: async (values) => {
       onSubmit(values);

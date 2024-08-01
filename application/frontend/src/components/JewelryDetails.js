@@ -136,29 +136,13 @@ const JewelryDetails = () => {
       navigate('/login');
       return;
     }
-
+    
     try {
-      const newJewelryResponse = await axiosInstance.post('/jewelries', {
-        // Thêm dữ liệu cần thiết để tạo jewelry
-        name:product.name,
-        description:product.description,
-        price:product.price,
-        gemstone_id:product?.gemstone_id?._id ?? '',
-        category:product.category,
-        material_id:product.material_id._id,
-        material_weight:product.material_weight,
-        type: 'Custom',
-        available: false,
-        subgemstone_id:product?.subgemstone_id?._id ?? '',
-        subgemstone_quantity:product.subgemstone_quantity,
-        images: product.images 
-        
-      });
-      const newJewelryId = newJewelryResponse.data._id;
       await axiosInstance.post('/requests/order-requests', {
-        jewelry_id: newJewelryId,
+        jewelry_id: product._id,
         ...formData
       });
+      await axiosInstance.patch(`/jewelries/${product._id}`, {available: false});
       setOpen(false);
       toast.success('Request created successfully!', {
         autoClose: 5000, // Auto close after 5 seconds
