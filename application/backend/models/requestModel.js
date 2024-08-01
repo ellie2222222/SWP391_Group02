@@ -28,6 +28,7 @@ const requestSchema = new Schema({
     },
     request_description: {
         type: String,
+        maxlength: 1000,
     },
     request_status: {
         type: String,

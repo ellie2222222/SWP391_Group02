@@ -1,64 +1,224 @@
 const Invoice = require('../models/invoiceModel');
+const Transaction = require('../models/transactionModel');
 const Request = require('../models/requestModel');
+const Jewelry = require('../models/jewelryModel');
+const Gemstone = require('../models/gemstoneModel');
+const Material = require('../models/materialModel');
 const User = require('../models/userModel');
 
+const getEmployeeWithMostSales = async (req, res) => {
+    const { period, monthValue, yearValue } = req.query;
+
+    let matchStage = {
+        'worksOn.staff_ids.role': { $nin: ['manager', 'design_staff', 'production_staff'] },
+        'request.request_status': 'completed'
+    };
+
+    if (period === 'month') {
+        matchStage['invoices.createdAt'] = {
+            $gte: new Date(Date.UTC(yearValue, monthValue - 1, 1)),
+            $lt: new Date(Date.UTC(yearValue, monthValue, 0, 23, 59, 59, 999))
+        };
+    } else if (period === 'year') {
+        matchStage['invoices.createdAt'] = {
+            $gte: new Date(Date.UTC(yearValue, 0, 1)),
+            $lt: new Date(Date.UTC(yearValue, 12, 0, 23, 59, 59, 999)),
+        };
+    }
+
+    try {
+        const salesData = await Transaction.aggregate([
+            {
+                $lookup: {
+                    from: 'worksons',
+                    localField: 'request_id',
+                    foreignField: 'request_id',
+                    as: 'worksOn'
+                }
+            },
+            { $unwind: '$worksOn' },
+            { $unwind: '$worksOn.staff_ids' },
+            { $lookup: { from: 'requests', localField: 'request_id', foreignField: '_id', as: 'request' } },
+            { $unwind: '$request' },
+            { $lookup: { from: 'invoices', localField: '_id', foreignField: 'transaction_id', as: 'invoices' } },
+            { $unwind: '$invoices' },
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: '$worksOn.staff_ids.staff_id',
+                    totalSales: { $sum: '$invoices.total_amount' }
+                },
+            },
+            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+            { $unwind: '$user' },
+            {
+                $project: {
+                    _id: 1,
+                    userName: '$user.username',
+                    email: '$user.email',
+                    role: '$user.role',
+                    totalSales: 1
+                }
+            },
+            { $sort: { totalSales: -1 } },
+            { $limit: 1 }
+        ]);
+        
+        if (salesData.length > 0) {
+            const [topSeller] = salesData;
+            return res.json({ topSeller });
+        } else {
+            return res.json({ message: 'No sales data available' });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
 // Helper function to get date range
-// const getDateRange = (period) => {
-//     const now = new Date();
-//     let start, end;
-//     switch (period) {
-//         case 'month':
-//             start = new Date(now.getFullYear(), now.getMonth(), 1);
-//             end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-//             break;
-//         case 'quarter':
-//             const quarter = Math.floor(now.getMonth() / 3);
-//             start = new Date(now.getFullYear(), quarter * 3, 1);
-//             end = new Date(now.getFullYear(), quarter * 3 + 3, 0, 23, 59, 59);
-//             break;
-//         case 'year':
-//             start = new Date(now.getFullYear(), 0, 1);
-//             end = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
-//             break;
-//         default:
-//             throw new Error('Invalid period specified');
-//     }
-//     return { start, end };
-// };
+const getDateRange = (period, offset = 0) => {
+    const now = new Date();
+    let start, end;
+    switch (period) {
+        case 'month':
+            start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + offset, 1));
+            end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1 + offset, 0, 23, 59, 59, 999));
+            break;
+        case 'quarter':
+            const quarter = Math.floor((now.getUTCMonth() + offset * 3) / 3);
+            start = new Date(Date.UTC(now.getUTCFullYear(), quarter * 3, 1));
+            end = new Date(Date.UTC(now.getUTCFullYear(), (quarter + 1) * 3, 0, 23, 59, 59, 999));
+            break;
+        case 'year':
+            start = new Date(Date.UTC(now.getUTCFullYear() + offset, 0, 1));
+            end = new Date(Date.UTC(now.getUTCFullYear() + offset, 11, 31, 23, 59, 59, 999));
+            break;
+        default:
+            throw new Error('Invalid period specified');
+    }
+    return { start, end };
+};
+
+// Function to get current total revenue
+const getCurrentTotalRevenue = async (req, res) => {
+    const { period } = req.query;
+
+    try {
+        const { start, end } = getDateRange(period);
+        const previousPeriod = period === 'month' ? 'month' : period === 'quarter' ? 'quarter' : 'year';
+
+        const invoicesCurrent = await Invoice.aggregate([
+            {
+                $lookup: {
+                    from: 'transactions',
+                    localField: 'transaction_id',
+                    foreignField: '_id',
+                    as: 'transaction'
+                }
+            },
+            { $unwind: '$transaction' },
+            {
+                $lookup: {
+                    from: 'requests',
+                    localField: 'transaction.request_id',
+                    foreignField: '_id',
+                    as: 'request'
+                }
+            },
+            { $unwind: '$request' },
+            {
+                $match: {
+                    'request.request_status': 'completed',
+                    'createdAt': { $gte: start, $lt: end }
+                }
+            }
+        ]);
+
+        const totalRevenueCurrent = invoicesCurrent.reduce((total, invoice) => total + invoice.total_amount, 0);
+
+        const { start: startPrevious, end: endPrevious } = getDateRange(previousPeriod, -1);
+
+        const invoicesPrevious = await Invoice.aggregate([
+            {
+                $lookup: {
+                    from: 'transactions',
+                    localField: 'transaction_id',
+                    foreignField: '_id',
+                    as: 'transaction'
+                }
+            },
+            { $unwind: '$transaction' },
+            {
+                $lookup: {
+                    from: 'requests',
+                    localField: 'transaction.request_id',
+                    foreignField: '_id',
+                    as: 'request'
+                }
+            },
+            { $unwind: '$request' },
+            {
+                $match: {
+                    'request.request_status': 'completed',
+                    'createdAt': { $gte: startPrevious, $lt: endPrevious }
+                }
+            }
+        ]);
+
+        const totalRevenuePrevious = invoicesPrevious.reduce((total, invoice) => total + invoice.total_amount, 0);
+
+        const growthPercent = totalRevenuePrevious === 0
+            ? (totalRevenueCurrent === 0 ? 0 : 100)
+            : ((totalRevenueCurrent - totalRevenuePrevious) / totalRevenuePrevious) * 100;
+
+        return res.json({ 
+            totalRevenueCurrent,
+            totalRevenuePrevious,
+            growthPercent: growthPercent.toFixed(2) // Rounded to 2 decimal places
+        });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
 
 // Function to get total revenue
-// const getCurrentTotalRevenue = async (req, res) => {
-//     const { period } = req.query;
-
-//     const { start, end } = getDateRange(period);
-//     console.log(start)
-//     console.log(end)
-
-//     try {
-//         const invoices = await Invoice.find({
-//             createdAt: { $gte: start, $lt: end },
-//         });
-//         // console.log(invoices)
-//         const totalRevenue = invoices.reduce((total, invoice) => total + invoice.total_amount, 0);
-
-//         res.json({ totalRevenue });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error calculating total revenue', error });
-//     }
-// };
-
 const getTotalRevenue = async (req, res) => {
     try {
-        const invoices = await Invoice.find({});
+        const invoices = await Invoice.aggregate([
+            {
+                $lookup: {
+                    from: 'transactions',
+                    localField: 'transaction_id',
+                    foreignField: '_id',
+                    as: 'transaction'
+                }
+            },
+            { $unwind: '$transaction' },
+            {
+                $lookup: {
+                    from: 'requests',
+                    localField: 'transaction.request_id',
+                    foreignField: '_id',
+                    as: 'request'
+                }
+            },
+            { $unwind: '$request' },
+            {
+                $match: {
+                    'request.request_status': 'completed'
+                }
+            }
+        ]);
 
         const totalRevenue = invoices.reduce((total, invoice) => total + invoice.total_amount, 0);
 
-        res.json({ totalRevenue });
+        return res.json({ totalRevenue });
     } catch (error) {
-        res.status(500).json({ message: 'Error calculating total revenue', error });
+        return res.status(500).json({ message: 'Error calculating total revenue', error });
     }
-}
+};
 
+// Function to get monthly revenue
 const getMonthlyRevenue = async (req, res) => {
     const { period, yearValue } = req.query;
 
@@ -84,9 +244,32 @@ const getMonthlyRevenue = async (req, res) => {
             const start = new Date(year, index, 1);
             const end = new Date(year, index + 1, 0, 23, 59, 59);
 
-            const invoices = await Invoice.find({
-                createdAt: { $gte: start, $lt: end },
-            });
+            const invoices = await Invoice.aggregate([
+                {
+                    $lookup: {
+                        from: 'transactions',
+                        localField: 'transaction_id',
+                        foreignField: '_id',
+                        as: 'transaction'
+                    }
+                },
+                { $unwind: '$transaction' },
+                {
+                    $lookup: {
+                        from: 'requests',
+                        localField: 'transaction.request_id',
+                        foreignField: '_id',
+                        as: 'request'
+                    }
+                },
+                { $unwind: '$request' },
+                {
+                    $match: {
+                        'request.request_status': 'completed',
+                        'createdAt': { $gte: start, $lt: end }
+                    }
+                }
+            ]);
 
             const monthTotalRevenue = invoices.reduce((total, invoice) => total + invoice.total_amount, 0);
             totalRevenue += monthTotalRevenue;
@@ -94,12 +277,13 @@ const getMonthlyRevenue = async (req, res) => {
             return { x: month, y: monthTotalRevenue };
         }));
 
-        res.json({ data: monthlyRevenue, totalRevenue });
+        return res.json({ data: monthlyRevenue, totalRevenue });
     } catch (error) {
-        res.status(500).json({ message: 'Error calculating monthly revenue', error });
+        return res.status(500).json({ message: 'Error calculating monthly revenue', error });
     }
 };
 
+// Function to get daily revenue
 const getDailyRevenue = async (req, res) => {
     const { period, monthValue, yearValue } = req.query;
 
@@ -122,9 +306,32 @@ const getDailyRevenue = async (req, res) => {
             const start = new Date(year, month, day + 1);
             const end = new Date(year, month, day + 1, 23, 59, 59);
 
-            const invoices = await Invoice.find({
-                createdAt: { $gte: start, $lt: end },
-            });
+            const invoices = await Invoice.aggregate([
+                {
+                    $lookup: {
+                        from: 'transactions',
+                        localField: 'transaction_id',
+                        foreignField: '_id',
+                        as: 'transaction'
+                    }
+                },
+                { $unwind: '$transaction' },
+                {
+                    $lookup: {
+                        from: 'requests',
+                        localField: 'transaction.request_id',
+                        foreignField: '_id',
+                        as: 'request'
+                    }
+                },
+                { $unwind: '$request' },
+                {
+                    $match: {
+                        'request.request_status': 'completed',
+                        'createdAt': { $gte: start, $lt: end }
+                    }
+                }
+            ]);
 
             const dayTotalRevenue = invoices.reduce((total, invoice) => total + invoice.total_amount, 0);
             totalRevenue += dayTotalRevenue;
@@ -132,12 +339,13 @@ const getDailyRevenue = async (req, res) => {
             return { x: day + 1, y: dayTotalRevenue };
         }));
 
-        res.json({ data: dailyRevenue, totalRevenue });
+        return res.json({ data: dailyRevenue, totalRevenue });
     } catch (error) {
-        res.status(500).json({ message: 'Error calculating daily revenue', error });
+        return  res.status(500).json({ message: 'Error calculating daily revenue', error });
     }
 };
 
+// Function to get quarterly revenue
 const getQuarterlyRevenue = async (req, res) => {
     const { period, quarterValue, yearValue } = req.query;
 
@@ -164,9 +372,32 @@ const getQuarterlyRevenue = async (req, res) => {
             const start = new Date(year, monthIndex, 1);
             const end = new Date(year, monthIndex + 1, 0, 23, 59, 59);
 
-            const invoices = await Invoice.find({
-                createdAt: { $gte: start, $lt: end },
-            });
+            const invoices = await Invoice.aggregate([
+                {
+                    $lookup: {
+                        from: 'transactions',
+                        localField: 'transaction_id',
+                        foreignField: '_id',
+                        as: 'transaction'
+                    }
+                },
+                { $unwind: '$transaction' },
+                {
+                    $lookup: {
+                        from: 'requests',
+                        localField: 'transaction.request_id',
+                        foreignField: '_id',
+                        as: 'request'
+                    }
+                },
+                { $unwind: '$request' },
+                {
+                    $match: {
+                        'request.request_status': 'completed',
+                        'createdAt': { $gte: start, $lt: end }
+                    }
+                }
+            ]);
 
             const monthlyRevenue = invoices.reduce((total, invoice) => total + invoice.total_amount, 0);
             totalQuarterlyRevenue += monthlyRevenue;
@@ -174,12 +405,13 @@ const getQuarterlyRevenue = async (req, res) => {
             return { x: months[monthIndex], y: monthlyRevenue };
         }));
 
-        res.json({ data: quarterlyRevenue, totalRevenue: totalQuarterlyRevenue });
+        return res.json({ data: quarterlyRevenue, totalRevenue: totalQuarterlyRevenue });
     } catch (error) {
-        res.status(500).json({ message: 'Error calculating quarterly revenue', error });
+        return res.status(500).json({ message: 'Error calculating quarterly revenue', error });
     }
 };
 
+// Function to get recent invoices
 const getRecentInvoices = async (req, res) => {
     try {
         const invoices = await Invoice.find()
@@ -197,41 +429,180 @@ const getRecentInvoices = async (req, res) => {
         })
         .exec();
 
-        res.json({ invoices });
+        return res.json({ invoices });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching invoices', error });
+        return res.status(500).json({ message: 'Error fetching invoices', error });
     }
 };
 
 // Function to get completed requests
 const getCompletedRequests = async (req, res) => {
     try {
-        const requests = await Request.find({});
+        const requests = await Request.find({ request_status: 'completed' });
         const totalCompletedRequests = requests.length;
 
-        res.json({ totalCompletedRequests });
+        return res.json({ totalCompletedRequests });
     } catch (error) {
-        res.status(500).json({ message: 'Error calculating completed requests', error });
+        return  res.status(500).json({ message: 'Error calculating completed requests', error });
     }
 };
 
+// Function to get all customers
 const getAllCustomers = async (req, res) => {
     try {
         const users = await User.find({ role: "user" });
         const customers = users.length;
 
-        res.json({ customers });
+        return res.json({ customers });
     } catch (error) {
-        res.status(500).json({ message: 'Error getting all customers', error });
+        return res.status(500).json({ message: 'Error getting all customers', error });
     }
 }
 
+const getTopSellingGemstones = async (req, res) => {
+    try {
+        const topGemstones = await Request.aggregate([
+            { $match: { request_status: 'completed' } },
+            {
+                $lookup: {
+                    from: 'jewelries',
+                    localField: 'jewelry_id',
+                    foreignField: '_id',
+                    as: 'jewelry'
+                }
+            },
+            { $unwind: '$jewelry' },
+            { $unwind: '$jewelry.gemstone_ids' },
+            {
+                $lookup: {
+                    from: 'gemstones',
+                    localField: 'jewelry.gemstone_ids',
+                    foreignField: '_id',
+                    as: 'gemstone'
+                }
+            },
+            // { $unwind: '$gemstone' },
+            // {
+            //     $group: {
+            //         _id: '$gemstone.name',
+            //         count: { $sum: 1 },
+            //     }
+            // },
+            // {
+            //     $project: {
+            //         _id: 0,
+            //         sales: '$count',
+            //         gemstone: '$_id',
+            //     }
+            // },
+            // { $sort: { count: -1 } },
+            // { $limit: 10 }
+        ]);
+        // console.log(topGemstones)
+        return res.json({ topGemstones });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error fetching top 10 gemstones' });
+    }
+};
+
+
+const getTopSellingMaterials = async (req, res) => {
+    try {
+        const topMaterials = await Request.aggregate([
+            { $match: { request_status: 'completed' } },
+            {
+                $lookup: {
+                    from: 'jewelries',
+                    localField: 'jewelry_id',
+                    foreignField: '_id',
+                    as: 'jewelry'
+                }
+            },
+            { $unwind: '$jewelry' },
+            {
+                $lookup: {
+                    from: 'materials',
+                    localField: 'jewelry.material_id',
+                    foreignField: '_id',
+                    as: 'material'
+                }
+            },
+            { $unwind: '$material' },
+            {
+                $group: {
+                    _id: '$material.name',
+                    count: { $sum: 1 },
+                }
+            },
+            { 
+                $project: {
+                    _id: 0,
+                    material: '$_id',
+                    sales: '$count'
+                }
+            },
+            { $sort: { count: -1 } },
+            { $limit: 10 }
+        ]);
+        return res.json({ topMaterials });
+    } catch (error) {
+        return res.status(500).json({ error: 'Error fetching top 10 materials' });
+    }
+};
+
+const getTopSellingJewelry = async (req, res) => {
+    try {
+        const topJewelries = await Request.aggregate([
+            { $match: { request_status: 'completed' } },
+            { 
+                $lookup: {
+                    from: 'jewelries',
+                    localField: 'jewelry_id',
+                    foreignField: '_id',
+                    as: 'jewelry'
+                }
+            },
+            { $unwind: '$jewelry' },
+            { $match: { 'jewelry.type': 'Sample' } },
+            {
+                $group: {
+                    _id: '$jewelry._id',
+                    count: { $sum: 1 },
+                    name: { $first: '$jewelry.name' },
+                    images: { $first: '$jewelry.images' }
+                }
+            },
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+            {
+                $project: {
+                    _id: 0,
+                    jewelryId: '$_id',
+                    name: 1,
+                    sales: '$count',
+                    images: 1,
+                }
+            }
+        ]);
+        res.json({ topJewelries });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching top 10 jewelries' });
+    }
+};
+
 module.exports = {
-    getCompletedRequests,
+    getCompletedRequests,   
     getMonthlyRevenue,
     getDailyRevenue,
     getQuarterlyRevenue,
     getTotalRevenue,
     getRecentInvoices,
     getAllCustomers,
+    getCurrentTotalRevenue,
+    getEmployeeWithMostSales,
+    getTopSellingGemstones,
+    getTopSellingMaterials,
+    getTopSellingJewelry,
 };
