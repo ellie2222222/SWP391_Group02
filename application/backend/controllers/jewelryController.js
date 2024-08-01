@@ -252,6 +252,31 @@ const updateJewelry = async (req, res) => {
     }
 };
 
+const updateJewelryAvailability = async (req, res) => {
+    try {
+        const { available } = req.body;
+
+        if (typeof available !== 'boolean') {
+            return res.status(400).json({ error: 'Invalid data. "available" must be a boolean.' });
+        }
+
+        const updatedJewelry = await Jewelry.findByIdAndUpdate(
+            req.params.id,
+            { available },
+            { new: true }
+        );
+
+        if (!updatedJewelry) {
+            return res.status(404).json({ error: 'Jewelry not found' });
+        }
+
+        res.status(200).json(updatedJewelry);
+    } catch (error) {
+        console.error('Error while updating jewelry availability', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 const getJewelries = async (req, res) => {
     const { name, available, category, type, sortByPrice, sortByName, page = 1, limit = 12 } = req.query;
 
@@ -352,5 +377,6 @@ module.exports = {
     getJewelry,
     createJewelry,
     deleteJewelry,
-    updateJewelry
+    updateJewelry,
+    updateJewelryAvailability
 };
