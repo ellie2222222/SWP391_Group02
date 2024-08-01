@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { getJewelries, getJewelry, createJewelry, deleteJewelry, updateJewelry } = require('../controllers/jewelryController');
+const { getJewelries, getJewelry, createJewelry, deleteJewelry, updateJewelry, updateJewelryAvailability } = require('../controllers/jewelryController');
 const requireAuth = require('../middleware/requireAuth');
 const { requireAdminOrManagerOrSaleOrDesign,requireAdminOrManagerOrSaleOrDesignOrUser } = require('../middleware/requireRoles');
 const jewelryRoutes = express.Router();
@@ -20,5 +20,6 @@ jewelryRoutes.delete('/:id', requireAuth, requireAdminOrManagerOrSaleOrDesign, d
 
 jewelryRoutes.patch('/:id', requireAuth, requireAdminOrManagerOrSaleOrDesignOrUser, upload.array('images', 5), updateJewelry);
 
+jewelryRoutes.patch('/:id/availability', requireAuth, requireAdminOrManagerOrSaleOrDesignOrUser, updateJewelryAvailability);
 
 module.exports = jewelryRoutes;

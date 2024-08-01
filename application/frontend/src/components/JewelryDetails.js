@@ -73,36 +73,36 @@ const CenteredBox = styled(Box)({
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
-      color: '#b48c72',
+    color: '#b48c72',
   },
   '& .MuiInput-underline:after': {
-      borderBottomColor: '#b48c72',
+    borderBottomColor: '#b48c72',
   },
   '& .MuiOutlinedInput-root': {
-      fontSize: "1.3rem",
-      '& fieldset': {
-          borderColor: '#b48c72',
-      },
-      '&:hover fieldset': {
-          borderColor: '#b48c72',
-      },
-      '&.Mui-focused fieldset': {
-          borderColor: '#b48c72',
-      },
+    fontSize: "1.3rem",
+    '& fieldset': {
+      borderColor: '#b48c72',
+    },
+    '&:hover fieldset': {
+      borderColor: '#b48c72',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#b48c72',
+    },
   },
   "& .MuiInputLabel-root": {
-      fontSize: "1.3rem",
-      "&.Mui-focused": {
-          color: "#b48c72",
-      },
+    fontSize: "1.3rem",
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
   },
   "& .MuiFormHelperText-root": {
-      fontSize: "1.2rem",
-      marginLeft: 0,
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
   "& .MuiTypography-root": {
-      fontSize: "1.2rem",
-      marginLeft: 0,
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
 });
 
@@ -136,26 +136,28 @@ const JewelryDetails = () => {
       navigate('/login');
       return;
     }
-    
+
     try {
       await axiosInstance.post('/requests/order-requests', {
         jewelry_id: product._id,
         ...formData
       });
-      await axiosInstance.patch(`/jewelries/${product._id}`, {available: false});
+
+      await axiosInstance.patch(`/jewelries/${product._id}/availability`, { available: false });
+
       setOpen(false);
       toast.success('Request created successfully!', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
         draggable: true,
-    });
+      });
     } catch (error) {
       console.error('Error while creating order information!', error);
       toast.error('Failed to create request. Please try again later.', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
         draggable: true,
-    });
+      });
     }
   };
 
