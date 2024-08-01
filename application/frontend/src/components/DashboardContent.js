@@ -10,7 +10,6 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import GemstonesBarChart from './GemstonesBarChart';
 import MaterialsBarChart from './MaterialsBarChart';
-import JewelriesBarChart from './JewelriesBarChart';
 
 const CustomFormControl = styled(FormControl)({
   // minWidth: 120,
