@@ -16,8 +16,6 @@ const validateEmptyFields = (data) => {
     if (!type) emptyFields.push('type');
     if (type && type === 'Sample' && !price) emptyFields.push('price');
 
-    console.log('Empty Fields:', emptyFields); // Debugging statement
-
     if (emptyFields.length > 0) {
         return "Please fill in the required fields";
     }
@@ -32,16 +30,6 @@ const validateInputData = (data) => {
     // Filter out empty strings
     gemstone_ids = gemstone_ids.filter(id => id.trim() !== '');
     subgemstone_ids = subgemstone_ids.filter(id => id.trim() !== '');
-
-    // Log initial input data
-    // console.log('Initial data:', {
-    //     gemstone_ids,
-    //     material_id,
-    //     price,
-    //     material_weight,
-    //     subgemstone_ids,
-    //     type
-    // });
 
     // Validate gemstone IDs
     if (gemstone_ids && gemstone_ids.length > 0) {
@@ -291,7 +279,7 @@ const getJewelries = async (req, res) => {
         }
 
         const skip = (page - 1) * limit;
-        const jewelries = await Jewelry.find(query).sort(sort).skip(skip).limit(parseInt(limit))
+        const jewelries = await Jewelry.find(query).sort({ createdAt: -1, ...sort }).skip(skip).limit(parseInt(limit))
             .populate('gemstone_ids')
             .populate('material_id')
             .populate('subgemstone_ids');

@@ -131,6 +131,10 @@ export default function Sidebar() {
         logout();
     };
 
+    const handleNavigateHome = () => {
+        navigate('/');
+    };
+
     const CustomListItemIcon = styled(ListItemIcon)({
         minWidth: 0,
         mr: open ? 3 : 'auto',
@@ -158,7 +162,14 @@ export default function Sidebar() {
                     <Typography variant="h4" noWrap component="div">
                         Management
                     </Typography>
-                    <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 'auto', fontSize: "1.5rem" }}>
+                    <Button
+                        onClick={handleNavigateHome}
+                        color="inherit"
+                        sx={{ marginLeft: 'auto', fontSize: '1.5rem' }}
+                    >
+                        Home
+                    </Button>
+                    <Button color="inherit" onClick={handleLogout} sx={{ fontSize: "1.5rem" }}>
                         Logout
                     </Button>
                 </Toolbar>

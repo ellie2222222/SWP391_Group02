@@ -5,18 +5,39 @@ const { cloudinary } = require('../cloudinary');
 
 // Get all gemstones or get gemstones by name
 const getGemstones = async (req, res) => {
-    const { name } = req.query;
+    const { search, cut, clarity, color, polish, symmetry, fluorescence } = req.query;
 
     try {
         let query = {};
-        if (name) {
-            query.name = new RegExp(name, 'i'); // 'i' for case-insensitive search
+        if (search) {
+            query.name = new RegExp(search, 'i');
+        }
+        if (cut) {
+            query.cut = cut;
+        }
+        if (clarity) {
+            query.clarity = clarity;
+        }
+        if (color) {
+            query.color = color;
+        }
+        if (polish) {
+            query.polish = polish;
+        }
+        if (symmetry) {
+            query.symmetry = symmetry;
+        }
+        if (fluorescence) {
+            query.fluorescence = fluorescence;
         }
 
         const gemstones = await Gemstone.find(query);
+
         res.status(200).json(gemstones);
     } catch (error) {
         console.error('Error fetching gemstones:', error);
+
+        // Return an error message in the response with status 500 (Internal Server Error)
         res.status(500).json({ error: 'An error occurred while fetching gemstones' });
     }
 };

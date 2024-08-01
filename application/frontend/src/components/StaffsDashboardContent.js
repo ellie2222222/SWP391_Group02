@@ -176,10 +176,18 @@ const StaffsDashboardContent = () => {
             await axiosInstance.patch(`/users/${selectedUser._id}`, values);
             fetchUsers();
             setIsDialogOpen(false);
-            toast.success('User updated successfully!');
+            toast.success('User updated successfully!', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         } catch (error) {
             console.error("There was an error saving the user!", error);
-            toast.error('Failed to update user. Please try again.');
+            toast.error('Failed to update user. Please try again.', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            })
         }
     };
 
@@ -250,7 +258,7 @@ const StaffsDashboardContent = () => {
                                     <CustomTableCell>{user._id}</CustomTableCell>
                                     <CustomTableCell>{user.username}</CustomTableCell>
                                     <CustomTableCell>{user.email}</CustomTableCell>
-                                    <CustomTableCell>{user.phone}</CustomTableCell>
+                                    <CustomTableCell>{user.phone_number}</CustomTableCell>
                                     <CustomTableCell>{user.address}</CustomTableCell>
                                     <CustomTableCell>{capitalizeWords(user.role)}</CustomTableCell>
                                     <CustomTableCell>

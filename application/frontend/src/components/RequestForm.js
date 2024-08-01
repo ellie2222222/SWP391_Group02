@@ -218,7 +218,6 @@ export default function RequestForm({ initialValues, onSubmit, fetchData, closeA
                         label="Request Status"
                         error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                     >
-                        <CustomMenuItem value="pending">Pending</CustomMenuItem>
                         <CustomMenuItem value="assigned">Assigned</CustomMenuItem>
                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
                         <CustomMenuItem value="accepted">Accepted</CustomMenuItem>

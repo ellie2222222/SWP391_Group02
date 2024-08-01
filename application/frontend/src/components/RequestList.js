@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CardMedia, Container, Box, Typography, Button, CircularProgress, Grid, Divider, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack, IconButton } from '@mui/material';
+import { CardMedia, Container, Box, Typography, Button, CircularProgress, Grid, Divider, Table, TableBody, TableCell, TableHead, TableRow, TableContainer, styled, Card, CardActions, CardContent, Stepper, Step, StepLabel, Dialog, DialogTitle, DialogContent, DialogActions, Pagination, Stack, IconButton, Paper } from '@mui/material';
 import useAuth from '../hooks/useAuthContext';
 import axiosInstance from '../utils/axiosInstance';
 import { jwtDecode } from 'jwt-decode';
@@ -10,7 +10,6 @@ import UserFeedbackDesignForm from './UserFeedbackDesignForm';
 import { Info } from '@mui/icons-material';
 import ErrorIcon from '@mui/icons-material/Error';
 import zaloLogo from './assets/imgs/Logo_Zalo.svg';
-import WarrantyLists from './WarrantyLists';
 
 const CustomButton1 = styled(Button)({
   outlineColor: '#000',
@@ -30,6 +29,14 @@ const CustomStepLabel = styled(StepLabel)({
     fontSize: '1.3rem',
     textTransform: 'capitalize'
   },
+});
+
+const LargeTypography = styled(Typography)({
+  fontSize: '1.3rem',
+});
+
+const CustomTableCell = styled(TableCell)({
+  fontSize: '1.3rem',
 });
 
 const CustomStepIconRoot = styled('div')(({ theme, ownerState }) => ({
@@ -85,8 +92,6 @@ function CustomStepIcon(props) {
   );
 }
 
-
-
 const RequestList = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -99,11 +104,8 @@ const RequestList = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [saleStaffNumber, setSaleStaffNumber] = useState('');
-  const [designStaffNumber, setDesignStaffNumber] = useState('');
   const [isContactInfoDialogOpen, setIsContactInfoDialogOpen] = useState(false);
   const [isWarrantyDialogOpen, setIsWarrantyDialogOpen] = useState(false);
- 
-
 
   const steps = ['pending', 'assigned', 'quote', 'accepted', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'payment', 'warranty', 'completed'];
   const alternateSteps = ['pending', 'assigned', 'quote', 'accepted', 'deposit_design', 'design', 'design_completed', 'deposit_production', 'production', 'payment', 'warranty', 'cancelled'];
@@ -129,17 +131,14 @@ const RequestList = () => {
     }
   };
 
-  const getStaffContact = async () => {
+  const getStaffContact = async (request) => {
     try {
-      const response = await axiosInstance('/users/get-staff-contact');
-      setSaleStaffNumber(response.data.saleStaff);
-      setDesignStaffNumber(response.data.designStaff);
+      const response = await axiosInstance(`/users/get-staff-contact/${request._id}`);
+      setSaleStaffNumber(response.data.saleStaffContact);
     } catch (error) {
       console.error('Error getting contact numbers', error);
     }
   }
-
-
 
   const handleAcceptRequest = async (requestId) => {
     try {
@@ -213,7 +212,7 @@ const RequestList = () => {
       window.location.href = payment.data.result.order_url;
       // window.open(payment.data.result.order_url, '_blank');
     } catch (error) {
-      console.error('Error, cannot proceed to payment', error); 
+      console.error('Error, cannot proceed to payment', error);
       toast.error('Error, cannot proceed to payment', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
@@ -225,7 +224,7 @@ const RequestList = () => {
     setSelectedRequest(request);
     setIsWarrantyDialogOpen(true);
   };
-  
+
   const getStatusStep = (status) => {
     if (status === 'cancelled') {
       return alternateSteps.indexOf(status);
@@ -318,17 +317,18 @@ const RequestList = () => {
     }
   };
 
-  const handleOpenContactInfoDialog = () => {
+  const handleOpenContactInfoDialog = (request) => {
+    getStaffContact(request);
     setIsContactInfoDialogOpen(true);
   };
 
   const handleCloseContactInfoDialog = () => {
     setIsContactInfoDialogOpen(false);
+    setSaleStaffNumber('')
   };
 
   useEffect(() => {
     fetchRequests(page);
-    getStaffContact();
   }, [user.token, page]);
 
   if (loading) {
@@ -345,7 +345,7 @@ const RequestList = () => {
         <Typography variant="h2" component="p" textAlign="center" my={2}>Requests</Typography>
         {requests.length === 0 && (
           <Typography variant="h4" my={2}>No requests</Typography>
-        )} 
+        )}
         {requests.map((request, index) => (
           <Card key={index} variant="outlined" sx={{ marginBottom: '20px', overflow: 'auto' }}>
             <CardContent>
@@ -361,7 +361,7 @@ const RequestList = () => {
               </Typography>
               <Box display='flex' alignItems='center'>
                 <Typography variant="h5">Staff Contact Information</Typography>
-                <IconButton onClick={handleOpenContactInfoDialog}>
+                <IconButton onClick={() => handleOpenContactInfoDialog(request)}>
                   <Info fontSize='large' />
                 </IconButton>
               </Box>
@@ -394,9 +394,9 @@ const RequestList = () => {
             <CardActions>
               <CustomButton1 onClick={() => handleDetailsDialog(request)}>View Detail</CustomButton1>
               {request.request_status === 'completed' && (
-                  <CustomButton1 onClick={() => handleWarrantyDialog(request)}>
-                                                  Warranty Detail
-                  </CustomButton1>
+                <CustomButton1 onClick={() => handleWarrantyDialog(request)}>
+                  Warranty Detail
+                </CustomButton1>
               )}
               {request.request_status === 'accepted' && (
                 <>
@@ -444,10 +444,10 @@ const RequestList = () => {
       {/* Dialog for Request Details */}
       {selectedRequest && (
         <Dialog open={isDetailsDialogOpen} onClose={() => setIsDetailsDialogOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle variant='h4' align='center' gutterBottom>Request Details</DialogTitle>
+          <DialogTitle variant='h2' align='center'>Request Details</DialogTitle>
           <DialogContent>
             <Typography
-              variant="h5"
+              variant="h3"
               component="p"
               marginTop="20px"
               sx={{
@@ -456,138 +456,247 @@ const RequestList = () => {
                 overflow: 'hidden',
                 wordWrap: 'break-word'
               }}
+              fontWeight={300}
+              my={2}
             >
-              Description: {selectedRequest.request_description}
+              Description
             </Typography>
+            <Typography sx={{ fontSize: '1.3rem' }}>{selectedRequest.request_description || 'None'}</Typography>
+            <Typography variant='h3' fontWeight={300} my={2}>Quote Information</Typography>
             {selectedRequest.quote_content && (
               <>
                 <Typography
-                  variant="h6"
                   component="p"
                   marginTop="20px"
                   sx={{
                     wordBreak: 'break-word',
                     whiteSpace: 'pre-wrap',
                     overflow: 'hidden',
-                    wordWrap: 'break-word'
+                    wordWrap: 'break-word',
+                    fontSize: '1.3rem',
                   }}
                 >
                   Quote Content: {selectedRequest.quote_content}
                 </Typography>
                 <Typography
-                  variant="h6"
                   component="p"
                   sx={{
                     wordBreak: 'break-word',
                     whiteSpace: 'pre-wrap',
                     overflow: 'hidden',
-                    wordWrap: 'break-word'
+                    wordWrap: 'break-word',
+                    fontSize: '1.3rem',
                   }}
                 >
-                  Quote Amount: {selectedRequest.quote_amount.toLocaleString()}₫
+                  Quote Amount: {selectedRequest.quote_amount.toLocaleString() + '₫' || 'N/A'}
                 </Typography>
               </>
             )}
-            {selectedRequest.jewelry_id && selectedRequest.jewelry_id.images && (
-              <Box marginTop="20px">
-                <Typography
-                  variant="h6"
-                  component="p"
-                  sx={{
-                    wordBreak: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                    overflow: 'hidden',
-                    wordWrap: 'break-word'
-                  }}
-                >
-                  Design Images:
-                </Typography>
-                <Box display="flex" flexWrap="wrap">
-                  {selectedRequest.jewelry_id.images.map((image, index) => (
-                    <Card key={index} sx={{ maxWidth: 200, margin: "10px 20px 0 0" }}>
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={image}
-                        alt={`design image ${index + 1}`}
-                      />
-                    </Card>
-                  ))}
-                </Box>
-              </Box>
-            )}
-            {/* {selectedRequest.production_start_date && (
-              <Typography
-                variant="h6"
-                component="p"
-                mt={2}
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
-                }}
-              >
-                Production Start Date: {new Date(selectedRequest.production_start_date).toLocaleDateString()}
-              </Typography>
-            )}
-            {selectedRequest.production_end_date && (
-              <Typography
-                variant="h6"
-                component="p"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
-                }}
-              >
-                Production End Date: {new Date(selectedRequest.production_end_date).toLocaleDateString()}
-              </Typography>
-            )}
-            {selectedRequest.warranty_content && (
-              <Typography
-                variant="h6"
-                component="p"
-                mt={2}
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
-                }}
-              >
-                Warranty Content: {selectedRequest.warranty_content}
-              </Typography>
-            )}
-            {selectedRequest.warranty_start_date && (
-              <Typography
-                variant="h6"
-                component="p"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
-                }}
-              >
-                Warranty Start Date: {new Date(selectedRequest.warranty_start_date).toLocaleDateString()}
-              </Typography>
-            )}
-            {selectedRequest.warranty_end_date && (
-              <Typography
-                variant="h6"
-                component="p"
-                sx={{
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  overflow: 'hidden',
-                  wordWrap: 'break-word'
-                }}
-              >
-                Warranty End Date: {new Date(selectedRequest.warranty_end_date).toLocaleDateString()}
-              </Typography>
-            )} */}
+            <Typography variant='h3' fontWeight={300} my={2}>Jewelry Information</Typography>
+            <Typography sx={{ fontSize: '1.3rem' }} mb={2}>Name: {selectedRequest?.jewelry_id?.name || 'N/A'}</Typography>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell><Typography variant="h4">Items</Typography></TableCell>
+                    <TableCell colSpan={4}><Typography variant="h4" align='center'>Details</Typography></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+
+                  <TableRow>
+                    <TableCell>
+                      <Typography variant="h6">Category</Typography>
+                    </TableCell>
+                    <TableCell colSpan={4}>
+                      <LargeTypography variant="body1" align='center'>{selectedRequest?.jewelry_id?.category || '-'}</LargeTypography>
+                    </TableCell>
+                  </TableRow>
+
+                  {/* Material Section */}
+                  <TableRow>
+                    <TableCell rowSpan={2}>
+                      <Typography variant="h6">Material</Typography>
+                    </TableCell>
+                    <TableCell colSpan={4}>
+                      <LargeTypography variant="body1" align='center'>{selectedRequest?.jewelry_id?.material_id?.name || '-'}</LargeTypography>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <Typography variant="h6">Material Carat</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <LargeTypography variant="body1">{selectedRequest?.jewelry_id?.material_id?.carat || '-'}</LargeTypography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="h6">Material Weight</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <LargeTypography variant="body1">{selectedRequest?.jewelry_id ? selectedRequest?.jewelry_id?.material_weight + ' mace' : '-'} </LargeTypography>
+                    </TableCell>
+                  </TableRow>
+
+                  {/* Gemstone Section */}
+                  {selectedRequest?.jewelry_id?.gemstone_ids && selectedRequest?.jewelry_id?.gemstone_ids.length > 0 && (
+                    selectedRequest?.jewelry_id?.gemstone_ids.map((gemstone) => (
+                      <>
+                        <TableRow>
+                          <TableCell rowSpan={5}>
+                            <Typography variant="h6">Main Gemstone</Typography>
+                          </TableCell>
+                          <TableCell colSpan={4}>
+                            <LargeTypography variant="body1" align='center'>{gemstone.name || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Carat</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.carat || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Shape</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.cut || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Color</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.color || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Clarity</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.clarity || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Measurements</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.measurements || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Polish</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.polish || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Symmetry</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.symmetry || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Fluorescence</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{gemstone.fluorescence || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    ))
+                  )}
+
+                  {/* Subgemstone Section */}
+                  {selectedRequest?.jewelry_id?.subgemstone_ids && selectedRequest?.jewelry_id?.subgemstone_ids.length > 0 && (
+                    selectedRequest?.jewelry_id?.subgemstone_ids.map((subgemstone) => (
+                      <>
+                        <TableRow>
+                          <TableCell rowSpan={5}>
+                            <Typography variant="h6">Sub Gemstone</Typography>
+                          </TableCell>
+                          <TableCell colSpan={4}>
+                            <LargeTypography variant="body1" align='center'>{subgemstone.name || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Carat</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.carat || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Shape</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.cut || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Color</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.color || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Clarity</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.clarity || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Measurements</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.measurements || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Polish</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.polish || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Symmetry</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.symmetry || '-'}</LargeTypography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="h6">Gemstone Fluorescence</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <LargeTypography variant="body1">{subgemstone.fluorescence || '-'}</LargeTypography>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Typography variant='h3' fontWeight={300} my={2}>Images</Typography>
+            <Grid container spacing={2}>
+              {selectedRequest?.jewelry_id?.images.map((image, index) => (
+                <Grid item xs={4}>
+                  <CardMedia
+                    key={index}
+                    component="img"
+                    alt="Jewelry"
+                    image={image}
+                    sx={{ width: '100%', margin: '0px' }}
+                  />
+                </Grid>
+              ))}
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setIsDetailsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
@@ -621,8 +730,7 @@ const RequestList = () => {
       <Dialog open={isContactInfoDialogOpen} onClose={handleCloseContactInfoDialog}>
         <DialogTitle variant='h4' align='center'>Contact Information</DialogTitle>
         <DialogContent>
-          <Typography variant="h5">Sale Staff Contact Number: {saleStaffNumber}</Typography>
-          <Typography variant="h5">Design Staff Contact Number: {designStaffNumber}</Typography>
+          <Typography variant="h5">Sale Staff Contact Number: {saleStaffNumber || 'Sale Staff will be assigned to your request. Awaiting contact information'}</Typography>
           <CustomButton1
             href="https://chat.zalo.me/"
             target="_blank"
@@ -642,104 +750,112 @@ const RequestList = () => {
             Close
           </Button>
         </DialogActions>
+      </Dialog>
+      {selectedRequest && (
+        <Dialog
+          open={isWarrantyDialogOpen}
+          onClose={() => setIsWarrantyDialogOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle sx={{ textAlign: 'center', fontWeight: '300' }} variant='h2'>
+            Warranty
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ padding: 2 }}>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell colSpan={2} sx={{ textAlign: 'center', fontWeight: '300', fontSize: '2rem' }}>
+                        Warranty Details
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {/* User ID Row */}
+                    {selectedRequest.user_id && (
+                      <TableRow>
+                        <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>User ID</CustomTableCell>
+                        <CustomTableCell>{selectedRequest.user_id._id}</CustomTableCell>
+                      </TableRow>
+                    )}
+
+                    {/* Username Row */}
+                    {selectedRequest.user_id && (
+                      <TableRow>
+                        <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>User's Name</CustomTableCell>
+                        <CustomTableCell>{selectedRequest.user_id.username}</CustomTableCell>
+                      </TableRow>
+                    )}
+
+                    {/* Jewelry Details Rows */}
+
+                    {selectedRequest.jewelry_id && (
+                      <>
+                        <TableRow>
+                          <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Jewelry Name</CustomTableCell>
+                          <CustomTableCell>{selectedRequest.jewelry_id.name || 'N/A'}</CustomTableCell>
+                        </TableRow>
+                        <TableRow>
+                          <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Gemstone ID</CustomTableCell>
+                          <CustomTableCell>{selectedRequest.jewelry_id.gemstone_id || 'N/A'}</CustomTableCell>
+                        </TableRow>
+                      </>
+                    )}
+
+                    {/* Production Dates Rows */}
+                    {selectedRequest.production_start_date && (
+                      <>
+                        <TableRow>
+                          <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Production Start Date</CustomTableCell>
+                          <CustomTableCell>{new Date(selectedRequest.production_start_date).toLocaleDateString()}</CustomTableCell>
+                        </TableRow>
+                        <TableRow>
+                          <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Production End Date</CustomTableCell>
+                          <CustomTableCell>{new Date(selectedRequest.production_end_date).toLocaleDateString()}</CustomTableCell>
+                        </TableRow>
+                      </>
+                    )}
+
+                    {/* Warranty Content Row */}
+                    {selectedRequest.warranty_content && (
+                      <TableRow>
+                        <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty Content</CustomTableCell>
+                        <CustomTableCell>{selectedRequest.warranty_content}</CustomTableCell>
+                      </TableRow>
+                    )}
+
+                    {/* Warranty Dates Rows */}
+                    {selectedRequest.warranty_start_date && (
+                      <>
+                        <TableRow>
+                          <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty Start Date</CustomTableCell>
+                          <CustomTableCell>{new Date(selectedRequest.warranty_start_date).toLocaleDateString()}</CustomTableCell>
+                        </TableRow>
+                        <TableRow>
+                          <CustomTableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty End Date</CustomTableCell>
+                          <CustomTableCell>{new Date(selectedRequest.warranty_end_date).toLocaleDateString()}</CustomTableCell>
+                        </TableRow>
+                      </>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setIsWarrantyDialogOpen(false)}
+              sx={{ color: '#b48c72', fontSize: '1.3rem' }}
+            >
+              Close
+            </Button>
+          </DialogActions>
         </Dialog>
-        {selectedRequest && (
-  <Dialog
-    open={isWarrantyDialogOpen}
-    onClose={() => setIsWarrantyDialogOpen(false)}
-    maxWidth="sm"
-    fullWidth
-  >
-    <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '2.5rem' }}>
-      Warranty
-    </DialogTitle>
-    <DialogContent>
-      <Box sx={{ padding: 2 }}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell colSpan={2} sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-                  Warranty Details
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {/* User ID Row */}
-              {selectedRequest.user_id && (
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>User ID</TableCell>
-                  <TableCell>{selectedRequest.user_id}</TableCell>
-                </TableRow>
-              )}
+      )}
 
-              {/* Jewelry Details Rows */}
 
-              {selectedRequest.jewelry_id && (
-                <>         
-                  <TableRow>                   
-                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Jewelry Name</TableCell>
-                    <TableCell>{selectedRequest.jewelry_id.name || 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Gemstone ID</TableCell>
-                    <TableCell>{selectedRequest.jewelry_id.gemstone_id || 'N/A'}</TableCell>
-                  </TableRow>
-                </>
-              )}
-
-              {/* Production Dates Rows */}
-              {selectedRequest.production_start_date && (
-                <>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Production Start Date</TableCell>
-                    <TableCell>{new Date(selectedRequest.production_start_date).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Production End Date</TableCell>
-                    <TableCell>{new Date(selectedRequest.production_end_date).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                </>
-              )}
-
-              {/* Warranty Content Row */}
-              {selectedRequest.warranty_content && (
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty Content</TableCell>
-                  <TableCell>{selectedRequest.warranty_content}</TableCell>
-                </TableRow>
-              )}
-
-              {/* Warranty Dates Rows */}
-              {selectedRequest.warranty_start_date && (
-                <>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty Start Date</TableCell>
-                    <TableCell>{new Date(selectedRequest.warranty_start_date).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Warranty End Date</TableCell>
-                    <TableCell>{new Date(selectedRequest.warranty_end_date).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                </>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </DialogContent>
-    <DialogActions>
-      <Button
-        onClick={() => setIsWarrantyDialogOpen(false)}
-        color="primary"
-      >
-        Close
-      </Button>
-    </DialogActions>
-  </Dialog>
-)}
-
-        
     </Container>
   );
 };

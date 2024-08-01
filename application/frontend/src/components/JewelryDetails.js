@@ -73,36 +73,36 @@ const CenteredBox = styled(Box)({
 
 const CustomTextField = styled(TextField)({
   '& label.Mui-focused': {
-      color: '#b48c72',
+    color: '#b48c72',
   },
   '& .MuiInput-underline:after': {
-      borderBottomColor: '#b48c72',
+    borderBottomColor: '#b48c72',
   },
   '& .MuiOutlinedInput-root': {
-      fontSize: "1.3rem",
-      '& fieldset': {
-          borderColor: '#b48c72',
-      },
-      '&:hover fieldset': {
-          borderColor: '#b48c72',
-      },
-      '&.Mui-focused fieldset': {
-          borderColor: '#b48c72',
-      },
+    fontSize: "1.3rem",
+    '& fieldset': {
+      borderColor: '#b48c72',
+    },
+    '&:hover fieldset': {
+      borderColor: '#b48c72',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#b48c72',
+    },
   },
   "& .MuiInputLabel-root": {
-      fontSize: "1.3rem",
-      "&.Mui-focused": {
-          color: "#b48c72",
-      },
+    fontSize: "1.3rem",
+    "&.Mui-focused": {
+      color: "#b48c72",
+    },
   },
   "& .MuiFormHelperText-root": {
-      fontSize: "1.2rem",
-      marginLeft: 0,
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
   "& .MuiTypography-root": {
-      fontSize: "1.2rem",
-      marginLeft: 0,
+    fontSize: "1.2rem",
+    marginLeft: 0,
   },
 });
 
@@ -139,20 +139,19 @@ const JewelryDetails = () => {
 
     try {
       const newJewelryResponse = await axiosInstance.post('/jewelries', {
-        // Thêm dữ liệu cần thiết để tạo jewelry
-        name:product.name,
-        description:product.description,
-        price:product.price,
-        gemstone_id:product?.gemstone_id?._id ?? '',
-        category:product.category,
-        material_id:product.material_id._id,
-        material_weight:product.material_weight,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        gemstone_id: product?.gemstone_id?._id ?? '',
+        category: product.category,
+        material_id: product.material_id._id,
+        material_weight: product.material_weight,
         type: 'Custom',
         available: false,
-        subgemstone_id:product?.subgemstone_id?._id ?? '',
-        subgemstone_quantity:product.subgemstone_quantity,
-        images: product.images 
-        
+        subgemstone_id: product?.subgemstone_id?._id ?? '',
+        subgemstone_quantity: product.subgemstone_quantity,
+        images: product.images
+
       });
       const newJewelryId = newJewelryResponse.data._id;
       await axiosInstance.post('/requests/order-requests', {
@@ -164,14 +163,14 @@ const JewelryDetails = () => {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
         draggable: true,
-    });
+      });
     } catch (error) {
       console.error('Error while creating order information!', error);
       toast.error('Failed to create request. Please try again later.', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
         draggable: true,
-    });
+      });
     }
   };
 
@@ -270,17 +269,27 @@ const JewelryDetails = () => {
             <TableHead>
               <TableRow>
                 <TableCell><Typography variant="h4">Items</Typography></TableCell>
-                <TableCell colSpan={2}><Typography variant="h4" align='center'>Details</Typography></TableCell>
+                <TableCell colSpan={4}><Typography variant="h4" align='center'>Details</Typography></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
+
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Category</Typography>
+                </TableCell>
+                <TableCell colSpan={4}>
+                  <LargeTypography variant="body1" align='center'>{product.category}</LargeTypography>
+                </TableCell>
+              </TableRow>
+
               {/* Material Section */}
               <TableRow>
-                <TableCell rowSpan={3}>
+                <TableCell rowSpan={2}>
                   <Typography variant="h6">Material</Typography>
                 </TableCell>
-                <TableCell colSpan={2}>
-                  <LargeTypography variant="body1" align='center'>{product.material_id ? product.material_id.name : '-'}</LargeTypography>
+                <TableCell colSpan={4}>
+                  <LargeTypography variant="body1" align='center'>{product?.material_id?.name || '-'}</LargeTypography>
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -288,118 +297,159 @@ const JewelryDetails = () => {
                   <Typography variant="h6">Material Carat</Typography>
                 </TableCell>
                 <TableCell>
-                  <LargeTypography variant="body1">{product.material_id ? product.material_id.carat : '-'}</LargeTypography>
+                  <LargeTypography variant="body1">{product?.material_id?.carat || '-'}</LargeTypography>
                 </TableCell>
-              </TableRow>
-              <TableRow>
                 <TableCell>
                   <Typography variant="h6">Material Weight</Typography>
                 </TableCell>
                 <TableCell>
-                  <LargeTypography variant="body1">{product.material_weight} mace</LargeTypography>
+                  <LargeTypography variant="body1">{product ? product?.material_weight + ' mace' : '-'}</LargeTypography>
                 </TableCell>
               </TableRow>
 
               {/* Gemstone Section */}
-              {product.gemstone_id && (
-                <>
-                  <TableRow>
-                    <TableCell rowSpan={5}>
-                      <Typography variant="h6">Gemstone</Typography>
-                    </TableCell>
-                    <TableCell colSpan={2}>
-                      <LargeTypography variant="body1" align='center'>{product.gemstone_id ? product.gemstone_id.name : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Carat</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.carat : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Shape</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.cut : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Color</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.color : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Clarity</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.gemstone_id ? product.gemstone_id.clarity : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                </>
+              {product.gemstone_ids && product.gemstone_ids.length > 0 && (
+                product.gemstone_ids.map((gemstone) => (
+                  <>
+                    <TableRow>
+                      <TableCell rowSpan={5}>
+                        <Typography variant="h6">Main Gemstone</Typography>
+                      </TableCell>
+                      <TableCell colSpan={4}>
+                        <LargeTypography variant="body1" align='center'>{gemstone.name || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Carat</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.carat || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Shape</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.cut || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Color</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.color || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Clarity</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.clarity || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Measurements</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.measurements || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Polish</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.polish || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Symmetry</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.symmetry || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Fluorescence</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{gemstone.fluorescence || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                  </>
+                ))
               )}
 
               {/* Subgemstone Section */}
-              {product.subgemstone_id && (
-                <>
-                  <TableRow>
-                    <TableCell rowSpan={5}>
-                      <Typography variant="h6">Subgemstone</Typography>
-                    </TableCell>
-                    <TableCell colSpan={2}>
-                      <LargeTypography variant="body1" align='center'>{product.subgemstone_id ? product.subgemstone_id.name : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Carat</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.subgemstone_id ? product.subgemstone_id.carat : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Shape</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.subgemstone_id ? product.subgemstone_id.cut : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Color</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.subgemstone_id ? product.subgemstone_id.color : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Typography variant="h6">Gemstone Clarity</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <LargeTypography variant="body1">{product.subgemstone_id ? product.subgemstone_id.clarity : '-'}</LargeTypography>
-                    </TableCell>
-                  </TableRow>
-                </>
+              {product.subgemstone_ids && product.subgemstone_ids.length > 0 && (
+                product.subgemstone_ids.map((subgemstone) => (
+                  <>
+                    <TableRow>
+                      <TableCell rowSpan={5}>
+                        <Typography variant="h6">Sub Gemstone</Typography>
+                      </TableCell>
+                      <TableCell colSpan={4}>
+                        <LargeTypography variant="body1" align='center'>{subgemstone.name || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Carat</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.carat || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Shape</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.cut || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Color</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.color || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Clarity</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.clarity || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Measurements</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.measurements || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Polish</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.polish || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Symmetry</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.symmetry || '-'}</LargeTypography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="h6">Gemstone Fluorescence</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <LargeTypography variant="body1">{subgemstone.fluorescence || '-'}</LargeTypography>
+                      </TableCell>
+                    </TableRow>
+                  </>
+                ))
               )}
-
-              <TableRow>
-                <TableCell>
-                  <Typography variant="h6">Category</Typography>
-                </TableCell>
-                <TableCell>
-                  <LargeTypography variant="body1">{product.category}</LargeTypography>
-                </TableCell>
-              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

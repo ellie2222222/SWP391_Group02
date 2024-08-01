@@ -219,6 +219,11 @@ const PendingRequestDashboardContent = () => {
         fetchRequests();
     }, [searchParams, page]);
 
+    const getTimestamp = (request) => {
+        const status = request.status_history.find(history => history.status === 'pending');
+        return status ? new Date(status.timestamp).toLocaleDateString() : 'N/A';
+    }
+
     return (
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <DrawerHeader />
@@ -282,6 +287,7 @@ const PendingRequestDashboardContent = () => {
                                     <CustomTableCell sx={{ fontWeight: "bold" }}>Request ID</CustomTableCell>
                                     <CustomTableCell sx={{ fontWeight: "bold" }}>Sender</CustomTableCell>
                                     <CustomTableCell sx={{ fontWeight: "bold" }}>Request Status</CustomTableCell>
+                                    <CustomTableCell sx={{ fontWeight: "bold" }}>Send Date</CustomTableCell>
                                     <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Description</CustomTableCell>
                                     <CustomTableCell sx={{ fontWeight: "bold" }} align="center">Actions</CustomTableCell>
                                 </TableRow>
@@ -292,6 +298,7 @@ const PendingRequestDashboardContent = () => {
                                         <CustomTableCell sx={{ fontWeight: "bold" }}>{request._id}</CustomTableCell>
                                         <CustomTableCell>{request.user_id ? request.user_id.email : 'N/A'}</CustomTableCell>
                                         <CustomTableCell style={{ textTransform: 'capitalize' }}>{capitalizeWords(request.request_status)}</CustomTableCell>
+                                        <CustomTableCell>{getTimestamp(request)}</CustomTableCell>
                                         <CustomTableCell>
                                             <CustomButton1 color="primary" onClick={() => handleDescriptionDetailOpen(request)}>Details</CustomButton1>
                                         </CustomTableCell>

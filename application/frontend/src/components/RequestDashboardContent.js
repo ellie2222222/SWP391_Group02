@@ -152,7 +152,7 @@ const RequestDashboardContent = () => {
         setSelectedRequest(request);
         setIsAssignmentDialogOpen(true);
     };
-    
+
     const handleSubmit = async (values) => {
         try {
             setLoading(true);
@@ -326,7 +326,7 @@ const RequestDashboardContent = () => {
                                 </Table>
                                 <Dialog open={isEditDialogOpen} onClose={handleCloseAllDialogs}>
                                     <DialogContent>
-                                        <RequestForm initialValues={selectedRequest} onSubmit={handleSubmit} fetchData={fetchRequests} closeAllDialogs={handleCloseAllDialogs}/>
+                                        <RequestForm initialValues={selectedRequest} onSubmit={handleSubmit} fetchData={fetchRequests} closeAllDialogs={handleCloseAllDialogs} />
                                     </DialogContent>
                                     <DialogActions>
                                         <Button onClick={handleCloseAllDialogs} sx={{ color: "#b48c72", fontSize: '1.3rem' }}>
@@ -337,7 +337,7 @@ const RequestDashboardContent = () => {
                                 <Dialog open={isAssignmentDialogOpen} onClose={handleCloseAllDialogs}>
                                     <DialogTitle align='center' variant='h2' fontWeight={300}>Staffs Assignment</DialogTitle>
                                     <DialogContent>
-                                        <StaffAssignmentForm selectedRequest={selectedRequest} fetchData={fetchRequests} handleCloseAllDialogs={handleCloseAllDialogs} finishAssignment={false}/>
+                                        <StaffAssignmentForm selectedRequest={selectedRequest} fetchData={fetchRequests} handleCloseAllDialogs={handleCloseAllDialogs} finishAssignment={false} />
                                     </DialogContent>
                                     <DialogActions>
                                         <Button onClick={handleCloseAllDialogs} sx={{ fontSize: '1.3rem', color: "#b48c72" }}>
@@ -371,44 +371,210 @@ const RequestDashboardContent = () => {
                     <Typography variant='h3' fontWeight={300} my={2}>Description</Typography>
                     <LargeTypography>{selectedRequest && selectedRequest.request_description}</LargeTypography>
                     <Typography variant='h3' fontWeight={300} my={2}>Jewelry Information</Typography>
-                    {selectedRequest && selectedRequest?.jewelry_id && (
-                        <>
-                            <LargeTypography marginBottom="10px">Name: {selectedRequest?.jewelry_id?.name}</LargeTypography>
-                            <LargeTypography marginBottom="10px">Price: {selectedRequest?.jewelry_id?.price} VND</LargeTypography>
-                            {selectedRequest?.jewelry_id?.gemstone_id && (
-                                <>
-                                    <LargeTypography marginBottom="10px">Gemstone: {selectedRequest?.jewelry_id?.gemstone_id.name}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Carat: {selectedRequest?.jewelry_id?.gemstone_id.carat}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Shape: {selectedRequest?.jewelry_id?.gemstone_id.cut}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Color: {selectedRequest?.jewelry_id?.gemstone_id.color}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Gemstone Clarity: {selectedRequest?.jewelry_id?.gemstone_id.clarity}</LargeTypography>
-                                </>
-                            )}
-                            <LargeTypography marginBottom="10px">Gemstone Weight: {selectedRequest?.jewelry_id?.gemstone_weight} kg</LargeTypography>
-                            {selectedRequest?.jewelry_id?.material_id && (
-                                <>
-                                    <LargeTypography marginBottom="10px">Materials: {selectedRequest?.jewelry_id?.material_id.name}</LargeTypography>
-                                    <LargeTypography marginBottom="10px">Material Carat: {selectedRequest?.jewelry_id?.material_id.carat}</LargeTypography>
-                                </>
-                            )}
-                            <LargeTypography marginBottom="10px">Material Weight: {selectedRequest?.jewelry_id?.material_weight} kg</LargeTypography>
-                            <LargeTypography marginBottom="10px">Category: {selectedRequest?.jewelry_id?.category}</LargeTypography>
-                            <Typography variant='h3' fontWeight={300} my={2}>Images</Typography>
-                            <Grid container spacing={2}>
-                                {selectedRequest?.jewelry_id?.images.map((image, index) => (
-                                    <Grid item xs={4}>
-                                        <CardMedia
-                                            key={index}
-                                            component="img"
-                                            alt="Jewelry"
-                                            image={image}
-                                            sx={{ width: '100%', margin: '0px' }}
-                                        />
-                                    </Grid>
-                                ))}
+                    <Typography sx={{ fontSize: '1.3rem' }} mb={2}>Name: {selectedRequest?.jewelry_id?.name || 'N/A'}</Typography>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><Typography variant="h4">Items</Typography></TableCell>
+                                    <TableCell colSpan={4}><Typography variant="h4" align='center'>Details</Typography></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+
+                                <TableRow>
+                                    <TableCell>
+                                        <Typography variant="h6">Category</Typography>
+                                    </TableCell>
+                                    <TableCell colSpan={4}>
+                                        <LargeTypography variant="body1" align='center'>{selectedRequest?.jewelry_id?.category || '-'}</LargeTypography>
+                                    </TableCell>
+                                </TableRow>
+
+                                {/* Material Section */}
+                                <TableRow>
+                                    <TableCell rowSpan={2}>
+                                        <Typography variant="h6">Material</Typography>
+                                    </TableCell>
+                                    <TableCell colSpan={4}>
+                                        <LargeTypography variant="body1" align='center'>{selectedRequest?.jewelry_id?.material_id?.name || '-'}</LargeTypography>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell>
+                                        <Typography variant="h6">Material Carat</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <LargeTypography variant="body1">{selectedRequest?.jewelry_id?.material_id?.carat || '-'}</LargeTypography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h6">Material Weight</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <LargeTypography variant="body1">{selectedRequest?.jewelry_id ? selectedRequest?.jewelry_id?.material_weight + ' mace' : '-'} </LargeTypography>
+                                    </TableCell>
+                                </TableRow>
+
+                                {/* Gemstone Section */}
+                                {selectedRequest?.jewelry_id?.gemstone_ids && selectedRequest?.jewelry_id?.gemstone_ids.length > 0 && (
+                                    selectedRequest?.jewelry_id?.gemstone_ids.map((gemstone) => (
+                                        <>
+                                            <TableRow>
+                                                <TableCell rowSpan={5}>
+                                                    <Typography variant="h6">Main Gemstone</Typography>
+                                                </TableCell>
+                                                <TableCell colSpan={4}>
+                                                    <LargeTypography variant="body1" align='center'>{gemstone.name || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Carat</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.carat || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Shape</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.cut || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Color</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.color || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Clarity</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.clarity || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Measurements</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.measurements || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Polish</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.polish || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Symmetry</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.symmetry || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Fluorescence</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{gemstone.fluorescence || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                        </>
+                                    ))
+                                )}
+
+                                {/* Subgemstone Section */}
+                                {selectedRequest?.jewelry_id?.subgemstone_ids && selectedRequest?.jewelry_id?.subgemstone_ids.length > 0 && (
+                                    selectedRequest?.jewelry_id?.subgemstone_ids.map((subgemstone) => (
+                                        <>
+                                            <TableRow>
+                                                <TableCell rowSpan={5}>
+                                                    <Typography variant="h6">Sub Gemstone</Typography>
+                                                </TableCell>
+                                                <TableCell colSpan={4}>
+                                                    <LargeTypography variant="body1" align='center'>{subgemstone.name || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Carat</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.carat || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Shape</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.cut || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Color</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.color || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Clarity</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.clarity || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Measurements</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.measurements || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Polish</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.polish || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Symmetry</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.symmetry || '-'}</LargeTypography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Gemstone Fluorescence</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <LargeTypography variant="body1">{subgemstone.fluorescence || '-'}</LargeTypography>
+                                                </TableCell>
+                                            </TableRow>
+                                        </>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Typography variant='h3' fontWeight={300} my={2}>Images</Typography>
+                    <Grid container spacing={2}>
+                        {selectedRequest?.jewelry_id?.images.map((image, index) => (
+                            <Grid item xs={4}>
+                                <CardMedia
+                                    key={index}
+                                    component="img"
+                                    alt="Jewelry"
+                                    image={image}
+                                    sx={{ width: '100%', margin: '0px' }}
+                                />
                             </Grid>
-                        </>
-                    )}
+                        ))}
+                    </Grid>
                     <Typography variant='h3' fontWeight={300} my={2}>Quote Information</Typography>
                     <LargeTypography>Quote Amount: {(selectedRequest && selectedRequest.quote_amount) ? selectedRequest.quote_amount : 'N/A'}</LargeTypography>
                     <LargeTypography>Quote Content: {(selectedRequest && selectedRequest.quote_content) ? selectedRequest.quote_content : 'N/A'}</LargeTypography>

@@ -459,54 +459,6 @@ const getAllCustomers = async (req, res) => {
     }
 }
 
-const getTopSellingGemstones = async (req, res) => {
-    try {
-        const topGemstones = await Request.aggregate([
-            { $match: { request_status: 'completed' } },
-            {
-                $lookup: {
-                    from: 'jewelries',
-                    localField: 'jewelry_id',
-                    foreignField: '_id',
-                    as: 'jewelry'
-                }
-            },
-            { $unwind: '$jewelry' },
-            { $unwind: '$jewelry.gemstone_ids' },
-            {
-                $lookup: {
-                    from: 'gemstones',
-                    localField: 'jewelry.gemstone_ids',
-                    foreignField: '_id',
-                    as: 'gemstone'
-                }
-            },
-            // { $unwind: '$gemstone' },
-            // {
-            //     $group: {
-            //         _id: '$gemstone.name',
-            //         count: { $sum: 1 },
-            //     }
-            // },
-            // {
-            //     $project: {
-            //         _id: 0,
-            //         sales: '$count',
-            //         gemstone: '$_id',
-            //     }
-            // },
-            // { $sort: { count: -1 } },
-            // { $limit: 10 }
-        ]);
-        // console.log(topGemstones)
-        return res.json({ topGemstones });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Error fetching top 10 gemstones' });
-    }
-};
-
-
 const getTopSellingMaterials = async (req, res) => {
     try {
         const topMaterials = await Request.aggregate([
@@ -551,44 +503,27 @@ const getTopSellingMaterials = async (req, res) => {
     }
 };
 
-const getTopSellingJewelry = async (req, res) => {
+const getCategoryCounts = async (req, res) => {
     try {
-        const topJewelries = await Request.aggregate([
-            { $match: { request_status: 'completed' } },
-            { 
-                $lookup: {
-                    from: 'jewelries',
-                    localField: 'jewelry_id',
-                    foreignField: '_id',
-                    as: 'jewelry'
-                }
-            },
-            { $unwind: '$jewelry' },
-            { $match: { 'jewelry.type': 'Sample' } },
+        const jewelryCategories = await Jewelry.aggregate([
             {
                 $group: {
-                    _id: '$jewelry._id',
-                    count: { $sum: 1 },
-                    name: { $first: '$jewelry.name' },
-                    images: { $first: '$jewelry.images' }
+                    _id: '$category',
+                    count: { $sum: 1 }
                 }
             },
-            { $sort: { count: -1 } },
-            { $limit: 10 },
             {
                 $project: {
                     _id: 0,
-                    jewelryId: '$_id',
-                    name: 1,
-                    sales: '$count',
-                    images: 1,
+                    id: '$_id',
+                    value: '$count',
                 }
             }
         ]);
-        res.json({ topJewelries });
+
+        return res.json({ jewelryCategories });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error fetching top 10 jewelries' });
+        return res.json({ error: 'Error fetching categories of jewelry' })
     }
 };
 
@@ -602,7 +537,6 @@ module.exports = {
     getAllCustomers,
     getCurrentTotalRevenue,
     getEmployeeWithMostSales,
-    getTopSellingGemstones,
     getTopSellingMaterials,
-    getTopSellingJewelry,
+    getCategoryCounts,
 };

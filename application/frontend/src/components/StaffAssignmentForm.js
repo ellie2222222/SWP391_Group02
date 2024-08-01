@@ -5,7 +5,7 @@ import { Add, Delete, Edit, Search } from '@mui/icons-material';
 import RequestForm from './RequestForm';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 
 const CustomButton1 = styled(Button)({
@@ -90,6 +90,7 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
     const [assignedStaffs, setAssignedStaffs] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const navigate = useNavigate();
 
     const fetchStaffs = async () => {
         try {
@@ -178,7 +179,9 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
             const rolesInStaffIds = staffIds.map(staff => staff.role);
             const hasAllRoles = requiredRoles.every(role => rolesInStaffIds.includes(role));
             if (hasAllRoles) {
-                await axiosInstance.patch(`/requests/${selectedRequest._id}`, { request_status: 'assigned' })
+                await axiosInstance.patch(`/requests/${selectedRequest._id}`, { 
+                    request_status: 'assigned' 
+                })
 
                 toast.success('Assignment success', {
                     autoClose: 5000, // Auto close after 5 seconds
@@ -196,6 +199,30 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
             }
         } catch (error) {
             toast.error(error.response.data.error || error.message || 'Error finishing assignment', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
+        }
+    }
+
+    const handleReassignStaff = async () => {
+        try {
+            await axiosInstance.patch(`/requests/${selectedRequest._id}`, { 
+                request_status: 'pending' 
+            })
+
+            toast.success('Reassignment success. Redirect to pending request dashboard in 5 seconds.', {
+                autoClose: 5000, // Auto close after 5 seconds
+                closeOnClick: true,
+                draggable: true,
+            });
+
+            setTimeout(() => {
+                navigate('/management/pending-requests')
+            }, 5000)
+        } catch (error) {
+            toast.error(error.response.data.error || error.message || 'Error reassigning', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
                 draggable: true,
@@ -277,13 +304,15 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                                 <Typography variant="h6">Email: {staff.email}</Typography>
                                 <Typography variant="h6">Role: {staff.role && capitalizeWords(staff.role)}</Typography>
                             </CardContent>
-                            <CardActions>
-                                <Button  onClick={() => assignStaff(staff)}>
-                                    <IconButton sx={{ color: '#b48c72' }}>
-                                        <Add fontSize='large'/>
-                                    </IconButton>
-                                </Button>
-                            </CardActions>
+                            {selectedRequest.request_status === 'pending' && (
+                                <CardActions>
+                                    <Button  onClick={() => assignStaff(staff)}>
+                                        <IconButton sx={{ color: '#b48c72' }}>
+                                            <Add fontSize='large'/>
+                                        </IconButton>
+                                    </Button>
+                                </CardActions>
+                            )}
                         </Card>
                     ))}
                     {staffs.length === 0 && (
@@ -322,7 +351,7 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                                 <Typography variant="h6">Email: {staff.staff_id.email}</Typography>
                                 <Typography variant="h6">Role: {staff.role && capitalizeWords(staff.role)}</Typography>
                             </CardContent>
-                            {staff.role !== 'manager' && (
+                            {staff.role !== 'manager' && selectedRequest.request_status === 'pending' && (
                                 <CardActions>
                                     <Button onClick={() => removeStaff(staff.staff_id)}>
                                         <IconButton sx={{ color: '#b48c72' }}>
@@ -340,9 +369,14 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                             </CardContent>
                         </Card>
                     )}
-                    {finishAssignment === true && (
+                    {selectedRequest.request_status === 'pending' && (
                         <CustomButton1 sx={{ mt: 2 }} onClick={handleFinishAssignment}>
                             Finish Assignment
+                        </CustomButton1>
+                    )}
+                    {selectedRequest.request_status !== 'pending' && selectedRequest.request_status !== 'completed' && (
+                        <CustomButton1 sx={{ mt: 2 }} onClick={handleReassignStaff}>
+                            Reassign Staff
                         </CustomButton1>
                     )}
                 </Box>

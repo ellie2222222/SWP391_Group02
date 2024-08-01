@@ -10,6 +10,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import GemstonesBarChart from './GemstonesBarChart';
 import MaterialsBarChart from './MaterialsBarChart';
+import CategoriesPieChart from './CategoriesPieChart';
 
 const CustomFormControl = styled(FormControl)({
   // minWidth: 120,
@@ -53,19 +54,18 @@ const DashboardContent = () => {
   const [recentInvoices, setRecentInvoices] = useState([]);
   const [loadingRevenueGraph, setLoadingRevenueGraph] = useState(false);
   const [loadingRecentInvoices, setLoadingRecentInvoices] = useState(false);
-  const [topSellingGemstones, setTopSellingGemstones] = useState([]);
   const [topSellingMaterials, setTopSellingMaterials] = useState([]);
-  const [topSellingJewelrySamples, setTopSellingJewelrySamples] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  const fetchTopSellingGemstones = async () => {
+  const fetchCategoryCounts = async () => {
     try {
-      const response = await axiosInstance.get("/analytics/top-selling-gemstones");
-      setTopSellingGemstones(response.data.topGemstones);
+      const response = await axiosInstance.get("/analytics/category-counts");
+      setCategories(response.data.jewelryCategories);
     } catch (error) {
 
     }
@@ -75,16 +75,6 @@ const DashboardContent = () => {
     try {
       const response = await axiosInstance.get("/analytics/top-selling-materials");
       setTopSellingMaterials(response.data.topMaterials);
-    } catch (error) {
-
-    }
-  };
-
-  const fetchTopSellingJewelrySamples = async () => {
-    try {
-      const response = await axiosInstance.get("/analytics/top-selling-jewelry-sample");
-      console.log(response.data.topJewelries)
-      setTopSellingJewelrySamples(response.data.topJewelries);
     } catch (error) {
 
     }
@@ -202,9 +192,8 @@ const DashboardContent = () => {
     fetchTotalRequests();
     fetchRecentInvoices();
     fetchTotalRevenue();
-    fetchTopSellingGemstones();
     fetchTopSellingMaterials();
-    fetchTopSellingJewelrySamples();
+    fetchCategoryCounts();
   }, []);
 
 
@@ -495,41 +484,19 @@ const DashboardContent = () => {
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap="20px" mb={3}>
         <Box gridColumn="span 6" gap="2rem" borderRadius="5px" border="2px solid #b48c72" height='500px'>
           <Box py={2}>
-            <Typography variant="h4" align='center'>Top-Selling Gemstones</Typography>
-          </Box>
-          <Box height='90%' width='100%'>
-            <GemstonesBarChart data={topSellingGemstones} />
-          </Box>
-        </Box>
-        <Box gridColumn="span 6" gap="2rem" borderRadius="5px" border="2px solid #b48c72" height='500px'>
-          <Box py={2}>
             <Typography variant="h4" align='center'>Top-Selling Materials</Typography>
           </Box>
           <Box height='90%' width='100%'>
             <MaterialsBarChart data={topSellingMaterials} />
           </Box>
         </Box>
-      </Box>
-      <Box borderRadius="5px" border="2px solid #b48c72">
-        <Box py={2}>
-          <Typography variant="h4" align='center'>Top-Selling Jewelry Sample</Typography>
-        </Box>
-        <Box>
-          {topSellingJewelrySamples.map((jewelry, index) => (
-            <Card key={jewelry.jewelryId} sx={{ display: 'flex', flexDirection: 'column', mb: 2 }}>
-              <CardContent>
-                <Typography variant="h5" fontWeight='300' mb={2}>
-                  {index + 1}. {jewelry.name}: {jewelry.jewelryId}
-                </Typography>
-              </CardContent>
-              <CardMedia
-                component="img"
-                sx={{ width: '500px', margin: '0 auto' }}
-                image={jewelry.images[0] || 'placeholder.jpg'}
-                alt={jewelry.name}
-              />
-            </Card>
-          ))}
+        <Box gridColumn="span 6" gap="2rem" borderRadius="5px" border="2px solid #b48c72" height='500px'>
+          <Box py={2}>
+            <Typography variant="h4" align='center'>Categories</Typography>
+          </Box>
+          <Box height='90%' width='100%'>
+            <CategoriesPieChart data={categories} />
+          </Box>
         </Box>
       </Box>
     </Box>
