@@ -45,6 +45,17 @@ const CustomButton = styled(Button)({
   },
 });
 
+const CustomButton1 = styled(Button)({
+  outlineColor: '#000',
+  backgroundColor: '#EEEEEE',
+  width: '100%',
+  fontSize: '1.3rem',
+  '&:hover': {
+    color: '#b48c72',
+    backgroundColor: 'transparent',
+  },
+});
+
 const StyledDialogTitle = styled(DialogTitle)({
   fontSize: '2rem',
   textAlign: 'center',
@@ -229,9 +240,16 @@ const JewelryDetails = () => {
                 <LargeTypography variant="body1">Lifetime Warranty</LargeTypography>
               </Box>
             </Box>
-            <CustomButton variant="contained" onClick={handleClickOpen}>
+            {product.available ? (
+              <CustomButton variant="contained" onClick={handleClickOpen}>
               CREATE REQUEST NOW
             </CustomButton>
+            ) : (
+              <CustomButton1 disabled>
+              SOLD OUT
+            </CustomButton1>
+            )}
+            
             <Box display="flex" alignItems="center" justifyContent="center" gap='0.5rem'>
               <LargeTypography>
                 Need some help?

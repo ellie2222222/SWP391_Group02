@@ -198,7 +198,7 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                         label="request_status"
                         error={formik.touched.request_status && Boolean(formik.errors.request_status)}
                     >
-                        <CustomMenuItem value="pending">Pending</CustomMenuItem>
+                        <CustomMenuItem value="assigned">Assigned</CustomMenuItem>
                         <CustomMenuItem value="cancelled">Cancelled</CustomMenuItem>
                         <CustomMenuItem value="quote">Quote</CustomMenuItem>
                     </Select>
