@@ -212,16 +212,26 @@ const AdminContent = () => {
         }
     };
 
-    const handleSubmit = async (values,gemstoneValues) => {
-        console.log(gemstoneValues.subgemstone_ids)
+    const handleSubmit = async (values, gemstoneValues) => {
         try {
             setLoading(true);
             const gemstoneIdsToUpdate = [...new Set([...gemstoneValues.gemstone_ids, ...gemstoneValues.subgemstone_ids])];
-            console.log(gemstoneIdsToUpdate)
-            const updateGemstoneRequests = gemstoneIdsToUpdate.map(id => 
+            const gemstoneIdsDefault = [
+                ...new Set([
+                    ...(selectedJewelry?.subgemstone_ids?.map(gem => gem._id) || []),
+                    ...(selectedJewelry?.gemstone_ids?.map(gem => gem._id) || [])
+                ])
+            ];
+            const gemstoneAvailableAgain = gemstoneIdsDefault.filter(id => !gemstoneIdsToUpdate.includes(id));
+
+            console.log(gemstoneAvailableAgain)
+            const updateGemstoneRequests = gemstoneIdsToUpdate.map(id =>
                 axiosInstance.patch(`/gemstones/${id}`, { available: false })
             );
-            await Promise.all([...updateGemstoneRequests]);
+            const updateGemstoneAvailableAgain = gemstoneAvailableAgain.map(id =>
+                axiosInstance.patch(`/gemstones/${id}`, { available: true })
+            );
+            await Promise.all([...updateGemstoneRequests, ...updateGemstoneAvailableAgain]);
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
                 toast.success('Jewelry item updated successfully', {
@@ -458,10 +468,10 @@ const AdminContent = () => {
                         </Typography>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setIsDeleteDialogOpen(false)}  sx={{ color: '#b48c72', fontSize: '1.3rem' }}>
+                        <Button onClick={() => setIsDeleteDialogOpen(false)} sx={{ color: '#b48c72', fontSize: '1.3rem' }}>
                             Cancel
                         </Button>
-                        <Button onClick={handleConfirmDelete}  sx={{ color: '#b48c72', fontSize: '1.3rem' }} autoFocus>
+                        <Button onClick={handleConfirmDelete} sx={{ color: '#b48c72', fontSize: '1.3rem' }} autoFocus>
                             Confirm
                         </Button>
                     </DialogActions>

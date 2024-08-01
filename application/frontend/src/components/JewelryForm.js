@@ -133,7 +133,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
           axiosInstance.get('/gemstones'),
           axiosInstance.get('/materials')
         ]);
-        setGemstones( gemstonesRes.data);
+        setGemstones(gemstonesRes.data);
         setMaterials(materialsRes.data);
       } catch (error) {
         console.error('Failed to fetch options', error);
@@ -188,7 +188,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
         formData.append('removedImages', image);
       });
       try {
-        await onSubmit(formData,values);
+        await onSubmit(formData, values);
         toast.success('Form submitted', {
           autoClose: 5000, // Auto close after 5 seconds
           closeOnClick: true,
@@ -207,19 +207,29 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
   });
 
   useEffect(() => {
-    const gemstone = gemstones.find(g => g._id === formik.values.gemstone_id);
-    if (gemstone) {
-      setGemstonePrice(gemstone?.price);
-    } else {
-      setGemstonePrice(0);
+    const gemstoneIds = formik.values.gemstone_ids;
+    let totalGemstonePrice = 0;
+
+    if (Array.isArray(gemstoneIds) && gemstoneIds.length > 0) {
+      totalGemstonePrice = gemstoneIds.reduce((total, id) => {
+        const gemstone = gemstones.find(g => g._id === id);
+        return gemstone ? total + gemstone.price : total;
+      }, 0);
     }
 
-    const subGemstone = gemstones.find(g => g._id === formik.values.subgemstone_id);
-    if (subGemstone) {
-      setSubGemstonePrice(subGemstone?.price * formik.values.subgemstone_quantity);
-    } else {
-      setSubGemstonePrice(0);
+    setGemstonePrice(totalGemstonePrice);
+
+    const subGemstoneIds = formik.values.subgemstone_ids;
+    let totalSubGemstonePrice = 0;
+
+    if (Array.isArray(subGemstoneIds) && subGemstoneIds.length > 0) {
+      totalSubGemstonePrice = subGemstoneIds.reduce((total, id) => {
+        const gemstone = gemstones.find(g => g._id === id);
+        return gemstone ? total + gemstone.price : total;
+      }, 0);
     }
+
+    setSubGemstonePrice(totalSubGemstonePrice);
 
     const material = materials.find(m => m._id === formik.values.material_id);
     if (material) {
@@ -229,7 +239,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     }
 
     formik.setFieldValue('price', gemstonePrice + subGemstonePrice + materialPrice);
-  }, [formik.values.gemstone_id, formik.values.subgemstone_id, formik.values.subgemstone_quantity, formik.values.material_id, formik.values.material_weight, gemstones, materials, gemstonePrice, subGemstonePrice, materialPrice]);
+  }, [formik.values.gemstone_ids, formik.values.subgemstone_ids, formik.values.material_id, formik.values.material_weight, gemstones, materials, gemstonePrice, subGemstonePrice, materialPrice]);
 
   const handleImageChange = (event) => {
     const files = event.currentTarget.files;
@@ -486,7 +496,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
           </Box>
           <Box>
             <Typography variant="h6" gutterBottom>
-             Sub Gemstones
+              Sub Gemstones
             </Typography>
             {formik.values.subgemstone_ids.map((subGemstoneId, index) => (
               <Box key={index} display="flex" alignItems="center" mb={2}>
