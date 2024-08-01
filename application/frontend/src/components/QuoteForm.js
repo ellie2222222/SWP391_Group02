@@ -250,14 +250,13 @@ export default function QuoteForm({ initialValues, onSubmit }) {
                 <DialogContent>
                     <JewelryForm
                         initialValues={selectedJewelry ? {
-                            ...selectedJewelry,
-                            gemstone_id: selectedJewelry?.gemstone_id?._id,
-                            material_id: selectedJewelry?.material_id?._id
+                            ...selectedJewelry
                         } : {
                             name: '',
                             description: '',
                             price: 0,
-                            gemstone_id: '',
+                            gemstone_ids: [],
+                            subgemstone_ids:[],
                             gemstone_weight: 0,
                             material_id: '',
                             material_weight: 0,

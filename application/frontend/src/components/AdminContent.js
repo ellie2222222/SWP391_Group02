@@ -212,9 +212,26 @@ const AdminContent = () => {
         }
     };
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, gemstoneValues) => {
         try {
             setLoading(true);
+            const gemstoneIdsToUpdate = [...new Set([...gemstoneValues.gemstone_ids, ...gemstoneValues.subgemstone_ids])];
+            const gemstoneIdsDefault = [
+                ...new Set([
+                    ...(selectedJewelry?.subgemstone_ids?.map(gem => gem._id) || []),
+                    ...(selectedJewelry?.gemstone_ids?.map(gem => gem._id) || [])
+                ])
+            ];
+            const gemstoneAvailableAgain = gemstoneIdsDefault.filter(id => !gemstoneIdsToUpdate.includes(id));
+
+            console.log(gemstoneAvailableAgain)
+            const updateGemstoneRequests = gemstoneIdsToUpdate.map(id =>
+                axiosInstance.patch(`/gemstones/${id}`, { available: false })
+            );
+            const updateGemstoneAvailableAgain = gemstoneAvailableAgain.map(id =>
+                axiosInstance.patch(`/gemstones/${id}`, { available: true })
+            );
+            await Promise.all([...updateGemstoneRequests, ...updateGemstoneAvailableAgain]);
             if (selectedJewelry) {
                 await axiosInstance.patch(`/jewelries/${selectedJewelry._id}`, values);
                 toast.success('Jewelry item updated successfully', {
@@ -409,7 +426,7 @@ const AdminContent = () => {
 
                 <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
                     <DialogContent>
-                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_id: '', gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', images: [], available: false, subgemstone_id: '', subgemstone_quantity: 0 }} onSubmit={handleSubmit} />
+                        <JewelryForm initialValues={selectedJewelry || { name: '', description: '', price: 0, gemstone_ids: [], gemstone_weight: 0, material_id: '', material_weight: 0, category: '', type: '', images: [], available: false, subgemstone_ids: [], subgemstone_quantity: 0 }} onSubmit={handleSubmit} />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: "1.3rem", color: "#b48c72" }} disabled={loading}>
@@ -451,10 +468,10 @@ const AdminContent = () => {
                         </Typography>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setIsDeleteDialogOpen(false)}  sx={{ color: '#b48c72', fontSize: '1.3rem' }}>
+                        <Button onClick={() => setIsDeleteDialogOpen(false)} sx={{ color: '#b48c72', fontSize: '1.3rem' }}>
                             Cancel
                         </Button>
-                        <Button onClick={handleConfirmDelete}  sx={{ color: '#b48c72', fontSize: '1.3rem' }} autoFocus>
+                        <Button onClick={handleConfirmDelete} sx={{ color: '#b48c72', fontSize: '1.3rem' }} autoFocus>
                             Confirm
                         </Button>
                     </DialogActions>
