@@ -98,6 +98,7 @@ const JewelryList = () => {
         params: {
           ...Object.fromEntries(searchParams),
           available: true,
+          type: 'Sample',
         },
       });
 

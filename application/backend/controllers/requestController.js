@@ -58,21 +58,22 @@ const getRequests = async (req, res) => {
 
     // Fetch requests with pagination and population
     const requests = await Request.find(query)
-      .skip(skip)
-      .limit(parseInt(limit))
-      .sort({ createdAt: -1 })
-      .populate({
-        path: 'user_id',
-        select: 'email',
-        match: userFilter
-      })
-      .populate({
-        path: 'jewelry_id',
-        populate: [
-          { path: 'material_id' },
-          { path: 'gemstone_id' }
-        ]
-      });
+    .skip(skip)
+    .limit(parseInt(limit))
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'user_id',
+      select: 'email',
+      match: userFilter
+    })
+    .populate({
+      path: 'jewelry_id',
+      populate: [
+        { path: 'material_id' },
+        { path: 'gemstone_ids' },
+        { path: 'subgemstone_ids' }
+      ]
+    });
 
     // Count total requests for pagination
     const totalRequests = await Request.countDocuments(query);
@@ -182,6 +183,12 @@ const createRequest = async (req, res) => {
 
   if (!request_description) {
     return res.status(400).json({ error: "Please provide a description for the request" });
+  }
+  if (request_description.length > 1000) {
+    return res.status(400).json({ error: "Description cannot exceed 1000 characters" });
+  }
+  if (request_description.length < 10) {
+    return res.status(400).json({ error: "Description must be a minimum of 10 characters" });
   }
 
   // Initialize all fields with default or null values
