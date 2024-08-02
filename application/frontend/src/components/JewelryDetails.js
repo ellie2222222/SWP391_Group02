@@ -154,7 +154,6 @@ const JewelryDetails = () => {
         setProduct(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('There was an error fetching the product!', error);
         setLoading(false);
       }
     };
@@ -183,7 +182,6 @@ const JewelryDetails = () => {
         draggable: true,
         });
     } catch (error) {
-      console.error('Error while creating order information!', error);
       toast.error('Failed to create request. Please try again later.', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,

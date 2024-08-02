@@ -21,7 +21,6 @@ const requireAuth = async (req, res, next) => {
         req.id = _id;
         next();
     } catch (error) {
-        console.error('Error verifying token:', error);
         res.status(403).json({ error: 'Request is not authorized' });
     }
 };

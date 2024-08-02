@@ -32,7 +32,6 @@ const BlogDetails = () => {
         setBlog(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('There was an error fetching the blog!', error);
         setLoading(false);
       }
     };
@@ -42,7 +41,6 @@ const BlogDetails = () => {
         const response = await axiosInstance.get('/blogs');
         setBlogs(response.data.blogs);
       } catch (error) {
-        console.error('There was an error fetching the blogs!', error);
       }
     };
 

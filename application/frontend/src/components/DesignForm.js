@@ -92,7 +92,6 @@ export default function DesignForm({ initialValues, onSubmit }) {
             try {
                  await onSubmit(values, formData);
             } catch (error) {
-                console.error(error)
                 toast.error(error)
             }
             setLoading(false);

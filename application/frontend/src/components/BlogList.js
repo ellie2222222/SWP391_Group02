@@ -16,7 +16,6 @@ const BlogLists = () => {
         setBlogsData(response.data); // expecting response.data to be { blogs: [], total: ..., totalPages: ..., currentPage: ... }
         setLoading(false);
       } catch (error) {
-        console.error('There was an error fetching the blogs!', error);
         setLoading(false);
       }
     };

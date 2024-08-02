@@ -91,7 +91,6 @@ const ProfileDetail = () => {
                 setLoading(false);
             } catch (error) {
                 setLoading(false);
-                console.error(error.response?.data?.error || error.message);
                 toast.error('Failed to fetch profile details', {
                     autoClose: 5000, // Auto close after 5 seconds
                     closeOnClick: true,
@@ -123,7 +122,6 @@ const ProfileDetail = () => {
                     draggable: true,
                 });
             } catch (error) {
-                console.error(error.response?.data?.error || error.message);
                 toast.error('Failed to update profile', {   
                     autoClose: 5000, // Auto close after 5 seconds
                     closeOnClick: true,

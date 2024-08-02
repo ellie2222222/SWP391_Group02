@@ -18,7 +18,6 @@ const WarrantyLists = () => {
         setWarranties(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching warranties:', error);
         setLoading(false);
       }
     };

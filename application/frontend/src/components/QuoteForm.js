@@ -168,7 +168,6 @@ export default function QuoteForm({ initialValues, onSubmit }) {
             setSelectedJewelry(response.data);
             setIsJewelryFormOpen(false);
         } catch (error) {
-            console.error('Failed to submit jewelry form', error);
             toast.error(error.response.data.error || 'Jewelry saved fail', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

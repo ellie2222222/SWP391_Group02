@@ -15,7 +15,6 @@ const GoldPrice = () => {
                 let list = response.data.filter((material) => material.name.toLowerCase().includes('gold'))
                 setGoldPrices(list);
             } catch (error) {
-                console.error('Error fetching gold prices:', error);
             } finally {
                 setLoading(false);
             }

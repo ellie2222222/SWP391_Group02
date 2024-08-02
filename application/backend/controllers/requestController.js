@@ -110,7 +110,6 @@ const getRequest = async (req, res) => {
 
     res.status(200).json(request);
   } catch (error) {
-    console.error('Error fetching request:', error);
     res.status(500).json({ error: "An error occurred while fetching request" });
   }
 };
@@ -150,7 +149,6 @@ const getUserRequests = async (req, res) => {
       currentPage: parseInt(page),
     });
   } catch (error) {
-    console.error('Error fetching request:', error);
     res.status(500).json({ error: "An error occurred while fetching your requests" });
   }
 };
@@ -176,7 +174,6 @@ const getUserRequest = async (req, res) => {
 
     res.status(200).json(requests);
   } catch (error) {
-    console.error('Error fetching request:', error);
     res.status(500).json({ error: "An error occurred while fetching your requests" });
   }
 };
@@ -237,7 +234,6 @@ const createRequest = async (req, res) => {
 
     res.status(201).json(request);
   } catch (error) {
-    console.error('Error creating request:', error);
     res.status(500).json({ error: "Error while creating request" });
   }
 };
@@ -388,7 +384,6 @@ const updateRequest = async (req, res) => {
 
     res.status(200).json({ message: "Update successfully", updatedRequest });
   } catch (error) {
-    console.error('Error updating request:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -435,7 +430,6 @@ const createOrderRequest = async (req, res) => {
     const request = await Request.create(newRequest);
     res.status(201).json(request);
   } catch (error) {
-    console.error('Error creating order request:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -475,7 +469,6 @@ const userFeedbackQuote = async (req, res) => {
 
     res.status(200).json({ message: "Feedback updated successfully", updatedRequest });
   } catch (error) {
-    console.error('Error updating request:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -514,7 +507,6 @@ const managerFeedbackQuote = async (req, res) => {
 
     res.status(200).json({ message: "Feedback updated successfully", updatedRequest });
   } catch (error) {
-    console.error('Error updating request:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -554,7 +546,6 @@ const userFeedbackDesign = async (req, res) => {
 
     res.status(200).json({ message: "Feedback updated successfully", updatedRequest });
   } catch (error) {
-    console.error('Error updating request:', error);
     res.status(500).json({ error: error.message });
   }
 };

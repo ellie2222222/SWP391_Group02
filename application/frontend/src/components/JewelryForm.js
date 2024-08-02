@@ -135,7 +135,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
         setGemstones(gemstonesRes.data);
         setMaterials(materialsRes.data);
       } catch (error) {
-        console.error('Failed to fetch options', error);
       }
     };
 
@@ -194,7 +193,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
           draggable: true,
         })
       } catch (error) {
-        console.error(error)
         toast.error(error, {
           autoClose: 5000, // Auto close after 5 seconds
           closeOnClick: true,

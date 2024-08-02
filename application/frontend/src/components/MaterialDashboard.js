@@ -59,7 +59,6 @@ export default function MaterialDashboard() {
             const response = await axiosInstance.get('/materials');
             setMaterials(response.data);
         } catch (error) {
-            console.error("There was an error fetching the materials!", error);
             toast.error('Fetch material fail', {
                 autoClose: 5000,
                 closeOnClick: true,
@@ -83,7 +82,6 @@ export default function MaterialDashboard() {
                 draggable: true,
             });
         } catch (error) {
-            console.error('Error deleting material:', error);
             toast.error('Delete material fail', {
                 autoClose: 5000,
                 closeOnClick: true,
@@ -115,7 +113,6 @@ export default function MaterialDashboard() {
                 draggable: true,
             });
         } catch (error) {
-            console.error("There was an error saving the material!", error);
             toast.error('Fail', {
                 autoClose: 5000,
                 closeOnClick: true,

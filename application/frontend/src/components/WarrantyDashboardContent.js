@@ -86,7 +86,6 @@ export default function WarrantyDashboardContent() {
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total)
         } catch (error) {
-            console.error("There was an error fetching the requests!", error);
             toast.error('There was an error fetching the requests!', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
@@ -108,7 +107,6 @@ export default function WarrantyDashboardContent() {
             });
             fetchRequests();
         } catch (error) {
-            console.error('Error while updating warranty', error)
             toast.success('Update warranty fail', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

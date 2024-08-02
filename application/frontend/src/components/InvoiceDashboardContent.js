@@ -104,7 +104,6 @@ const InvoiceDashboardContent = () => {
             setTotal(response.data.totalInvoices);
             setTotalPages(response.data.totalPages);
         } catch (error) {
-            console.error(error)
             toast.error("There was an error fetching invoices!", {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

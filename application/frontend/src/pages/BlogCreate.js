@@ -81,7 +81,6 @@ const BlogCreate = () => {
             setTotal(response.data.total);
             setTotalPages(response.data.totalPages);
         } catch (error) {
-            console.error("There was an error fetching the blogs!", error);
             toast.error('There was an error fetching blogs', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
@@ -142,7 +141,6 @@ const BlogCreate = () => {
                 draggable: true,
             })
         } catch (error) {
-            console.error('Error deleting blog:', error);
             toast.error('Failed to delete blog post', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
@@ -178,7 +176,6 @@ const BlogCreate = () => {
             fetchBlogs();
             setIsDialogOpen(false);
         } catch (error) {
-            console.error("There was an error saving the blog!", error);
             toast.error("There was an error saving the blog!", {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

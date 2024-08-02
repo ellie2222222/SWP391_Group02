@@ -120,7 +120,6 @@ const StaffsDashboardContent = () => {
             setTotal(response.data.total);
             setTotalPages(response.data.totalPages);
         } catch (error) {
-            console.error("There was an error fetching the users!", error);
         }
     };
 
@@ -182,7 +181,6 @@ const StaffsDashboardContent = () => {
                 draggable: true,
             })
         } catch (error) {
-            console.error("There was an error saving the user!", error);
             toast.error('Failed to update user. Please try again.', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

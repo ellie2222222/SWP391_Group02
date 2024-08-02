@@ -116,7 +116,6 @@ const AdminContent = () => {
             setTotal(response.data.total);
             setTotalPages(response.data.totalPages);
         } catch (error) {
-            console.error("There was an error fetching the jewelries!", error);
         }
     };
 
@@ -201,7 +200,6 @@ const AdminContent = () => {
                 draggable: true,
             });
         } catch (error) {
-            console.error('Error deleting jewelry:', error);
             toast.error('Failed to delete jewelry item', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
@@ -250,7 +248,6 @@ const AdminContent = () => {
             fetchJewelries();
             setIsDialogOpen(false);
         } catch (error) {
-            console.error("There was an error saving the jewelry!", error);
             toast.error(error.response?.data?.error || error.message, {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
