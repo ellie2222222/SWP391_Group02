@@ -147,7 +147,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
       available: initialValues.available ?? false,
       gemstone_ids: initialValues.gemstone_ids.length > 0 ? initialValues.gemstone_ids.map(gem => gem._id) : [], // Changed from gemstone_id to gemstone_ids
       subgemstone_ids: initialValues.subgemstone_ids.length > 0 ? initialValues.subgemstone_ids.map(subgem => subgem._id) : [],
-      subgemstone_quantity: initialValues.subgemstone_quantity ?? 0,
       material_id: initialValues.material_id?._id || '',
     },
     validationSchema: Yup.object({
@@ -156,11 +155,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
       price: Yup.number().required("Required.").typeError("Must be a number"),
       gemstone_ids: Yup.array().of(Yup.string()).nullable(),
       subgemstone_ids: Yup.array().of(Yup.string()).nullable(),
-      subgemstone_quantity: Yup.number()
-        .typeError("Must be a number")
-        .integer("Must be an integer")
-        .min(0, "Must be a natural number")
-        .nullable(),
       material_id: Yup.string().required("Required."),
       material_weight: Yup.number().required("Required.").typeError("Must be a number"),
       category: Yup.string().required("Required."),
