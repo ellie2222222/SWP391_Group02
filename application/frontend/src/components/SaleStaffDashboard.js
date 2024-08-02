@@ -82,6 +82,7 @@ export default function SaleStaffDashboard() {
             const response = await axiosInstance.get('/requests', {
                 params: {
                     ...Object.fromEntries(searchParams),
+                    request_status: 'assigned',
                 },
             });
             setRequests(response.data.requests);
