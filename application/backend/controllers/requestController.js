@@ -33,19 +33,11 @@ const getRequests = async (req, res) => {
     }
 
     // Role-based query adjustments
-    if (role === "sale_staff") {
-      query.$or = [
-        { request_status: "assigned" },
-        { request_status: "warranty" }
-      ];
-    } else if (role === "design_staff") {
+    if (role === "design_staff") {
       query.request_status = "design";
     } else if (role === "production_staff") {
       query.request_status = "production";
     }
-    // else if (role === "manager") {
-    //   query.request_status = { $ne: 'pending' };
-    // }
 
     if (role !== 'manager') {
       // Fetch associated WorksOn entries for the user
