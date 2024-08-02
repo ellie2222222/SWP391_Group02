@@ -296,19 +296,29 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);
     const selectedSubGemstoneIds = formik.values.subgemstone_ids.map(gem => gem);
     const allSelectedIds = new Set([...selectedGemstoneIds, ...selectedSubGemstoneIds]);
-
-    // Keep track of the previous selection
-    const previouslySelectedGemstone = formik.values.gemstone_ids[index];
-
+    const gemstoneIdsDefault = [
+      ...new Set([
+          ...(initialValues?.subgemstone_ids?.map(gem => gem._id) || []),
+          ...(initialValues?.gemstone_ids?.map(gem => gem._id) || [])
+      ])
+    ];
+    const gemstoneAvailableAgain = gemstoneIdsDefault.filter(id => !allSelectedIds.has(id));
+    console.log(gemstoneAvailableAgain)
     return gemstones.filter(gem =>
-      (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === previouslySelectedGemstone
-    );
+      (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === formik.values.gemstone_ids[index] || gemstoneAvailableAgain.includes(gem._id));
   };
   const getFilteredSubGemstones = (index) => {
     const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);
     const selectedSubGemstoneIds = formik.values.subgemstone_ids.map(gem => gem);
     const allSelectedIds = new Set([...selectedGemstoneIds, ...selectedSubGemstoneIds]);
-    return gemstones.filter(gem => (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === formik.values.subgemstone_ids[index]);
+    const gemstoneIdsDefault = [
+      ...new Set([
+          ...(initialValues?.subgemstone_ids?.map(gem => gem._id) || []),
+          ...(initialValues?.gemstone_ids?.map(gem => gem._id) || [])
+      ])
+    ];
+    const gemstoneAvailableAgain = gemstoneIdsDefault.filter(id => !allSelectedIds.has(id));
+    return gemstones.filter(gem => (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === formik.values.subgemstone_ids[index] || gemstoneAvailableAgain.includes(gem._id));
   };
   const handleAddGemstone = () => {
     formik.setFieldValue('gemstone_ids', [...formik.values.gemstone_ids, '']); // Add a new empty field
@@ -329,6 +339,7 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
   };
 
   const handleSubGemstoneChange = (index, value) => {
+    console.log(index)
     const updatedSubGemstoneIds = [...formik.values.subgemstone_ids];
     updatedSubGemstoneIds[index] = value;
     formik.setFieldValue('subgemstone_ids', updatedSubGemstoneIds);

@@ -132,7 +132,6 @@ export default function QuoteForm({ initialValues, onSubmit }) {
     }, [selectedJewelry, formik.values.production_cost]);
 
     const handleJewelryFormSubmit = async (values,gemstoneValues) => {
-        console.log(formik.values)
         try {
             let response;
             if (selectedJewelry) {
