@@ -158,6 +158,26 @@ const RequestList = () => {
       });
     }
   };
+  const handleCancelledRequest = async (requestId) => {
+    try {
+      await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'cancelled' });
+      setError('');
+      fetchRequests(page);
+      toast.success('Cancel request successfully', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
+    } catch (error) {
+      if (error.response === undefined) setError(error.message);
+      else setError(error.response.data.error);
+      toast.error('Cancel request quote fail', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
+    }
+  };
   const handleAcceptDesignRequest = async (requestId) => {
     try {
       await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit_production' });
@@ -390,6 +410,7 @@ const RequestList = () => {
             </CardContent>
             <CardActions>
               <CustomButton1 onClick={() => handleDetailsDialog(request)}>View Detail</CustomButton1>
+              <CustomButton1 onClick={() => handleCancelledRequest(request._id)} >Cancel Request</CustomButton1>
               {request.request_status === 'completed' && (
                 <CustomButton1 onClick={() => handleWarrantyDialog(request)}>
                   Warranty Detail
