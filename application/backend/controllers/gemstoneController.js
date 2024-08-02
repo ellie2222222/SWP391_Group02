@@ -35,9 +35,6 @@ const getGemstones = async (req, res) => {
 
         res.status(200).json(gemstones);
     } catch (error) {
-        console.error('Error fetching gemstones:', error);
-
-        // Return an error message in the response with status 500 (Internal Server Error)
         res.status(500).json({ error: 'An error occurred while fetching gemstones' });
     }
 };
@@ -59,7 +56,6 @@ const getGemstone = async (req, res) => {
 
         res.status(200).json(gemstone)
     } catch (error) {
-        console.error('Error fetching gemstone:', error);
         res.status(500).json({ error: 'An error occurred while fetching gemstone' });
     }
 
@@ -175,7 +171,6 @@ const createGemstone = async (req, res) => {
                 const result = await new Promise((resolve, reject) => {
                     cloudinary.uploader.upload_stream({ folder: 'certificate' }, (error, result) => {
                         if (error) {
-                            console.error('Upload Error:', error);
                             reject(error);
                         } else {
                             resolve(result);
@@ -186,7 +181,6 @@ const createGemstone = async (req, res) => {
                 certificate_image = result.secure_url;
                 certificate_image_public_ids = result.public_id;
             } catch (uploadError) {
-                console.error('Error uploading to Cloudinary:', uploadError);
                 return res.status(500).json({ error: 'Error uploading certificate image' });
             }
         }
@@ -211,8 +205,7 @@ const createGemstone = async (req, res) => {
         const savedGemstone = await newGemstone.save();
         res.status(201).json(savedGemstone);
     } catch (error) {
-        console.error('Error while creating Gemstone', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Error while creating gemstone' });
     }
 };
 
@@ -304,7 +297,6 @@ const deleteGemstone = async (req, res) => {
 
         res.status(200).json({ message: 'Gemstone deleted successfully', gemstone });
     } catch (error) {
-        console.error('Error details:', error); // Enhanced logging
         res.status(500).json({ error: 'An error occurred while deleting the gemstone', details: error.message });
     }
 };

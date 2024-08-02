@@ -45,7 +45,6 @@ const RequestDetails = () => {
                 setError('')
                 setLoading(false);
             } catch (error) {
-                console.error('There was an error fetching request!', error);
                 setLoading(false);
                 if (error.response === undefined) setError(error.message);
                 else setError(error.response.data.error)

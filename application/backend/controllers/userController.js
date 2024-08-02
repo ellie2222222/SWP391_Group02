@@ -73,7 +73,6 @@ const deleteUser = async (req, res) => {
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    console.error('Error deleting user:', error);
     res.status(500).json({ error: "An error occurred while deleting the user" });
   }
 };
@@ -97,7 +96,6 @@ const updateUser = async (req, res) => {
 
     res.status(200).json({ user });
   } catch (error) {
-    console.error('Error updating user:', error);
     res.status(500).json({ error: "An error occurred while updating the user" });
   }
 };
@@ -137,7 +135,6 @@ const assignRole = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    console.error('Error assigning role:', error);
     return res.status(500).json({ error: "An error occurred while assigning the role" });
   }
 };
@@ -321,13 +318,11 @@ const forgotPassword = async (req, res) => {
 
     transporter.sendMail(mailOptions, (error, response) => {
       if (error) {
-        console.error('Error sending email:', error);
         return res.status(500).json({ message: 'Error sending email' });
       }
       res.status(200).json({ message: 'Email sent successfully' });
     });
   } catch (err) {
-    console.error('Server error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };

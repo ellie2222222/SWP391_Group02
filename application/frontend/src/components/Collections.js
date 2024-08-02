@@ -57,7 +57,6 @@ const Collections = () => {
         setProducts(seasonalProducts);
         setLoading(false);
       } catch (error) {
-        console.error('There was an error fetching the products!', error);
         setLoading(false);
       }
     };

@@ -87,7 +87,6 @@ export default function QuotedRequestDashBoard() {
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total)
         } catch (error) {
-            console.error("There was an error fetching the requests!", error);
             toast.error('There was an error fetching the requests!', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

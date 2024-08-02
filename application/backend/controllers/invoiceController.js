@@ -93,7 +93,6 @@ const createInvoice = async (req, res) => {
 
         res.status(201).json({ invoice, updatedRequest });
     } catch (error) {
-        console.error('Error creating invoice:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -149,7 +148,6 @@ const getInvoiceByRequestId = async (req, res) => {
 
         res.json({ invoice });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'Error while retrieving invoice' });
     }
 };

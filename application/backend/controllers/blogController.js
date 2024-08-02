@@ -50,7 +50,6 @@ const createBlog = async (req, res) => {
                 return new Promise((resolve, reject) => {
                     const uploadStream = cloudinary.uploader.upload_stream({ folder: 'blogs' }, (error, result) => {
                         if (error) {
-                            console.error('Upload Error:', error); // Log upload errors
                             reject(error);
                         } else {
                             blog_images.push(result.secure_url);
@@ -76,7 +75,6 @@ const createBlog = async (req, res) => {
         const savedBlog = await newBlog.save();
         res.status(201).json(savedBlog);
     } catch (error) {
-        console.error('Server Error:', error); // Log server errors
         res.status(500).json({ error: error.message });
     }
 };
@@ -142,7 +140,6 @@ const updateBlog = async (req, res) => {
   
       return res.json({ message: 'Blog updated successfully' });
     } catch (err) {
-      console.error(err);
       return res.status(500).json({ error: 'Server error' });
     }
   };

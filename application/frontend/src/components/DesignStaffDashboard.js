@@ -75,7 +75,6 @@ export default function DesignStaffDashboard() {
             setTotal(response.data.total)
             setRequests(response.data.requests);
         } catch (error) {
-            console.error("There was an error fetching the requests!", error);
             toast.error('There was an error fetching the requests!', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
@@ -100,7 +99,6 @@ export default function DesignStaffDashboard() {
             }); 
             fetchRequests();
         } catch (error) {
-            console.error('Error while updating design', error);
             toast.error('Design update fail', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

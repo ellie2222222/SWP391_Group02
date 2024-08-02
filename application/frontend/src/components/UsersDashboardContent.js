@@ -112,7 +112,6 @@ const UserDashboardContent = () => {
             setUsers(response.data.users);
             setTotalPages(response.data.totalPages);
         } catch (error) {
-            console.error("There was an error fetching the users!", error);
         }
     };
 
@@ -170,7 +169,6 @@ const UserDashboardContent = () => {
             setIsDialogOpen(false);
             toast.success('User updated successfully!');
         } catch (error) {
-            console.error("There was an error saving the user!", error);
             toast.error('Failed to update user. Please try again.');
         }
     };

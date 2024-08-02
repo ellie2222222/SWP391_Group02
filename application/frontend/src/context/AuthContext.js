@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
                     }
                 }
             } catch (error) {
-                console.error('Error checking auth:', error);
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -46,7 +45,6 @@ export const AuthProvider = ({ children }) => {
                     setUser(null);
                 }
             } catch (error) {
-                console.error('Error refreshing token:', error);
                 setUser(null);
             }
         };
@@ -78,7 +76,6 @@ export const AuthProvider = ({ children }) => {
             setUser({ ...decoded, token });
             return decoded.role;
         } catch (error) {
-            console.error('Login error:', error);
             throw error;
         }
     };
@@ -106,7 +103,6 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem('token'); // Remove the token from local storage
             setUser(null);
         } catch (error) {
-            console.error('Logout error:', error);
         }
     };
 

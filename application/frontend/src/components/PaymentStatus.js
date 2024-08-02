@@ -54,7 +54,6 @@ const PaymentStatus = () => {
         });
       }
     } catch (error) {
-      console.error('There was an error processing order status', error);
       setError('There was an error getting order status');
       setLoading(false);
     }

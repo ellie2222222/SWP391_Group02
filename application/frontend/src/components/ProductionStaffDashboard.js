@@ -75,7 +75,6 @@ export default function ProductionStaffDashboard() {
             setTotal(response.data.total)
             setRequests(response.data.requests);
         } catch (error) {
-            console.error("There was an error fetching the requests!", error);
             toast.error('There was an error fetching the requests!', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
@@ -100,7 +99,6 @@ export default function ProductionStaffDashboard() {
                 closeOnClick: true,
                 draggable: true,
             })
-            console.error(error.response ? error.response.data.error : error.message);
         }
     };
 

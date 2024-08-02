@@ -44,7 +44,6 @@ const getMaterials = async (req, res) => {
         const materials = await Material.find(query);
         res.status(200).json(materials);
     } catch (error) {
-        console.error('Error fetching materials:', error);
         res.status(500).json({ error: 'An error occurred while fetching materials' });
     }
 };
@@ -64,7 +63,6 @@ const getMaterial = async (req, res) => {
         }
         res.status(200).json(material);
     } catch (error) {
-        console.error('Error fetching material:', error);
         res.status(500).json({ error: 'An error occurred while fetching the material' });
     }
 };
@@ -86,7 +84,6 @@ const createMaterial = async (req, res) => {
         const material = await Material.create(req.body);
         res.status(201).json(material);
     } catch (error) {
-        console.error('Error creating material:', error);
         res.status(500).json({ error: 'An error occurred while creating the material' });
     }
 };
@@ -106,7 +103,6 @@ const deleteMaterial = async (req, res) => {
         }
         res.status(200).json(material);
     } catch (error) {
-        console.error('Error deleting material:', error);
         res.status(500).json({ error: 'An error occurred while deleting the material' });
     }
 };
@@ -138,7 +134,6 @@ const updateMaterial = async (req, res) => {
 
         res.status(200).json(material);
     } catch (error) {
-        console.error('Error updating material:', error);
         res.status(500).json({ error: 'An error occurred while updating the material' });
     }
 };

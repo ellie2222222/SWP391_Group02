@@ -108,7 +108,6 @@ export default function GemstonesDashboard() {
             const response = await axiosInstance.get(`/gemstones?search=${search}&cut=${cut}&clarity=${clarity}&color=${color}&polish=${polish}&symmetry=${symmetry}&fluorescence=${fluorescence}`);
             setGemstones(response.data);
         } catch (error) {
-            console.error("There was an error fetching the gemstones!", error);
             toast.error('Fetch gemstone fail', {
                 autoClose: 5000,
                 closeOnClick: true,
@@ -132,7 +131,6 @@ export default function GemstonesDashboard() {
                 draggable: true,
             });
         } catch (error) {
-            console.error('Error deleting gemstone:', error);
             toast.error('Delete gemstone fail', {
                 autoClose: 5000,
                 closeOnClick: true,
@@ -164,7 +162,6 @@ export default function GemstonesDashboard() {
                 draggable: true,
             });
         } catch (error) {
-            console.error("There was an error saving the gemstone!", error);
             toast.error('Save gemstone fail', {
                 autoClose: 5000,
                 closeOnClick: true,

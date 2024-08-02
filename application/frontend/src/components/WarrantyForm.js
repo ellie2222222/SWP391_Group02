@@ -83,7 +83,6 @@ const WarrantyForm = ({ initialValues, onSubmit }) => {
                     setWarrantyStartDate(format(parseISO(invoice.createdAt), 'yyyy-MM-dd'));
                 }
             } catch (error) {
-                console.error('Error while fetching invoice', error);
                 toast.error('Error while fetching invoice', {
                     autoClose: 5000, // Auto close after 5 seconds
                     closeOnClick: true,

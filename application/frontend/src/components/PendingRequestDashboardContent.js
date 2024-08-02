@@ -126,7 +126,6 @@ const PendingRequestDashboardContent = () => {
             setTotalPages(response.data.totalPages);
             setTotal(response.data.total)
         } catch (error) {
-            console.error("There was an error fetching the requests!", error);
             toast.error('There was an error fetching the requests!', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,
@@ -161,7 +160,6 @@ const PendingRequestDashboardContent = () => {
             handleCloseAllDialogs();
             fetchRequests();
         } catch (error) {
-            console.error("There was an error saving the request!", error);
             toast.error(error.response?.data?.error || error.message, {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

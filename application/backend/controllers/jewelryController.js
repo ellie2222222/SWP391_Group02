@@ -119,7 +119,6 @@ const createJewelry = async (req, res) => {
                 return new Promise((resolve, reject) => {
                     const uploadStream = cloudinary.uploader.upload_stream({ folder: 'jewelry' }, (error, result) => {
                         if (error) {
-                            console.error('Upload Error:', error);
                             reject(error);
                         } else {
                             images.push(result.secure_url);
@@ -157,7 +156,6 @@ const createJewelry = async (req, res) => {
 
         res.status(201).json(populatedJewelry);
     } catch (error) {
-        console.error('Error while creating jewelry', error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -247,8 +245,7 @@ const updateJewelry = async (req, res) => {
             .populate('subgemstone_ids');
         res.status(200).json(updatedJewelry);
     } catch (error) {
-        console.error('Error while updating jewelry', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Error while updating jewelry' });
     }
 };
 
@@ -272,8 +269,7 @@ const updateJewelryAvailability = async (req, res) => {
 
         res.status(200).json(updatedJewelry);
     } catch (error) {
-        console.error('Error while updating jewelry availability', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Error while updating jewelry availability' });
     }
 };
 

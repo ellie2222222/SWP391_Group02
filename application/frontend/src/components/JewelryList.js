@@ -106,7 +106,6 @@ const JewelryList = () => {
       setTotal(response.data.total)
       setTotalPages(response.data.totalPages);
     } catch (error) {
-      console.error('There was an error fetching products!', error);
       toast.error('There was an error fetching products!', {
         autoClose: 5000, // Auto close after 5 seconds
         closeOnClick: true,
