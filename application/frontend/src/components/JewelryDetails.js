@@ -146,18 +146,16 @@ const JewelryDetails = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ description: '' });
-
+  const fetchJewelry = async () => {
+    try {
+      const response = await axiosInstance.get(`/jewelries/${id}`);
+      setProduct(response.data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchJewelry = async () => {
-      try {
-        const response = await axiosInstance.get(`/jewelries/${id}`);
-        setProduct(response.data);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
-    };
-
     fetchJewelry();
   }, [id]);
 
@@ -187,7 +185,8 @@ const JewelryDetails = () => {
         closeOnClick: true,
         draggable: true,
         });
-    }
+    };
+    fetchJewelry();
   };
 
   const handleClickOpen = () => {

@@ -158,6 +158,26 @@ const RequestList = () => {
       });
     }
   };
+  const handleCancelledRequest = async (requestId) => {
+    try {
+      await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'cancelled' });
+      setError('');
+      fetchRequests(page);
+      toast.success('Cancel request successfully', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
+    } catch (error) {
+      if (error.response === undefined) setError(error.message);
+      else setError(error.response.data.error);
+      toast.error('Cancel request quote fail', {
+        autoClose: 5000, // Auto close after 5 seconds
+        closeOnClick: true,
+        draggable: true,
+      });
+    }
+  };
   const handleAcceptDesignRequest = async (requestId) => {
     try {
       await axiosInstance.patch(`/requests/${requestId}`, { request_status: 'deposit_production' });
@@ -390,6 +410,7 @@ const RequestList = () => {
             </CardContent>
             <CardActions>
               <CustomButton1 onClick={() => handleDetailsDialog(request)}>View Detail</CustomButton1>
+              <CustomButton1 onClick={() => handleCancelledRequest(request._id)} >Cancel Request</CustomButton1>
               {request.request_status === 'completed' && (
                 <CustomButton1 onClick={() => handleWarrantyDialog(request)}>
                   Warranty Detail
@@ -839,6 +860,44 @@ const RequestList = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+              {selectedRequest.jewelry_id && selectedRequest.jewelry_id.gemstone_ids && (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 2 }}>
+                  {selectedRequest.jewelry_id.gemstone_ids.map((gemstone, index) => (
+                    <Card key={index} sx={{ maxWidth: 1000, m: 1 }}>
+                      <CardMedia
+                        component="img"
+                        height="600"
+                        image={gemstone.certificate_image}
+                        alt={`Gemstone Certificate ${index + 1}`}
+                      />
+                      <Box sx={{ p: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Certificate of {gemstone.name}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  ))}
+                </Box>
+              )}
+               {selectedRequest.jewelry_id && selectedRequest.jewelry_id.subgemstone_ids && (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 2 }}>
+                  {selectedRequest.jewelry_id.subgemstone_ids.map((gemstone, index) => (
+                    <Card key={index} sx={{ maxWidth: 1000, m: 1 }}>
+                      <CardMedia
+                        component="img"
+                        height="600"
+                        image={gemstone.certificate_image}
+                        alt={`Gemstone Certificate ${index + 1}`}
+                      />
+                      <Box sx={{ p: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Certificate of {gemstone.name}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  ))}
+                </Box>
+              )}
             </Box>
           </DialogContent>
           <DialogActions>
