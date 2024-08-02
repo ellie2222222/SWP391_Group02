@@ -125,7 +125,6 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
   const [open, setOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
-
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -299,7 +298,13 @@ const JewelryForm = ({ initialValues, onSubmit }) => {
     const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);
     const selectedSubGemstoneIds = formik.values.subgemstone_ids.map(gem => gem);
     const allSelectedIds = new Set([...selectedGemstoneIds, ...selectedSubGemstoneIds]);
-    return gemstones.filter(gem => (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === formik.values.gemstone_ids[index]);
+
+    // Keep track of the previous selection
+    const previouslySelectedGemstone = formik.values.gemstone_ids[index];
+
+    return gemstones.filter(gem =>
+      (gem.available === true && !allSelectedIds.has(gem._id)) || gem._id === previouslySelectedGemstone
+    );
   };
   const getFilteredSubGemstones = (index) => {
     const selectedGemstoneIds = formik.values.gemstone_ids.map(gem => gem);

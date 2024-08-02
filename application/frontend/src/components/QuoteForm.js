@@ -131,7 +131,8 @@ export default function QuoteForm({ initialValues, onSubmit }) {
         }
     }, [selectedJewelry, formik.values.production_cost]);
 
-    const handleJewelryFormSubmit = async (values) => {
+    const handleJewelryFormSubmit = async (values,gemstoneValues) => {
+        console.log(formik.values)
         try {
             let response;
             if (selectedJewelry) {
@@ -141,6 +142,23 @@ export default function QuoteForm({ initialValues, onSubmit }) {
             }
 
             setJewelryId(response.data._id);
+            const gemstoneIdsToUpdate = [...new Set([...gemstoneValues.gemstone_ids, ...gemstoneValues.subgemstone_ids])];
+            const gemstoneIdsDefault = [
+                ...new Set([
+                    ...(selectedJewelry?.subgemstone_ids?.map(gem => gem._id) || []),
+                    ...(selectedJewelry?.gemstone_ids?.map(gem => gem._id) || [])
+                ])
+            ];
+            const gemstoneAvailableAgain = gemstoneIdsDefault.filter(id => !gemstoneIdsToUpdate.includes(id));
+
+            console.log(gemstoneAvailableAgain)
+            const updateGemstoneRequests = gemstoneIdsToUpdate.map(id =>
+                axiosInstance.patch(`/gemstones/${id}`, { available: false })
+            );
+            const updateGemstoneAvailableAgain = gemstoneAvailableAgain.map(id =>
+                axiosInstance.patch(`/gemstones/${id}`, { available: true })
+            );
+            await Promise.all([...updateGemstoneRequests, ...updateGemstoneAvailableAgain]);
             toast.success('Jewelry saved successfully', {
                 autoClose: 5000, // Auto close after 5 seconds
                 closeOnClick: true,

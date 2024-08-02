@@ -169,22 +169,6 @@ const JewelryDetails = () => {
     }
 
     try {
-      const newJewelryResponse = await axiosInstance.post('/jewelries', {
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        gemstone_id: product?.gemstone_id?._id ?? '',
-        category: product.category,
-        material_id: product.material_id._id,
-        material_weight: product.material_weight,
-        type: 'Custom',
-        available: false,
-        subgemstone_id: product?.subgemstone_id?._id ?? '',
-        subgemstone_quantity: product.subgemstone_quantity,
-        images: product.images
-
-      });
-      const newJewelryId = newJewelryResponse.data._id;
       await axiosInstance.post('/requests/order-requests', {
         jewelry_id: product._id,
         ...formData
