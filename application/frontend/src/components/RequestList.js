@@ -839,6 +839,44 @@ const RequestList = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+              {selectedRequest.jewelry_id && selectedRequest.jewelry_id.gemstone_ids && (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 2 }}>
+                  {selectedRequest.jewelry_id.gemstone_ids.map((gemstone, index) => (
+                    <Card key={index} sx={{ maxWidth: 1000, m: 1 }}>
+                      <CardMedia
+                        component="img"
+                        height="600"
+                        image={gemstone.certificate_image}
+                        alt={`Gemstone Certificate ${index + 1}`}
+                      />
+                      <Box sx={{ p: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Certificate of {gemstone.name}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  ))}
+                </Box>
+              )}
+               {selectedRequest.jewelry_id && selectedRequest.jewelry_id.subgemstone_ids && (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', mt: 2 }}>
+                  {selectedRequest.jewelry_id.subgemstone_ids.map((gemstone, index) => (
+                    <Card key={index} sx={{ maxWidth: 1000, m: 1 }}>
+                      <CardMedia
+                        component="img"
+                        height="600"
+                        image={gemstone.certificate_image}
+                        alt={`Gemstone Certificate ${index + 1}`}
+                      />
+                      <Box sx={{ p: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Certificate of {gemstone.name}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  ))}
+                </Box>
+              )}
             </Box>
           </DialogContent>
           <DialogActions>
