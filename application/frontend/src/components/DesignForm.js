@@ -78,14 +78,18 @@ export default function DesignForm({ initialValues, onSubmit }) {
             removedImages.forEach((image) => {
                 formData.append('removedImages', image);
             });
+            
+            const gemstoneIds = initialValues.jewelry_id.gemstone_ids.map(gemstone => gemstone._id);
+            const subgemstoneIds = initialValues.jewelry_id.subgemstone_ids.map(subgemstone => subgemstone._id);
 
-            formData.append('gemstone_id', values.gemstone_id);
+            // Append the arrays of _id strings to FormData as JSON strings
+            formData.append('gemstone_ids', JSON.stringify(gemstoneIds));
             formData.append('material_id', initialValues.jewelry_id.material_id._id);
-            formData.append('subgemstone_id', values.subgemstone_id);
-            formData.append('subgemstone_quantity', values.subgemstone_quantity);
+            formData.append('subgemstone_ids', JSON.stringify(subgemstoneIds));
+        
 
             Object.keys(initialValues.jewelry_id).forEach(key => {
-                if (key !== 'images' && key !== 'gemstone_id' && key !== 'material_id' && key !== 'subgemstone_id' && key !== 'subgemstone_quantity') {
+                if (key !== 'images' && key !== 'gemstone_ids' && key !== 'material_id' && key !== 'subgemstone_ids') {
                     formData.append(key, initialValues.jewelry_id[key]);
                 }
             });

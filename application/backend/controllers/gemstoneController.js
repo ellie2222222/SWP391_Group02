@@ -62,7 +62,7 @@ const getGemstone = async (req, res) => {
 }
 
 const validateEmptyFields = (data) => {
-    const { name, price, carat, cut, clarity, color, measurements, polish, symmetry, fluorescence, comments } = data;
+    const { name, price, carat, cut, clarity, color, measurements, polish, symmetry, fluorescence } = data;
     let emptyFields = [];
 
     if (!name) {
@@ -95,10 +95,6 @@ const validateEmptyFields = (data) => {
     if (!fluorescence) {
         emptyFields.push('fluorescence');
     }
-    if (!comments) {
-        emptyFields.push('comments')
-    }
-
     if (emptyFields.length > 0) {
         return "Please fill in the required field"
     }

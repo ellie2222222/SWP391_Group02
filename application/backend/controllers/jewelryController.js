@@ -34,9 +34,8 @@ const validateInputData = (data) => {
     // Validate gemstone IDs
     if (gemstone_ids && gemstone_ids.length > 0) {
         gemstone_ids = gemstone_ids.map(id => id.trim());
-        console.log('Trimmed gemstone_ids:', gemstone_ids);
         gemstone_ids.forEach(id => {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
+            if (id !== 'undefined' && !mongoose.Types.ObjectId.isValid(id)) {
                 validationErrors.push('Invalid gemstone ID');
             }
         });
@@ -45,9 +44,8 @@ const validateInputData = (data) => {
     // Validate subgemstone IDs
     if (subgemstone_ids && subgemstone_ids.length > 0) {
         subgemstone_ids = subgemstone_ids.map(id => id.trim());
-        console.log('Trimmed subgemstone_ids:', subgemstone_ids);
         subgemstone_ids.forEach(id => {
-            if (!mongoose.Types.ObjectId.isValid(id)) {
+            if (id !== 'undefined' && !mongoose.Types.ObjectId.isValid(id)) {
                 validationErrors.push('Invalid sub gemstone ID');
             }
         });
@@ -55,8 +53,7 @@ const validateInputData = (data) => {
 
     // Check for duplicate IDs between gemstone_ids and subgemstone_ids
     if (gemstone_ids.length > 0 && subgemstone_ids.length > 0) {
-        const duplicateIds = gemstone_ids.filter(id => subgemstone_ids.includes(id));
-        console.log('Duplicate IDs:', duplicateIds);
+        const duplicateIds = gemstone_ids.filter(id => id !== 'undefined' && subgemstone_ids.includes(id));
         if (duplicateIds.length > 0) {
             validationErrors.push('Gemstone IDs cannot be duplicated');
         }
@@ -77,8 +74,6 @@ const validateInputData = (data) => {
         validationErrors.push("Invalid type");
     }
 
-    console.log('Validation errors:', validationErrors);
-
     return validationErrors;
 };
 
@@ -97,9 +92,6 @@ const createJewelry = async (req, res) => {
         // Filter out empty strings
         gemstone_ids = gemstone_ids.filter(id => id.trim() !== '');
         subgemstone_ids = subgemstone_ids.filter(id => id.trim() !== '');
-
-        // console.log('Parsed gemstone_ids:', gemstone_ids);
-        // console.log('Parsed subgemstone_ids:', subgemstone_ids);
 
         const emptyFieldsError = validateEmptyFields({ ...req.body, gemstone_ids, subgemstone_ids });
         if (emptyFieldsError) {
@@ -176,9 +168,6 @@ const updateJewelry = async (req, res) => {
         gemstone_ids = gemstone_ids.filter(id => id.trim() !== '');
         subgemstone_ids = subgemstone_ids.filter(id => id.trim() !== '');
 
-        // console.log('Parsed gemstone_ids:', gemstone_ids);
-        // console.log('Parsed subgemstone_ids:', subgemstone_ids);
-
         const validationErrors = validateInputData({ ...req.body, gemstone_ids, subgemstone_ids });
         if (validationErrors.length > 0) {
             return res.status(400).json({ error: validationErrors.join(', ') });
@@ -245,7 +234,7 @@ const updateJewelry = async (req, res) => {
             .populate('subgemstone_ids');
         res.status(200).json(updatedJewelry);
     } catch (error) {
-        res.status(500).json({ error: 'Error while updating jewelry' });
+        res.status(500).json({ error: error.message });
     }
 };
 
