@@ -300,9 +300,9 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                     {staffs.map((staff, index) => (
                         <Card key={index} sx={{ mt: index === 0 ? 0 : 2, display: 'flex', justifyContent: 'space-between', boxShadow: 4 }}>
                             <CardContent>
-                                <Typography variant="h5">{staff.username}</Typography>
-                                <Typography variant="h6">Email: {staff.email}</Typography>
-                                <Typography variant="h6">Role: {staff.role && capitalizeWords(staff.role)}</Typography>
+                                <Typography variant="h5">{staff?.username}</Typography>
+                                <Typography variant="h6">Email: {staff?.email}</Typography>
+                                <Typography variant="h6">Role: {staff?.role && capitalizeWords(staff?.role)}</Typography>
                             </CardContent>
                             {selectedRequest.request_status === 'pending' && (
                                 <CardActions>
@@ -347,13 +347,13 @@ const StaffAssignmentForm = ({ selectedRequest, fetchData, handleCloseAllDialogs
                     {assignedStaffs.map((staff, index) => (
                         <Card key={index} sx={{ mt: index === 0 ? 0 : 2, display: 'flex', justifyContent: 'space-between', boxShadow: 4 }}>
                             <CardContent>
-                                <Typography variant="h5">{staff.staff_id.username}</Typography>
-                                <Typography variant="h6">Email: {staff.staff_id.email}</Typography>
-                                <Typography variant="h6">Role: {staff.role && capitalizeWords(staff.role)}</Typography>
+                                <Typography variant="h5">{staff?.staff_id?.username}</Typography>
+                                <Typography variant="h6">Email: {staff?.staff_id?.email}</Typography>
+                                <Typography variant="h6">Role: {staff?.role && capitalizeWords(staff?.role)}</Typography>
                             </CardContent>
-                            {staff.role !== 'manager' && selectedRequest.request_status === 'pending' && (
+                            {staff?.role !== 'manager' && selectedRequest.request_status === 'pending' && (
                                 <CardActions>
-                                    <Button onClick={() => removeStaff(staff.staff_id)}>
+                                    <Button onClick={() => removeStaff(staff?.staff_id)}>
                                         <IconButton sx={{ color: '#b48c72' }}>
                                             <Delete fontSize='large'/>
                                         </IconButton>
