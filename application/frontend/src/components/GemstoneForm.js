@@ -123,7 +123,7 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
       onSubmit(formData);
     },
     validationSchema: Yup.object({
-      name: Yup.string().required('Diamond Name is required'),
+      name: Yup.string().required('Gemstone Name is required'),
       price: Yup.number().positive('Price must be positive').required('Diamond Price is required'),
       carat: Yup.number().positive('Carat must be positive').required('Carat is required'),
       cut: Yup.string().required('Cut is required'),
@@ -153,7 +153,7 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
       <Box component="form" onSubmit={formik.handleSubmit} sx={{ '& > :not(style)': { m: 1, width: '100%' } }}>
         <CustomTextField
           name="name"
-          label="Diamond Name"
+          label="Gemstone Name"
           variant="outlined"
           value={formik.values.name}
           onChange={formik.handleChange}
@@ -163,7 +163,7 @@ const GemstoneForm = ({ initialValues, onSubmit }) => {
         />
         <CustomTextField
           name="price"
-          label="Diamond Price"
+          label="Gemstone Price"
           variant="outlined"
           type="number"
           value={formik.values.price}
