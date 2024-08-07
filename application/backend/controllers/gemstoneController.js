@@ -5,7 +5,7 @@ const { cloudinary } = require('../cloudinary');
 
 // Get all gemstones or get gemstones by name
 const getGemstones = async (req, res) => {
-    const { search, cut, clarity, color, polish, symmetry, fluorescence } = req.query;
+    const { search, cut, clarity, color, polish, symmetry, fluorescence, available } = req.query;
 
     try {
         let query = {};
@@ -29,6 +29,9 @@ const getGemstones = async (req, res) => {
         }
         if (fluorescence) {
             query.fluorescence = fluorescence;
+        }
+        if (available) {
+            query.available = available;
         }
 
         const gemstones = await Gemstone.find(query);

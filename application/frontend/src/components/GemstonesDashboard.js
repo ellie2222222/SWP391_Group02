@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Box, FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField, Typography, styled } from '@mui/material';
-import axiosInstance from '../utils/axiosInstance';
 import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
+import { useSearchParams } from 'react-router-dom';
 import GemstoneForm from './GemstoneForm';
+import axiosInstance from '../utils/axiosInstance';
 import { toast, ToastContainer } from 'react-toastify';
 
 const CustomButton1 = styled(Button)({
@@ -85,13 +86,7 @@ export default function GemstonesDashboard() {
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [selectedGemstone, setSelectedGemstone] = useState(null);
     const [gemstoneToDelete, setGemstoneToDelete] = useState(null);
-    const [search, setSearch] = useState('');
-    const [cut, setCut] = useState('');
-    const [clarity, setClarity] = useState('');
-    const [color, setColor] = useState('');
-    const [polish, setPolish] = useState('');
-    const [symmetry, setSymmetry] = useState('');
-    const [fluorescence, setFluorescence] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const handleEditClick = (gemstone) => {
         setSelectedGemstone(gemstone);
@@ -105,7 +100,8 @@ export default function GemstonesDashboard() {
 
     const fetchGemstones = async () => {
         try {
-            const response = await axiosInstance.get(`/gemstones?search=${search}&cut=${cut}&clarity=${clarity}&color=${color}&polish=${polish}&symmetry=${symmetry}&fluorescence=${fluorescence}`);
+            const params = Object.fromEntries([...searchParams]);
+            const response = await axiosInstance.get('/gemstones', { params });
             setGemstones(response.data);
         } catch (error) {
             toast.error('Fetch gemstone fail', {
@@ -180,9 +176,21 @@ export default function GemstonesDashboard() {
         }
     };
 
+    const handleFilterChange = (name, value) => {
+        setSearchParams(prevParams => {
+            const newParams = new URLSearchParams(prevParams);
+            if (value) {
+                newParams.set(name, value);
+            } else {
+                newParams.delete(name);
+            }
+            return newParams;
+        });
+    };
+
     useEffect(() => {
         fetchGemstones();
-    }, [cut, clarity, color, polish, symmetry, fluorescence]);
+    }, [searchParams]);
 
     return (
         <Container>
@@ -191,8 +199,8 @@ export default function GemstonesDashboard() {
                 <CustomTextField
                     size="normal"
                     label="Search by name"
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
+                    value={searchParams.get('search') || ''}
+                    onChange={(event) => handleFilterChange('search', event.target.value)}
                     onKeyDown={handleKeyDown}
                     InputProps={{
                         endAdornment: (
@@ -210,8 +218,8 @@ export default function GemstonesDashboard() {
                     <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Cut</InputLabel>
                     <Select
                         sx={{ fontSize: "1.3rem" }}
-                        value={cut}
-                        onChange={(event) => setCut(event.target.value)}
+                        value={searchParams.get('cut') || ''}
+                        onChange={(event) => handleFilterChange('cut', event.target.value)}
                         label="Cut"
                     >
                         <CustomMenuItem value=''>All</CustomMenuItem>
@@ -232,8 +240,8 @@ export default function GemstonesDashboard() {
                     <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Clarity</InputLabel>
                     <Select
                         sx={{ fontSize: "1.3rem" }}
-                        value={clarity}
-                        onChange={(event) => setClarity(event.target.value)}
+                        value={searchParams.get('clarity') || ''}
+                        onChange={(event) => handleFilterChange('clarity', event.target.value)}
                         label="Clarity"
                     >
                         <CustomMenuItem value=''>All</CustomMenuItem>
@@ -248,14 +256,15 @@ export default function GemstonesDashboard() {
                         <CustomMenuItem value="I1">I1</CustomMenuItem>
                         <CustomMenuItem value="I2">I2</CustomMenuItem>
                         <CustomMenuItem value="I3">I3</CustomMenuItem>
+                        <CustomMenuItem value="Other">Other</CustomMenuItem>
                     </Select>
                 </CustomFormControl>
                 <CustomFormControl variant="outlined" sx={{ marginLeft: 2 }}>
                     <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Color</InputLabel>
                     <Select
                         sx={{ fontSize: "1.3rem" }}
-                        value={color}
-                        onChange={(event) => setColor(event.target.value)}
+                        value={searchParams.get('color') || ''}
+                        onChange={(event) => handleFilterChange('color', event.target.value)}
                         label="Color"
                     >
                         <CustomMenuItem value=''>All</CustomMenuItem>
@@ -280,8 +289,8 @@ export default function GemstonesDashboard() {
                     <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Polish</InputLabel>
                     <Select
                         sx={{ fontSize: "1.3rem" }}
-                        value={polish}
-                        onChange={(event) => setPolish(event.target.value)}
+                        value={searchParams.get('polish') || ''}
+                        onChange={(event) => handleFilterChange('polish', event.target.value)}
                         label="Polish"
                     >
                         <CustomMenuItem value=''>All</CustomMenuItem>
@@ -296,8 +305,8 @@ export default function GemstonesDashboard() {
                     <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Symmetry</InputLabel>
                     <Select
                         sx={{ fontSize: "1.3rem" }}
-                        value={symmetry}
-                        onChange={(event) => setSymmetry(event.target.value)}
+                        value={searchParams.get('symmetry') || ''}
+                        onChange={(event) => handleFilterChange('symmetry', event.target.value)}
                         label="Symmetry"
                     >
                         <CustomMenuItem value=''>All</CustomMenuItem>
@@ -312,8 +321,8 @@ export default function GemstonesDashboard() {
                     <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Fluorescence</InputLabel>
                     <Select
                         sx={{ fontSize: "1.3rem" }}
-                        value={fluorescence}
-                        onChange={(event) => setFluorescence(event.target.value)}
+                        value={searchParams.get('fluorescence') || ''}
+                        onChange={(event) => handleFilterChange('fluorescence', event.target.value)}
                         label="Fluorescence"
                     >
                         <CustomMenuItem value=''>All</CustomMenuItem>
@@ -324,76 +333,99 @@ export default function GemstonesDashboard() {
                         <CustomMenuItem value="Very Strong">Very Strong</CustomMenuItem>
                     </Select>
                 </CustomFormControl>
+                <CustomFormControl variant="outlined" sx={{ marginLeft: 2 }}>
+                    <InputLabel sx={{ fontSize: "1.3rem", fontWeight: 900 }}>Available</InputLabel>
+                    <Select
+                        sx={{ fontSize: "1.3rem" }}
+                        value={searchParams.get('available') || ''}
+                        onChange={(event) => handleFilterChange('available', event.target.value)}
+                        label="Available"
+                    >
+                        <CustomMenuItem value=''>All</CustomMenuItem>
+                        <CustomMenuItem value="true">Yes</CustomMenuItem>
+                        <CustomMenuItem value="false">No</CustomMenuItem>
+                    </Select>
+                </CustomFormControl>
             </Box>
-            <CustomButton1 startIcon={<Add fontSize='large' />} variant="contained" color="primary" onClick={handleAddClick}>
-                <Typography sx={{ fontSize: "1.3rem", fontWeight: "bold" }}>Add Gemstone</Typography>
-            </CustomButton1> 
+            <Box mb={2}>
+                <CustomButton1 variant="outlined" startIcon={<Add />} onClick={handleAddClick}>
+                    Add Gemstone
+                </CustomButton1>
+            </Box>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <CustomTableCell sx={{ fontWeight: "bold" }}>ID</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold" }}>Name</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold" }}>Price</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold" }}>Carat</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold" }}>Cut</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold" }}>Clarity</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold" }}>Color</CustomTableCell>
-                            <CustomTableCell sx={{ fontWeight: "bold" }} align='center'>Action</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Name</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Cut</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Clarity</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Color</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Carat</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Polish</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Symmetry</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Fluorescence</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Price</CustomTableCell>
+                            <CustomTableCell sx={{ fontWeight: 900 }}>Actions</CustomTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {gemstones.map(gemstone => (
+                        {gemstones.map((gemstone) => (
                             <TableRow key={gemstone._id}>
-                                <CustomTableCell sx={{ fontWeight: "bold" }}>{gemstone._id}</CustomTableCell>
                                 <CustomTableCell>{gemstone.name}</CustomTableCell>
-                                <CustomTableCell>{gemstone.price && gemstone.price.toLocaleString() + '₫'}</CustomTableCell>
-                                <CustomTableCell>{gemstone.carat}</CustomTableCell>
                                 <CustomTableCell>{gemstone.cut}</CustomTableCell>
                                 <CustomTableCell>{gemstone.clarity}</CustomTableCell>
                                 <CustomTableCell>{gemstone.color}</CustomTableCell>
-                                <CustomTableCell align='center'>
+                                <CustomTableCell>{gemstone.carat}</CustomTableCell>
+                                <CustomTableCell>{gemstone.polish}</CustomTableCell>
+                                <CustomTableCell>{gemstone.symmetry}</CustomTableCell>
+                                <CustomTableCell>{gemstone.fluorescence}</CustomTableCell>
+                                <CustomTableCell>{gemstone.price}</CustomTableCell>
+                                <CustomTableCell>
                                     <StyledIconButton onClick={() => handleEditClick(gemstone)}>
-                                        <Edit fontSize='large' />
+                                        <Edit />
                                     </StyledIconButton>
                                     <StyledIconButton onClick={() => handleDeleteClick(gemstone)}>
-                                        <Delete fontSize='large' />
+                                        <Delete />
                                     </StyledIconButton>
                                 </CustomTableCell>
                             </TableRow>
                         ))}
+                        {gemstones.length === 0 && (
+                            <TableRow>
+                                <TableCell align='center' colSpan={10}>
+                                    <Typography variant="h6" sx={{fontWeight: 'bold'}}>No gemstones found</Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="md" fullWidth>
+                <DialogTitle>{selectedGemstone ? 'Edit Gemstone' : 'Add Gemstone'}</DialogTitle>
                 <DialogContent>
-                    <GemstoneForm initialValues={selectedGemstone || { name: '', price: 0, carat: 0, cut: '', clarity: '', color: '' }} onSubmit={handleSubmit} />
+                    <GemstoneForm onSubmit={handleSubmit} initialValues={selectedGemstone || {}} />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
+                    <Button onClick={() => setIsDialogOpen(false)} color="primary">
                         Cancel
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <Dialog open={isConfirmDialogOpen} onClose={handleCancelDelete}>
-                <DialogTitle align='center' variant='h4'>Confirm Deletion</DialogTitle>
+                <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
-                    <Typography sx={{ fontSize: '1.3rem' }}>Are you sure you want to delete this gemstone?</Typography>
+                    <Typography>Are you sure you want to delete this gemstone?</Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCancelDelete} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
+                    <Button onClick={handleCancelDelete} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={confirmDelete} sx={{ fontSize: '1.3rem', color: '#b48c72' }}>
-                        Confirm
+                    <Button onClick={confirmDelete} color="secondary">
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <ToastContainer />
         </Container>
     );
 }
-
-
