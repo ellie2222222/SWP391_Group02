@@ -1,7 +1,7 @@
 const Blog = require('../models/blogModel');
 const mongoose = require('mongoose');
 const streamifier = require('streamifier');
-const { cloudinary } = require('../cloudinary');
+const { cloudinary } = require('../utils/cloudinary');
 
 // Helper functions for validation
 const validateEmptyFields = (data) => {

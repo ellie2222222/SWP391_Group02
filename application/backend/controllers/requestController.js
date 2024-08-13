@@ -5,8 +5,7 @@ const User = require("../models/userModel");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const streamifier = require('streamifier');
-const { cloudinary } = require('../cloudinary');
-const ObjectId = mongoose.Types.ObjectId;
+const { cloudinary } = require('../utils/cloudinary');
 
 // get all requests
 const getRequests = async (req, res) => {

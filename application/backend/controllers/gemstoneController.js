@@ -1,7 +1,7 @@
 const Gemstone = require('../models/gemstoneModel')
 const mongoose = require('mongoose')
 const streamifier = require('streamifier');
-const { cloudinary } = require('../cloudinary');
+const { cloudinary } = require('../utils/cloudinary');
 
 // Get all gemstones or get gemstones by name
 const getGemstones = async (req, res) => {

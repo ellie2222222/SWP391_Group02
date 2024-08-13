@@ -1,3 +1,4 @@
+const { getLogger } = require('../utils/logger');  // Import the getLogger function
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
@@ -5,6 +6,9 @@ const validator = require("validator");
 const nodemailer = require('nodemailer');
 const WorksOn = require('../models/worksOnModel');
 const bcrypt = require('bcrypt');
+
+// Create logger instances for different services
+const userServiceLogger = getLogger('user-service');
 
 const createToken = (_id, role) => {
   return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "30m" });
@@ -21,7 +25,6 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.login(email, password);
 
-    // create a token
     const token = createToken(user._id, user.role);
     const refreshToken = createRefreshToken(user._id, user.role);
 
@@ -29,28 +32,23 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({ token, refreshToken });
   } catch (error) {
+    userServiceLogger.error('Login failed', { email, error: error.message });
     res.status(500).json({ error: error.message });
   }
 };
 
 // signup a user
 const signupUser = async (req, res) => {
-  const { username, email, password, role,phone_number, address } = req.body;
+  const { username, email, password, role, phone_number, address } = req.body;
 
   try {
-    const user = await User.signup(
-      username,
-      email,
-      password,
-      role,
-      phone_number,
-      address
-    );
+    const user = await User.signup(username, email, password, role, phone_number, address);
 
     const token = createToken(user._id, user.role);
 
     res.status(201).json({ token });
   } catch (error) {
+    userServiceLogger.error('Signup failed', { email, error: error.message });
     res.status(400).json({ error: error.message });
   }
 };
@@ -59,7 +57,6 @@ const signupUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params;
 
-  // Convert id to ObjectID
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: "Invalid ID" });
   }
@@ -73,6 +70,7 @@ const deleteUser = async (req, res) => {
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
+    userServiceLogger.error('User deletion failed', { id, error: error.message });
     res.status(500).json({ error: "An error occurred while deleting the user" });
   }
 };
@@ -82,7 +80,6 @@ const updateUser = async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
-  // Convert id to ObjectID
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: "Invalid ID" });
   }
@@ -96,27 +93,21 @@ const updateUser = async (req, res) => {
 
     res.status(200).json({ user });
   } catch (error) {
+    userServiceLogger.error('User update failed', { id, updates, error: error.message });
     res.status(500).json({ error: "An error occurred while updating the user" });
   }
 };
 
+// assign a role
 const assignRole = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
   const { role } = req.body;
 
-  // check valid user id
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: "Invalid ID" });
   }
 
-  // check valid role
-  const allowedRoles = [
-    "user",
-    "manager",
-    "sale_staff",
-    "design_staff",
-    "production_staff",
-  ];
+  const allowedRoles = ["user", "manager", "sale_staff", "design_staff", "production_staff"];
 
   if (!allowedRoles.includes(role)) {
     return res.status(400).json({ error: "Invalid role" });
@@ -126,7 +117,7 @@ const assignRole = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: id },
       { $set: { role } },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     if (user) {
@@ -135,11 +126,11 @@ const assignRole = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
+    userServiceLogger.error('Role assignment failed', { id, role, error: error.message });
     return res.status(500).json({ error: "An error occurred while assigning the role" });
   }
 };
 
-// get all users
 // get all users
 const getUsers = async (req, res) => {
   const { search, sort, role, page = 1, limit = 10 } = req.query;
@@ -158,7 +149,6 @@ const getUsers = async (req, res) => {
       query.role = new RegExp(role, 'i');
     }
 
-    // Determine the sort field and order
     let sortField = {};
     if (sort) {
       const [field, order] = sort.split('_');
@@ -182,25 +172,27 @@ const getUsers = async (req, res) => {
       totalPages
     });
   } catch (error) {
+    userServiceLogger.error('Error while getting users', { error: error.message });
     return res.status(500).json({ error: "Error while getting users" });
   }
-}
+};
 
+// get staff
 const getStaffs = async (req, res) => {
   const { search, sort, role, page = 1, limit = 10 } = req.query;
 
   try {
     let query = {
-      role: { $nin: ['user', 'admin'] }  // Exclude 'user' and 'admin' roles
+      role: { $nin: ['user', 'admin'] }
     };
-    
+
     if (search) {
       query.$or = [
         { username: new RegExp(search, 'i') },
         { email: new RegExp(search, 'i') }
       ];
     }
-    
+
     if (role && !['user', 'admin'].includes(role.toLowerCase())) {
       query.role = {
         ...query.role,
@@ -208,7 +200,6 @@ const getStaffs = async (req, res) => {
       };
     }
 
-    // Determine the sort field and order
     let sortField = {};
     if (sort) {
       const [field, order] = sort.split('_');
@@ -232,36 +223,38 @@ const getStaffs = async (req, res) => {
       totalPages
     });
   } catch (error) {
-    return res.status(500).json({ error: "Error while getting staffs" });
+    userServiceLogger.error('Error while getting staff', { error: error.message });
+    return res.status(500).json({ error: "Error while getting staff" });
   }
-}
+};
 
+// get a user
 const getUser = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
 
-    // check valid user id
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid ID" });
     }
 
-    const user = await User.findOne({ _id: id })
+    const user = await User.findOne({ _id: id });
 
     if (!user) {
-      return res.status(404).json({ error: "No users found" })
+      return res.status(404).json({ error: "No users found" });
     }
 
-    return res.status(200).json({ user })
+    return res.status(200).json({ user });
   } catch (error) {
-    return res.status(500).json({ error: "Error while getting users" })
+    userServiceLogger.error('Error while getting user', { id, error: error.message });
+    return res.status(500).json({ error: "Error while getting user" });
   }
-}
+};
 
+// get staff contact
 const getStaffContact = async (req, res) => {
   try {
     const { request_id } = req.params;
 
-    // Find the WorksOn document for the specific request_id
     const worksOnDocument = await WorksOn.findOne({ request_id });
 
     if (!worksOnDocument) {
@@ -282,10 +275,12 @@ const getStaffContact = async (req, res) => {
 
     res.status(200).json({ saleStaffContact: saleStaffUser.phone_number });
   } catch (error) {
+    userServiceLogger.error('Error while getting staff contact', { request_id, error: error.message });
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
+// forgot password
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -299,7 +294,7 @@ const forgotPassword = async (req, res) => {
     const token = jwt.sign({ _id: user._id }, process.env.SECRET, { expiresIn: '1h' });
 
     const transporter = nodemailer.createTransport({
-      service: 'Gmail', // or your preferred email service provider
+      service: 'Gmail',
       auth: {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
@@ -318,16 +313,18 @@ const forgotPassword = async (req, res) => {
 
     transporter.sendMail(mailOptions, (error, response) => {
       if (error) {
+        userServiceLogger.error('Error sending password reset email', { email, error: error.message });
         return res.status(500).json({ message: 'Error sending email' });
       }
       res.status(200).json({ message: 'Email sent successfully' });
     });
   } catch (err) {
+    userServiceLogger.error('Error while processing forgot password', { email, error: err.message });
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Reset password
+// reset password
 const resetPassword = async (req, res) => {
   const { id, token } = req.params;
   const { password } = req.body;
@@ -338,7 +335,7 @@ const resetPassword = async (req, res) => {
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) {
-      return res.json({ Status: "Token error" })
+      return res.json({ Status: "Token error" });
     } else {
       bcrypt.hash(password, 10)
         .then(hash => {
@@ -348,9 +345,10 @@ const resetPassword = async (req, res) => {
         })
         .catch(err => res.send({ Status: err }))
     }
-  })
+  });
 };
 
+// reset profile password
 const resetProfilePassword = async (req, res) => {
   const { id } = req.body;
   const { oldPassword, password } = req.body;
@@ -376,10 +374,12 @@ const resetProfilePassword = async (req, res) => {
 
     res.send({ Status: 'Password updated successfully' });
   } catch (err) {
+    userServiceLogger.error('Error while resetting profile password', { id, error: err.message });
     res.status(500).send({ Status: err.message });
   }
 };
 
+// refresh token
 const refreshToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
@@ -389,18 +389,15 @@ const refreshToken = async (req, res) => {
     if (err) return res.sendStatus(403);
 
     const token = createToken(decoded._id, decoded.role);
-    // const currentTime = new Date().toLocaleString(); // Get current time
-
     res.json({ token, existToken: true });
   });
 };
 
-// Logout user
+// logout user
 const logout = (req, res) => {
   res.clearCookie('refreshToken');
+  userServiceLogger.info(`User ${req.id} logged out successfully.`);
   res.sendStatus(200);
 };
-
-
 
 module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword, getStaffContact, getStaffs };
