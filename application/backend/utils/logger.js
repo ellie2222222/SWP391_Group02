@@ -1,13 +1,16 @@
 const { createLogger, format, transports } = require('winston');
-const { LogtailTransport } = require('@logtail/winston'); 
+const { Logtail } = require('@logtail/node');
+const { LogtailTransport } = require('@logtail/winston');
 require('winston-daily-rotate-file');
+
+const logtail = new Logtail(process.env.LOGTAIL_TOKEN);
 
 const getLogger = (serviceName) => {
     const commonFormat = format.combine(
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         format.errors({ stack: true }),
         format.splat(),
-        format.json()
+        format.json(),
     );
 
     const serviceConfig = {
@@ -26,16 +29,13 @@ const getLogger = (serviceName) => {
         format: commonFormat,
         defaultMeta: { service: serviceName },
         transports: [
-            new transports.Console(),
-            new LogtailTransport({ sourceToken: process.env.LOGTAIL_TOKEN })
+            new LogtailTransport(logtail)
         ],
         exceptionHandlers: [
-            new transports.Console(),
-            new LogtailTransport({ sourceToken: process.env.LOGTAIL_TOKEN }), // For unhandled exceptions
+            new LogtailTransport(logtail)
         ],
         rejectionHandlers: [
-            new transports.Console(),
-            new LogtailTransport({ sourceToken: process.env.LOGTAIL_TOKEN }), // For unhandled promise rejections
+            new LogtailTransport(logtail)
         ],
     });
 };

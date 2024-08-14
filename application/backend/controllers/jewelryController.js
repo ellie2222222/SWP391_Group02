@@ -286,7 +286,7 @@ const getJewelries = async (req, res) => {
 
         const total = await Jewelry.countDocuments(query);
 
-        productServiceLogger.info(`Jewelries Retrieved: ${total} items`);
+        productServiceLogger.info({ request_method: req.method, message: `Jewelries Retrieved: ${total} items` });
         res.status(200).json({
             jewelries,
             total,
@@ -294,7 +294,7 @@ const getJewelries = async (req, res) => {
             currentPage: parseInt(page),
         });
     } catch (error) {
-        productServiceLogger.error(`Get Jewelries Error: ${error.message}`);
+        productServiceLogger.error({ request_method: req.method, message: `Get Jewelries Error: ${error.message}` });
         res.status(500).json({ error: 'Error while getting jewelries' });
     }
 };
