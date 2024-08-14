@@ -1,4 +1,5 @@
 const { createLogger, format, transports } = require('winston');
+const { LogtailTransport } = require('@logtail/winston'); 
 require('winston-daily-rotate-file');
 
 const getLogger = (serviceName) => {
@@ -20,18 +21,23 @@ const getLogger = (serviceName) => {
         throw new Error(`Unknown service: ${serviceName}`);
     }
 
-    const basePath = `logs/${serviceConfig[serviceName]}`;
-    
     return createLogger({
         level: 'info',
         format: commonFormat,
         defaultMeta: { service: serviceName },
         transports: [
-            new transports.DailyRotateFile({ filename: `${basePath}-error-%DATE%.log`, datePattern: 'YYYY-MM-DD', level: 'error', maxFiles: '30d' }),
-            new transports.DailyRotateFile({ filename: `${basePath}-info-%DATE%.log`, datePattern: 'YYYY-MM-DD', level: 'info', maxFiles: '30d' }),
-            new transports.File({ filename: `${basePath}-combined.log` })
-        ]
+            new transports.Console(),
+            new LogtailTransport({ sourceToken: process.env.LOGTAIL_TOKEN })
+        ],
+        exceptionHandlers: [
+            new transports.Console(),
+            new LogtailTransport({ sourceToken: process.env.LOGTAIL_TOKEN }), // For unhandled exceptions
+        ],
+        rejectionHandlers: [
+            new transports.Console(),
+            new LogtailTransport({ sourceToken: process.env.LOGTAIL_TOKEN }), // For unhandled promise rejections
+        ],
     });
 };
 
-module.exports = { getLogger }
+module.exports = { getLogger };

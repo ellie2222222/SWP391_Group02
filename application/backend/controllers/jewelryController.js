@@ -4,7 +4,6 @@ const streamifier = require('streamifier');
 const { cloudinary } = require('../utils/cloudinary');
 const { getLogger } = require('../utils/logger');  // Import the getLogger function
 
-
 // Create logger instances for different services
 const productServiceLogger = getLogger('product-service');
 
