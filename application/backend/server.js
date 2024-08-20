@@ -17,8 +17,17 @@ const transactionRoutes = require('./routes/transaction');
 const analyticRoutes = require('./routes/analytic');
 const worksOnRoutes = require('./routes/worksOn');
 
+const  { initializeRedisClient } = require("./middleware/redis");
+
 //application
-const app = express()
+const app = express();
+
+// redis cache
+try {
+  initializeRedisClient();
+} catch (error) {
+  console.error('Failed to initialize Redis:', error.message);
+}
 
 //middleware
 app.use(express.json())
@@ -66,11 +75,11 @@ mongoose.connect(process.env.MONGO_URI)
     console.log(error)
   })
 
-const axios = require('axios').default; // npm install axios
-const CryptoJS = require('crypto-js'); // npm install crypto-js
-const moment = require('moment'); // npm install moment
+const axios = require('axios').default;
+const CryptoJS = require('crypto-js');
+const moment = require('moment');
 
-// APP INFO
+// ZALOPAY APP INFO
 let config = {
   app_id: "2553",
   key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",

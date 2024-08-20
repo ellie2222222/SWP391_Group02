@@ -3,6 +3,7 @@ const multer = require('multer');
 const { getJewelries, getJewelry, createJewelry, deleteJewelry, updateJewelry, updateJewelryAvailability } = require('../controllers/jewelryController');
 const requireAuth = require('../middleware/requireAuth');
 const { requireAdminOrManagerOrSaleOrDesign,requireAdminOrManagerOrSaleOrDesignOrUser } = require('../middleware/requireRoles');
+const { redisCacheMiddleware } = require('../middleware/redis');
 const jewelryRoutes = express.Router();
 
 // Multer configuration for file uploads
@@ -10,9 +11,9 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Routes
-jewelryRoutes.get('/', getJewelries);
+jewelryRoutes.get('/', redisCacheMiddleware(), getJewelries);
 
-jewelryRoutes.get('/:id', getJewelry);
+jewelryRoutes.get('/:id', redisCacheMiddleware(), getJewelry);
 
 jewelryRoutes.post('/', requireAuth, requireAdminOrManagerOrSaleOrDesignOrUser, upload.array('images', 5), createJewelry); // Handle multiple file uploads with field name 'images' and max 5 files
 
