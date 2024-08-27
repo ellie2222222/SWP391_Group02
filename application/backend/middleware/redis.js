@@ -2,7 +2,7 @@ const { createClient } = require("redis");
 const hash = require("object-hash");
 const zlib = require("zlib");
 
-let redisClient = undefined;
+let redisClient;
 
 async function initializeRedisClient() {
     try {
@@ -28,90 +28,92 @@ async function initializeRedisClient() {
         console.error(`Connection to Redis failed with error:`);
         console.error(e);
     }
-
 }
 
 function requestToKey(req) {
-    const reqDataToHash = {
-        query: req.query,
-        body: req.body,
-    };
-    
+    const reqDataToHash = req.baseUrl + req.path;
     return `${req.baseUrl + req.path}@${hash.sha1(reqDataToHash)}`;
 }
 
 function isRedisWorking() {
-    return !!redisClient?.isOpen;
+    return redisClient && redisClient.isOpen;
 }
 
-async function writeData(key, data, options, compress) {
+async function writeData(key, data, options = {}, compress = false) {
     if (isRedisWorking()) {
-        let dataToCache = data;
         try {
-            if (compress) {
-                dataToCache = zlib.deflateSync(data).toString("base64");
-            }
-
-
+            let dataToCache = compress ? zlib.deflateSync(data).toString("base64") : data;
             await redisClient.set(key, dataToCache, options);
         } catch (e) {
-            console.error(`Failed to cache data for key=${key}`, e);
+            console.error(`Failed to cache data for key=${key}:`, e);
         }
+    } else {
+        console.warn("Redis is not available, skipping caching.");
     }
 }
 
-async function readData(key, compressed) {
-    let cachedValue = undefined;
+async function readData(key, compressed = false) {
     if (isRedisWorking()) {
         try {
-            cachedValue = await redisClient.get(key);
+            const cachedValue = await redisClient.get(key);
             if (cachedValue) {
-                if (compressed) {
-                    return zlib.inflateSync(Buffer.from(cachedValue, "base64")).toString();
-                } else {
-                    return cachedValue;
-                }
+                return compressed
+                    ? zlib.inflateSync(Buffer.from(cachedValue, "base64")).toString()
+                    : cachedValue;
             }
         } catch (e) {
-            console.error(`Failed to read data for key=${key}`, e);
+            console.error(`Failed to read data for key=${key}:`, e);
         }
+    } else {
+        console.warn("Redis is not available, skipping cache retrieval.");
     }
-
-    return cachedValue;
+    return null;
 }
 
-function redisCacheMiddleware(
-    options = {
-        EX: 21600, // 6h
-    },
-    compression = true
-) {
+async function invalidateCachedData(req, res, next) {
+    const key = requestToKey(req);
+    if (isRedisWorking()) {
+        try {
+            await redisClient.del(key);
+            console.log(`Cache invalidated for key=${key}`);
+        } catch (e) {
+            console.error(`Failed to invalidate cache for key=${key}:`, e);
+        }
+    }
+    next();
+}
+
+function redisCacheMiddleware(options = { EX: 21600 }, compression = false) {
     return async (req, res, next) => {
         if (isRedisWorking()) {
             const key = requestToKey(req);
-            const cachedValue = await readData(key, compression);
-            if (cachedValue) {
-                try {
-                    return res.json(JSON.parse(cachedValue));
-                } catch {
-                    return res.send(cachedValue);
-                }
-            } else {
-                // override how res.send behaves to introduce the caching logic
-                const oldSend = res.send;
-                res.send = function (data) {
-                    res.send = oldSend;
-
-                    if (res.statusCode.toString().startsWith("2")) {
-                        writeData(key, data, options, compression).then();
+            try {
+                const cachedValue = await readData(key, compression);
+                if (cachedValue) {
+                    console.log(`Cache hit for key=${key}`);
+                    try {
+                        return res.json(JSON.parse(cachedValue));
+                    } catch {
+                        return res.send(cachedValue);
                     }
-
-                    return res.send(data);
-                };
-
-                next();
+                } else {
+                    console.log(`Cache miss for key=${key}, fetching data from the database.`);
+                    const oldSend = res.send;
+                    res.send = function (data) {
+                        res.send = oldSend;
+                        if (res.statusCode.toString().startsWith("2")) {
+                            writeData(key, data, options, compression).then();
+                        }
+                        return res.send(data);
+                    };
+                    next();
+                }
+            } catch (e) {
+                console.error(`Cache middleware error for key=${key}:`, e);
+                next(); // Proceed without cache if there's an error
             }
         } else {
+            console.warn("Redis is not available, skipping caching.");
             next();
         }
     };
@@ -120,4 +122,5 @@ function redisCacheMiddleware(
 module.exports = {
     initializeRedisClient,
     redisCacheMiddleware,
+    invalidateCachedData,
 };
