@@ -6,6 +6,7 @@ const validator = require("validator");
 const nodemailer = require('nodemailer');
 const WorksOn = require('../models/worksOnModel');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 // Create logger instances for different services
 const userServiceLogger = getLogger('user-service');
@@ -21,6 +22,11 @@ const createRefreshToken = (_id, role) => {
 // login a user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  const { method, originalUrl } = req;
+  const deviceId = req.headers['user-agent'] || 'Unknown Device';
+  const ipAddress = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'Unknown IP';
+  const requestId = req.headers['x-request-id'] || uuidv4();
+  const userRemotePort = req.socket?.remotePort
 
   try {
     const user = await User.login(email, password);
@@ -30,9 +36,28 @@ const loginUser = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
 
+    userServiceLogger.info({
+      requestMethod: method,
+      deviceId,
+      ipAddress,
+      originalUrl,
+      userRemotePort,
+      requestId,
+      message: 'Login success'
+    });
+
     res.status(200).json({ token, refreshToken });
   } catch (error) {
-    userServiceLogger.error('Login failed', { email, error: error.message });
+    userServiceLogger.error({
+      requestMethod: method,
+      deviceId,
+      ipAddress,
+      originalUrl,
+      userRemotePort,
+      requestId,
+      error: error.message,
+      message: error.message || 'Login failed'
+    });
     res.status(500).json({ error: error.message });
   }
 };
@@ -40,15 +65,38 @@ const loginUser = async (req, res) => {
 // signup a user
 const signupUser = async (req, res) => {
   const { username, email, password, role, phone_number, address } = req.body;
+  const { method, originalUrl } = req;
+  const deviceId = req.headers['user-agent'] || 'Unknown Device';
+  const ipAddress = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'Unknown IP';
+  const requestId = req.headers['x-request-id'] || uuidv4();
+  const userRemotePort = req.socket?.remotePort
 
   try {
     const user = await User.signup(username, email, password, role, phone_number, address);
 
     const token = createToken(user._id, user.role);
 
+    userServiceLogger.info({
+      requestMethod: method,
+      deviceId,
+      ipAddress,
+      originalUrl,
+      userRemotePort,
+      requestId,
+      message: 'Signup success'
+    });
+
     res.status(201).json({ token });
   } catch (error) {
-    userServiceLogger.error('Signup failed', { email, error: error.message });
+    userServiceLogger.info({
+      requestMethod: method,
+      deviceId,
+      ipAddress,
+      originalUrl,
+      userRemotePort,
+      requestId,
+      message: error.message || 'Signup failed'
+    });
     res.status(400).json({ error: error.message });
   }
 };
@@ -369,7 +417,7 @@ const resetProfilePassword = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword; 
+    user.password = hashedPassword;
     await user.save();
 
     res.send({ Status: 'Password updated successfully' });
@@ -395,9 +443,39 @@ const refreshToken = async (req, res) => {
 
 // logout user
 const logout = (req, res) => {
-  res.clearCookie('refreshToken');
-  userServiceLogger.info(`User ${req.id} logged out successfully.`);
-  res.sendStatus(200);
+  const { method, originalUrl } = req;
+  const deviceId = req.headers['user-agent'] || 'Unknown Device';
+  const ipAddress = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'Unknown IP';
+  const requestId = req.headers['x-request-id'] || uuidv4();
+  const userRemotePort = req.socket?.remotePort
+
+  try {
+    res.clearCookie('refreshToken');
+
+    userServiceLogger.info({
+      requestMethod: method,
+      deviceId,
+      ipAddress,
+      originalUrl,
+      userRemotePort,
+      requestId,
+      message: 'User logs out successfully'
+    });
+
+    res.sendStatus(200);
+  } catch (error) {
+    userServiceLogger.info({
+      requestMethod: method,
+      deviceId,
+      ipAddress,
+      originalUrl,
+      userRemotePort,
+      requestId,
+      message: error.message || 'User logs out failed'
+    });
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+
 };
 
 module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword, getStaffContact, getStaffs };
