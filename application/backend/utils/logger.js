@@ -2,12 +2,20 @@ const { createLogger, format, transports } = require('winston');
 const { Logtail } = require('@logtail/node');
 const { LogtailTransport } = require('@logtail/winston');
 require('winston-daily-rotate-file');
+const moment = require('moment-timezone');
 
 const logtail = new Logtail(process.env.LOGTAIL_TOKEN);
 
+const localTimestampFormat = format((info) => {
+    const localTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    const localOffset = moment().format('Z'); // Local time zone offset in +HH:mm format
+    info.timestamp = `${localTime} ${localOffset}`;
+    return info;
+});
+
 const getLogger = (serviceName) => {
     const commonFormat = format.combine(
-        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        localTimestampFormat(), // Use the custom local timestamp format
         format.errors({ stack: true }),
         format.splat(),
         format.json(),
@@ -17,7 +25,7 @@ const getLogger = (serviceName) => {
         'product-service': 'product',
         'transaction-service': 'transaction',
         'invoice-service': 'invoice',
-        'user-service': 'user'
+        'user-service': 'user',
     };
 
     if (!serviceConfig[serviceName]) {

@@ -1,4 +1,5 @@
 const { getLogger } = require('../utils/logger');  // Import the getLogger function
+const { createSession, invalidateSession, findSessionByRefreshTokenAndUpdate } = require('../controllers/sessionController');
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
@@ -12,7 +13,7 @@ const { v4: uuidv4 } = require('uuid');
 const userServiceLogger = getLogger('user-service');
 
 const createToken = (_id, role) => {
-  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "30m" });
+  return jwt.sign({ _id, role }, process.env.SECRET, { expiresIn: "30s" });
 };
 
 const createRefreshToken = (_id, role) => {
@@ -35,6 +36,17 @@ const loginUser = async (req, res) => {
     const refreshToken = createRefreshToken(user._id, user.role);
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+
+    // Create and save session
+    await createSession({
+      user_id: user._id,
+      email: user.email,
+      username: user.username,
+      access_token: token,
+      refresh_token: refreshToken,
+      device_id: deviceId,
+      ip_address: ipAddress,
+    });
 
     userServiceLogger.info({
       requestMethod: method,
@@ -431,18 +443,31 @@ const resetProfilePassword = async (req, res) => {
 const refreshToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
-  if (!refreshToken) return res.sendStatus(401);
+  if (!refreshToken) {
+    return res.status(401).json({ error: "No refresh token provided" });
+  }
 
-  jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
-    if (err) return res.sendStatus(403);
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
 
     const token = createToken(decoded._id, decoded.role);
+    
+    await findSessionByRefreshTokenAndUpdate(refreshToken, token);
+
     res.json({ token, existToken: true });
-  });
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(403).json({ error: "Refresh token expired, please log in again" });
+    } else if (err.name === 'JsonWebTokenError') {
+      return res.status(403).json({ error: 'Invalid token. Request is not authorized.' });
+    }
+    res.status(500).json({ error: err.message });
+  }
 };
 
 // logout user
-const logout = (req, res) => {
+const logout = async (req, res) => {
   const { method, originalUrl } = req;
   const deviceId = req.headers['user-agent'] || 'Unknown Device';
   const ipAddress = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'Unknown IP';
@@ -451,6 +476,11 @@ const logout = (req, res) => {
 
   try {
     res.clearCookie('refreshToken');
+
+    const isDeleted = await invalidateSession(req.id, req.token)
+    if (!isDeleted) {
+      res.status(200).json({message: "Session not found"})
+    }
 
     userServiceLogger.info({
       requestMethod: method,
@@ -462,7 +492,7 @@ const logout = (req, res) => {
       message: 'User logs out successfully'
     });
 
-    res.sendStatus(200);
+    res.status(200).json({ message: "Log out successfully" });
   } catch (error) {
     userServiceLogger.info({
       requestMethod: method,
@@ -473,9 +503,23 @@ const logout = (req, res) => {
       requestId,
       message: error.message || 'User logs out failed'
     });
-    res.status(500).json({ message: "Internal Server Error" })
+    res.status(500).json({ message: error.message })
   }
-
 };
 
-module.exports = { signupUser, loginUser, updateUser, deleteUser, assignRole, getUsers, getUser, forgotPassword, resetPassword, refreshToken, logout, resetProfilePassword, getStaffContact, getStaffs };
+module.exports = {
+  signupUser,
+  loginUser,
+  updateUser,
+  deleteUser,
+  assignRole,
+  getUsers,
+  getUser,
+  forgotPassword,
+  resetPassword,
+  refreshToken,
+  logout,
+  resetProfilePassword,
+  getStaffContact,
+  getStaffs
+};
